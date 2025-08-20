@@ -186,3 +186,6 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos básicos de Leaflet para evitar problemas de importación */
+
