@@ -140,9 +140,7 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
               </div>
               {/* Indicador de área de trabajadores */}
               <div className="hidden sm:block">
-                <span className="text-white text-sm font-semibold bg-[#3C58CA]/40 backdrop-blur-sm px-4 py-2 rounded-full border border-[#8ed1fc]/30 shadow-lg">
-                  🚀 Panel de Trabajadores
-                </span>
+              
               </div>
             </div>
 
