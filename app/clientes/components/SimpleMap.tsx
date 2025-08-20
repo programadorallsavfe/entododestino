@@ -24,8 +24,18 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
 
-    // Crear mapa centrado en Sudamérica
-    const map = L.map(mapRef.current).setView([-15.7801, -47.9292], 4)
+    // Crear mapa centrado en Sudamérica con zoom fijo
+    const map = L.map(mapRef.current, {
+      zoomControl: true,
+      scrollWheelZoom: false, // Deshabilitar zoom con scroll
+      dragging: false, // Deshabilitar arrastrar el mapa
+      touchZoom: false, // Deshabilitar zoom táctil
+      doubleClickZoom: false, // Deshabilitar zoom con doble clic
+      boxZoom: false, // Deshabilitar zoom con caja
+      keyboard: false, // Deshabilitar controles de teclado
+      bounceAtZoomLimits: false // Deshabilitar rebote en límites de zoom
+    }).setView([-15.7801, -47.9292], 4)
+
     mapInstanceRef.current = map
 
     // Agregar capa OSM
@@ -33,6 +43,11 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19,
     }).addTo(map)
+
+    // Fijar el zoom y centro del mapa
+    map.setMaxBounds(map.getBounds())
+    map.setMinZoom(3)
+    map.setMaxZoom(6)
 
     return () => {
       if (mapInstanceRef.current) {
@@ -123,7 +138,12 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
   return (
     <div 
       ref={mapRef} 
-      className={`w-full h-full min-h-[500px] rounded-lg border ${className}`}
+      className={`w-full h-full min-h-[500px] rounded-lg border map-container-static ${className}`}
+      style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: 10
+      }}
     />
   )
 }

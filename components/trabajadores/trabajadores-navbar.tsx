@@ -341,7 +341,7 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
               <nav className="space-y-2">
                 {navigationItems.map((item) => {
                   const Icon = item.icon
-                  return (
+  return (
                     <Button
                       key={item.name}
                       variant={isActiveRoute(item.route) ? "default" : "ghost"}
@@ -367,7 +367,7 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
               </nav>
             </div>
           </div>
-        </div>
+    </div>
       )}
 
     </>

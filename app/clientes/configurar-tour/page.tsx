@@ -110,7 +110,7 @@ export default function ConfigurarTourPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-120px)]">
         
         {/* Panel izquierdo - Constructor de itinerario */}
-        <div className="h-full">
+        <div className="h-full overflow-y-auto">
           <PanelIzquierdoConstructorItinerario
             destinations={destinations}
             newDestination={newDestination}
@@ -122,8 +122,8 @@ export default function ConfigurarTourPage() {
           />
         </div>
         
-        {/* Panel derecho - Mapa */}
-        <div className="h-full">
+        {/* Panel derecho - Mapa (Fijo) */}
+        <div className="h-full sticky top-0">
           {isClient ? (
             <SimpleMap destinations={destinations} />
           ) : (

@@ -189,3 +189,57 @@
 
 /* Estilos básicos de Leaflet para evitar problemas de importación */
 
+/* Estilos para mapa estático */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+  font-family: inherit;
+}
+
+.leaflet-popup-tip {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* Deshabilitar interacciones del mapa */
+.leaflet-container.leaflet-disabled {
+  pointer-events: none;
+}
+
+.leaflet-container.leaflet-disabled .leaflet-control-zoom {
+  display: none;
+}
+
+/* Asegurar que el mapa no se mueva */
+.map-container-static {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
