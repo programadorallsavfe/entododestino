@@ -1,9 +1,25 @@
 // app/clientes/configurar-tour/page.tsx
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 
-import { SimpleMap } from '@/app/clientes/components/SimpleMap'
 import { Destination, PanelIzquierdoConstructorItinerario } from '../components/panel-izquierdo-constructor-itinerario'
+
+// Importación dinámica del mapa para evitar errores de SSR
+const SimpleMap = dynamic(
+  () => import('../components/SimpleMap').then(mod => ({ default: mod.SimpleMap })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full min-h-[500px] rounded-lg border bg-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Cargando mapa...</p>
+        </div>
+      </div>
+    )
+  }
+)
 
 export default function ConfigurarTourPage() {
   const [destinations, setDestinations] = useState<Destination[]>([
@@ -17,6 +33,12 @@ export default function ConfigurarTourPage() {
   ])
 
   const [newDestination, setNewDestination] = useState('')
+  const [isClient, setIsClient] = useState(false)
+
+  // Verificar que estamos en el cliente
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Base de datos simple de destinos
   const destinationDatabase = {
@@ -84,7 +106,7 @@ export default function ConfigurarTourPage() {
   }
 
   return (
-    <div className=" bg-background p-6">
+    <div className="bg-background p-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-120px)]">
         
         {/* Panel izquierdo - Constructor de itinerario */}
@@ -102,7 +124,16 @@ export default function ConfigurarTourPage() {
         
         {/* Panel derecho - Mapa */}
         <div className="h-full">
-          <SimpleMap destinations={destinations} />
+          {isClient ? (
+            <SimpleMap destinations={destinations} />
+          ) : (
+            <div className="w-full h-full min-h-[500px] rounded-lg border bg-muted/20 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                <p className="text-muted-foreground">Cargando mapa...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
