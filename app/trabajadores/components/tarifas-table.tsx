@@ -272,35 +272,7 @@ export const TarifasTable = () => {
         </CardContent>
       </Card>
 
-      {/* Resumen */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-primary">{tarifas.length}</div>
-              <div className="text-sm text-muted-foreground">Total Tarifas</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-green-600">
-                {tarifas.filter(t => t.temporada === 'Alta').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Temporada Alta</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-600">
-                USD {formatNumber(promedioTarifas)}
-              </div>
-              <div className="text-sm text-muted-foreground">Promedio</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-purple-600">
-                USD {formatNumber(totalTarifas)}
-              </div>
-              <div className="text-sm text-muted-foreground">Valor Total</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
     </div>
   )
 }

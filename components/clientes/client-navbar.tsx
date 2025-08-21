@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronDown, User, Flag, HelpCircle, ShoppingCart, Heart, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ModeToggle } from "@/components/mode-toggle"
 import { useIsMobile } from "@/hooks/use-mobile"
 import Image from "next/image"
+import { useRouter, usePathname } from "next/navigation"
 
 interface ClientNavbarProps {
   className?: string
@@ -15,7 +16,19 @@ interface ClientNavbarProps {
 const ClientNavbar = ({ className }: ClientNavbarProps) => {
   const [selectedCurrency, setSelectedCurrency] = useState("S/ PEN")
   const [selectedLanguage, setSelectedLanguage] = useState("English")
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isMobile = useIsMobile()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleNavigation = (route: string) => {
+    router.push(route)
+  }
+
+  // Cerrar menú móvil cuando cambie la ruta
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
 
   const handleCurrencyChange = (currency: string) => {
     setSelectedCurrency(currency)
@@ -32,7 +45,10 @@ const ClientNavbar = ({ className }: ClientNavbarProps) => {
           {/* Logo y Nombre */}
           <div className="flex items-center space-x-3">
             {/* Logo entododestino */}
-            <div className="relative w-32 h-12">
+            <div 
+              className="relative w-32 h-12 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleNavigation('/')}
+            >
               <Image
                 src="/assets/logoooo.png"
                 alt="entododestino - Siempre contigo"
@@ -46,16 +62,39 @@ const ClientNavbar = ({ className }: ClientNavbarProps) => {
 
           {/* Navegación principal - Solo visible en desktop */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
+            <Button 
+              variant="ghost" 
+              className={`font-medium transition-colors ${
+                pathname === '/clientes/alojamientos' 
+                  ? 'text-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => handleNavigation('/clientes/alojamientos')}
+            >
               Alojamientos
             </Button>
-            <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
+            <Button 
+              variant="ghost" 
+              className={`font-medium transition-colors ${
+                pathname === '/clientes/vuelos' 
+                  ? 'text-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => handleNavigation('/clientes/vuelos')}
+            >
               Vuelos
             </Button>
-            <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
+            <Button 
+              variant="ghost" 
+              className={`font-medium transition-colors ${
+                pathname === '/clientes/paquetes' 
+                  ? 'text-[#8ed1fc] bg-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => handleNavigation('/clientes/paquetes')}
+            >
               Paquetes
             </Button>
-            
           </nav>
 
           {/* Utilidades derecha */}
@@ -133,12 +172,63 @@ const ClientNavbar = ({ className }: ClientNavbarProps) => {
               variant="ghost" 
               size="icon" 
               className="lg:hidden text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Menú móvil */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-[#1e3a8a] border-t border-[#3C58CA]">
+          <div className="px-4 py-4 space-y-3">
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start font-medium transition-colors ${
+                pathname === '/clientes/alojamientos' 
+                  ? 'text-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => {
+                handleNavigation('/clientes/alojamientos')
+                setMobileMenuOpen(false)
+              }}
+            >
+              Alojamientos
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start font-medium transition-colors ${
+                pathname === '/clientes/vuelos' 
+                  ? 'text-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => {
+                handleNavigation('/clientes/vuelos')
+                setMobileMenuOpen(false)
+              }}
+            >
+              Vuelos
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start font-medium transition-colors ${
+                pathname === '/clientes/paquetes' 
+                  ? 'text-[#8ed1fc] bg-[#3C58CA]/30' 
+                  : 'text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20'
+              }`}
+              onClick={() => {
+                handleNavigation('/clientes/paquetes')
+                setMobileMenuOpen(false)
+              }}
+            >
+              Paquetes
+            </Button>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

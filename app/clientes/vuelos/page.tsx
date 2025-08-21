@@ -711,28 +711,7 @@ export default function VuelosPage() {
             </div>
 
             {/* Sugerencias de SOFIA */}
-            <Card className="mt-6 bg-accent/20 border-accent/30">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                    <span className="font-medium">Sugerencias de SOFIA basadas en tu búsqueda</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm text-muted-foreground">1/6</span>
-                    <Button variant="outline" size="sm">
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  ¡Felicitaciones! Tus fechas solicitadas son óptimas. Pero si buscas ahorrar, considera viajar en noviembre, donde los precios son un 10% más bajos.
-                </p>
-              </CardContent>
-            </Card>
+            
           </div>
         </div>
       </div>

@@ -14,6 +14,13 @@ interface TravelPackage {
     price: number
     image: string
     day: string
+    flightDetails: {
+        departure: string
+        arrival: string
+        stops: number
+        duration: string
+        airline: string
+    }
 }
 
 interface TravelCategory {
@@ -25,39 +32,99 @@ interface TravelCategory {
 const travelPackages: TravelPackage[] = [
     {
         id: 1,
-        title: "SUPER JAPON (TOKYO-TOKYO) - EXCLUSIVO SPECIAL TOURS (Lunes)",
-        destinations: 3,
-        nights: 7,
-        price: 73963,
+        title: "PERÚ MÁGICO - MACHU PICCHU Y CUSCO (Lunes)",
+        destinations: 4,
+        nights: 6,
+        price: 1500,
         image: "/assets/banner.jpg",
-        day: "Lunes"
+        day: "Lunes",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "LIM",
+            stops: 0,
+            duration: "4h 30m",
+            airline: "LATAM"
+        }
     },
     {
         id: 2,
-        title: "SUPER JAPON (OSAKA-TOKYO) - EXCLUSIVO SPECIAL TOURS (Lunes)",
+        title: "COLOMBIA CARIBE - CARTAGENA Y SANTA MARTA (Martes)",
         destinations: 3,
-        nights: 7,
-        price: 71589,
+        nights: 5,
+        price: 2100,
         image: "/assets/banner.jpg",
-        day: "Lunes"
+        day: "Martes",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "CTG",
+            stops: 1,
+            duration: "5h 15m",
+            airline: "American Airlines"
+        }
     },
     {
         id: 3,
-        title: "SUPER JAPON (OSAKA-TOKYO) - EXCLUSIVO SPECIAL TOURS (Lunes)",
-        destinations: 3,
+        title: "ECUADOR AVENTURA - QUITO Y GALÁPAGOS (Miércoles)",
+        destinations: 5,
         nights: 7,
-        price: 65063,
+        price: 1999,
         image: "/assets/banner.jpg",
-        day: "Lunes"
+        day: "Miércoles",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "UIO",
+            stops: 0,
+            duration: "4h 45m",
+            airline: "LATAM"
+        }
     },
     {
         id: 4,
-        title: "MARRUECOS IMPERIAL Y EL DESIERTO (1 nt en Jaima) (Sabado)",
-        destinations: 6,
-        nights: 9,
-        price: 48772,
+        title: "ARGENTINA TANGO - BUENOS AIRES Y MENDOZA (Jueves)",
+        destinations: 3,
+        nights: 6,
+        price: 1499,
         image: "/assets/banner.jpg",
-        day: "Sabado"
+        day: "Jueves",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "EZE",
+            stops: 1,
+            duration: "8h 30m",
+            airline: "American Airlines"
+        }
+    },
+    {
+        id: 5,
+        title: "CHILE NATURALEZA - SANTIAGO Y VALLE DEL ELQUI (Viernes)",
+        destinations: 4,
+        nights: 5,
+        price: 1399,
+        image: "/assets/banner.jpg",
+        day: "Viernes",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "SCL",
+            stops: 0,
+            duration: "8h 20m",
+            airline: "LATAM"
+        }
+    },
+    {
+        id: 6,
+        title: "BRASIL PLAYAS - RÍO DE JANEIRO Y FLORIANÓPOLIS (Sábado)",
+        destinations: 3,
+        nights: 6,
+        price: 1799,
+        image: "/assets/banner.jpg",
+        day: "Sábado",
+        flightDetails: {
+            departure: "MIA",
+            arrival: "GIG",
+            stops: 1,
+            duration: "9h 45m",
+            airline: "American Airlines"
+        }
     }
 ]
 
@@ -216,6 +283,50 @@ export const FiltrarViajes = () => {
                                                     <div className="flex items-center gap-2">
                                                         <Moon className="w-5 h-5" />
                                                         <span>{pkg.nights} NOCHES</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Flight Information */}
+                                                <div className="bg-black/30 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <span className="text-sm text-white/80 font-medium">Vuelo de ida y vuelta</span>
+                                                        <span className="text-xs text-blue-300 bg-blue-900/30 px-2 py-1 rounded-full">
+                                                            {pkg.flightDetails.stops === 0 ? 'Directo' : `${pkg.flightDetails.stops} escala${pkg.flightDetails.stops > 1 ? 's' : ''}`}
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center justify-between text-white">
+                                                        <div className="text-center">
+                                                            <p className="text-lg font-bold">{pkg.flightDetails.departure}</p>
+                                                            <p className="text-xs text-white/70">Salida</p>
+                                                        </div>
+                                                        
+                                                        <div className="flex-1 mx-4">
+                                                            <div className="flex items-center justify-center">
+                                                                <div className="w-16 h-0.5 bg-white/40 rounded-full relative">
+                                                                    <div className="absolute -top-1 left-1/2 w-2 h-2 bg-white rounded-full transform -translate-x-1/2"></div>
+                                                                </div>
+                                                                <div className="mx-2">
+                                                                    <svg className="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <div className="w-16 h-0.5 bg-white/40 rounded-full relative">
+                                                                    <div className="absolute -top-1 right-1/2 w-2 h-2 bg-white rounded-full transform translate-x-1/2"></div>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-center text-xs text-white/70 mt-1">{pkg.flightDetails.duration}</p>
+                                                        </div>
+                                                        
+                                                        <div className="text-center">
+                                                            <p className="text-lg font-bold">{pkg.flightDetails.arrival}</p>
+                                                            <p className="text-xs text-white/70">Llegada</p>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
+                                                        <span className="text-sm text-white/80">Aerolínea: <span className="text-blue-300 font-medium">{pkg.flightDetails.airline}</span></span>
+                                                        <span className="text-xs text-green-300 bg-green-900/30 px-2 py-1 rounded-full">Incluido</span>
                                                     </div>
                                                 </div>
                                             </div>
