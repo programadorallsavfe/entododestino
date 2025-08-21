@@ -93,7 +93,8 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
                 src="${dest.image}" 
                 alt="${dest.name}"
                 class="w-full h-full object-cover"
-                onerror="this.src='/assets/banner.jpg'"
+                onerror="this.src='/assets/banner.jpg'; this.onerror=null;"
+                style="width: 100%; height: 100%; object-fit: cover;"
               />
             </div>
             <div class="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${

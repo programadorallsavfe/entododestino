@@ -1,6 +1,6 @@
 "use client"
-import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -51,8 +51,7 @@ interface ItinerarioResumen {
   estado: 'pendiente' | 'confirmado' | 'pagado'
 }
 
-export default function ResumenItinerarioPage() {
-  const searchParams = useSearchParams()
+function ResumenItinerarioContent() {
   const router = useRouter()
   const [itinerario, setItinerario] = useState<ItinerarioResumen | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -335,7 +334,7 @@ export default function ResumenItinerarioPage() {
                       </div>
                       <div className="flex justify-between text-lg font-bold text-primary">
                         <span>Precio Final</span>
-                        <span>S/ {itinerario.precioDescuento.toFixed(2)}</span>
+                        <span>S/ {itinerario.precioTotal.toFixed(2)}</span>
                       </div>
                     </>
                   )}
@@ -365,7 +364,7 @@ export default function ResumenItinerarioPage() {
                   <Button 
                     onClick={handleDescargarPDF} 
                     variant="outline" 
-                    className="w-full h-12"
+                    className="text-sm"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Descargar PDF
@@ -401,5 +400,20 @@ export default function ResumenItinerarioPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ResumenItinerarioPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    }>
+      <ResumenItinerarioContent />
+    </Suspense>
   )
 }
