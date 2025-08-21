@@ -47,20 +47,15 @@ const ClientNavbar = ({ className }: ClientNavbarProps) => {
           {/* Navegación principal - Solo visible en desktop */}
           <nav className="hidden lg:flex items-center space-x-8">
             <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
-              Tours
+              Alojamientos
             </Button>
             <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
-              Hoteles
+              Vuelos
             </Button>
             <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
               Paquetes
             </Button>
-            <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
-              Contáctanos
-            </Button>
-            <Button variant="ghost" className="text-white hover:text-[#8ed1fc] hover:bg-[#3C58CA]/20 font-medium">
-              Mi Cuenta
-            </Button>
+            
           </nav>
 
           {/* Utilidades derecha */}
