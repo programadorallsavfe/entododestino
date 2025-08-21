@@ -42,6 +42,8 @@ interface PanelIzquierdoConstructorItinerarioProps {
   removeDestination: (id: string) => void
   updateDestination: (id: string, updates: Partial<Destination>) => void
   finishItinerary: () => void
+  onContinue?: () => void // Nueva prop opcional para manejar la continuación
+  isWizard?: boolean // Nueva prop para identificar si está en modo wizard
 }
 
 export const PanelIzquierdoConstructorItinerario = ({
@@ -51,27 +53,35 @@ export const PanelIzquierdoConstructorItinerario = ({
   addDestination,
   removeDestination,
   updateDestination,
-  finishItinerary
+  finishItinerary,
+  onContinue,
+  isWizard = false
 }: PanelIzquierdoConstructorItinerarioProps) => {
   const router = useRouter()
 
   const handleFinishItinerary = () => {
-    // Guardar los datos del itinerario en localStorage o estado global
-    const itinerarioData = {
-      destinations,
-      fechaInicio: '23 Septiembre 2025',
-      fechaFin: '29 Septiembre 2025',
-      duracion: 7,
-      personas: 2,
-      serviciosIncluidos: ['Hoteles', 'Tours', 'Visitas guiadas', 'Traslados', 'Alimentación'],
-      precioTotal: 2899.99,
-      precioDescuento: 2599.99
+    if (isWizard && onContinue) {
+      // Si está en modo wizard, usar la función personalizada
+      onContinue()
+    } else {
+      // Comportamiento original para /clientes/configurar-tour
+      // Guardar los datos del itinerario en localStorage o estado global
+      const itinerarioData = {
+        destinations,
+        fechaInicio: '23 Septiembre 2025',
+        fechaFin: '29 Septiembre 2025',
+        duracion: 7,
+        personas: 2,
+        serviciosIncluidos: ['Hoteles', 'Tours', 'Visitas guiadas', 'Traslados', 'Alimentación'],
+        precioTotal: 2899.99,
+        precioDescuento: 2599.99
+      }
+      
+      localStorage.setItem('itinerarioConfigurado', JSON.stringify(itinerarioData))
+      
+      // Redirigir a la página de resumen
+      router.push('/clientes/resumen-itinerario')
     }
-    
-    localStorage.setItem('itinerarioConfigurado', JSON.stringify(itinerarioData))
-    
-    // Redirigir a la página de resumen
-    router.push('/clientes/resumen-itinerario')
   }
 
   return (
