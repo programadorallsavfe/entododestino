@@ -62,14 +62,14 @@ export const TrabajadoresSidebar = () => {
       ]
     },
     {
-      id: 'reservas',
-      label: 'Reservas',
+      id: 'cotizaciones',
+      label: 'Cotizaciones',
       icon: <Calendar className="w-4 h-4" />,
-      href: '/trabajadores/reservas',
+      href: '/trabajadores/cotizaciones',
       badge: '25',
       subItems: [
-        { id: 'lista-reservas', label: 'Todas las Reservas', icon: <Calendar className="w-4 h-4" />, href: '/trabajadores/reservas/lista' },
-        { id: 'nueva-reserva', label: 'Nueva Reserva', icon: <Calendar className="w-4 h-4" />, href: '/trabajadores/reservas/nueva' }
+        { id: 'lista-cotizaciones', label: 'Todas las Cotizaciones', icon: <Calendar className="w-4 h-4" />, href: '/trabajadores/cotizaciones/lista' },
+        { id: 'nueva-cotizacion', label: 'Nueva Cotización', icon: <Calendar className="w-4 h-4" />, href: '/trabajadores/cotizaciones/nueva' }
       ]
     },
     {

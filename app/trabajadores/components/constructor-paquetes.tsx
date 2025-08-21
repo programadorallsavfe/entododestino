@@ -251,50 +251,34 @@ export const ConstructorPaquetes = ({ isOpen, onClose }: ConstructorPaquetesProp
             <div className="p-2 bg-primary/10 rounded-full flex-shrink-0">
               <Package className="w-6 h-6 text-primary" />
             </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-xl font-bold text-foreground">Constructor de Paquetes Turísticos</h2>
-              <p className="text-sm text-muted-foreground mt-1">Paso {currentStep} de 2: {currentStep === 1 ? 'Construir Itinerario' : 'Configurar Paquete'}</p>
-              <p className="text-xs text-blue-600 mt-1">
-                💡 Destinos disponibles: Río de Janeiro, São Paulo, Buenos Aires, Santiago, Bogotá, Quito, La Paz, Asunción, Montevideo, Caracas
-              </p>
-            </div>
           </div>
           
-          {/* Tarjeta de Resumen del Paquete */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="bg-white rounded-lg p-3 border shadow-sm min-w-0">
-              <div className="text-center">
-                <div className="text-sm font-medium text-gray-600">Paquete en Construcción</div>
-                <div className="text-base font-bold text-primary truncate">{packageInfo.name}</div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {packageInfo.startDate} - {packageInfo.endDate}
-                </div>
-                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-gray-600">
-                  <span>📅 {packageInfo.duration}</span>
-                  <span>🌙 {packageInfo.nights} noches</span>
-                  <span>👥 {packageInfo.travelers} viajeros</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {currentStep === 2 && (
-                <Button
-                  onClick={handleFinishPackage}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm h-10"
-                >
-                  Crear Paquete
-                </Button>
-              )}
+          <div className="flex items-center gap-2">
+            {currentStep === 1 && (
               <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-10 w-10 hover:bg-red-100 hover:text-red-600 transition-colors"
+                onClick={nextStep}
+                disabled={destinations.length < 2}
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-2 text-sm h-10"
               >
-                <X className="w-5 h-5" />
+                Siguiente →
               </Button>
-            </div>
+            )}
+            {currentStep === 2 && (
+              <Button
+                onClick={handleFinishPackage}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm h-10"
+              >
+                Crear Paquete
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-10 w-10 hover:bg-red-100 hover:text-red-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </Button>
           </div>
         </div>
 
@@ -451,33 +435,9 @@ export const ConstructorPaquetes = ({ isOpen, onClose }: ConstructorPaquetesProp
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-                          <select
-                            value={packageInfo.category}
-                            onChange={(e) => setPackageInfo(prev => ({ ...prev, category: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                          >
-                            <option value="Aventura">Aventura</option>
-                            <option value="Cultural">Cultural</option>
-                            <option value="Relax">Relax</option>
-                            <option value="Gastronómico">Gastronómico</option>
-                            <option value="Ecoturismo">Ecoturismo</option>
-                          </select>
-                        </div>
+                      
                         
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Dificultad</label>
-                          <select
-                            value={packageInfo.difficulty}
-                            onChange={(e) => setPackageInfo(prev => ({ ...prev, difficulty: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                          >
-                            <option value="Fácil">Fácil</option>
-                            <option value="Moderado">Moderado</option>
-                            <option value="Difícil">Difícil</option>
-                          </select>
-                        </div>
+                       
                       </div>
                     </div>
                   </div>
@@ -643,6 +603,14 @@ export const ConstructorPaquetes = ({ isOpen, onClose }: ConstructorPaquetesProp
                   className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
                 >
                   Siguiente →
+                </Button>
+              )}
+              {currentStep === 2 && (
+                <Button
+                  onClick={handleFinishPackage}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+                >
+                  Finalizar Paquete
                 </Button>
               )}
             </div>

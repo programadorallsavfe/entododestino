@@ -469,8 +469,7 @@ export default function SolicitudesPaquetesPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Solicitudes de Paquetes</h1>
-            <p className="text-muted-foreground">Gestiona y revisa las solicitudes de paquetes turísticos</p>
+            <h1 className="text-3xl font-bold text-foreground">Solicitudes de Cotizaciones</h1>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline">
@@ -480,6 +479,10 @@ export default function SolicitudesPaquetesPage() {
             <Button>
               <Search className="w-4 h-4 mr-2" />
               Buscar
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90">
+              <Package className="w-4 h-4 mr-2" />
+              Crear Cotización
             </Button>
           </div>
         </div>

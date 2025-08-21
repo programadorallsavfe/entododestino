@@ -106,10 +106,10 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
       description: 'Gestión de itinerarios'
     },
     {
-      name: 'Reservas',
+      name: 'Cotizaciones',
       route: '/trabajadores/solicitudes-paquetes',
       icon: Calendar,
-      description: 'Sistema de reservas'
+      description: 'Solicitud de cotizaciones'
     },
     {
       name: 'Tarifas',
