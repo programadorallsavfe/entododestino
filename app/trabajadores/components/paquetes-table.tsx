@@ -15,7 +15,11 @@ import {
   Hotel,
   Bus,
   UtensilsCrossed,
-  Ticket
+  Ticket,
+  X,
+  AlertTriangle,
+  CheckCircle,
+  Info
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,6 +28,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
+import { ConstructorPaquetes } from './constructor-paquetes'
 
 interface Paquete {
   id: string
@@ -51,9 +61,18 @@ export const PaquetesTable = () => {
   const [statusFilter, setStatusFilter] = useState<string>('todos')
   const [categoryFilter, setCategoryFilter] = useState<string>('todos')
   const [destinoFilter, setDestinoFilter] = useState<string>('todos')
+  
+  // Estados para modales y acciones
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [constructorPaquetesOpen, setConstructorPaquetesOpen] = useState(false)
+  const [selectedPaquete, setSelectedPaquete] = useState<Paquete | null>(null)
+  const [editingPaquete, setEditingPaquete] = useState<Paquete | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Mock data basado en paquetes reales
-  const paquetes: Paquete[] = [
+  const [paquetes, setPaquetes] = useState<Paquete[]>([
     {
       id: '1',
       nombre: 'Arequipa Aventurero',
@@ -174,13 +193,95 @@ export const PaquetesTable = () => {
       idiomas: ['Español'],
       minimoPersonas: 2
     }
-  ]
+  ])
 
   const destinos = ['Arequipa', 'Cusco', 'Chachapoyas', 'Ayacucho', 'Cajamarca', 'Lima', 'Trujillo']
   const categorias = [
     'Turismo Cultural', 'Turismo de Aventura', 'Turismo de Naturaleza', 
     'Ecoturismo', 'Gastronomía', 'Turismo Rural', 'Turismo Místico'
   ]
+
+  // Funciones para manejar acciones
+  const handleView = (paquete: Paquete) => {
+    setSelectedPaquete(paquete)
+    setViewModalOpen(true)
+  }
+
+  const handleEdit = (paquete: Paquete) => {
+    setEditingPaquete({ ...paquete })
+    setEditModalOpen(true)
+  }
+
+  const handleDelete = (paquete: Paquete) => {
+    setSelectedPaquete(paquete)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleNewPaquete = () => {
+    setConstructorPaquetesOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!selectedPaquete) return
+    
+    setIsLoading(true)
+    try {
+      // Simular llamada a API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setPaquetes(prev => prev.filter(p => p.id !== selectedPaquete.id))
+      toast.success('Paquete eliminado exitosamente')
+      setDeleteDialogOpen(false)
+      setSelectedPaquete(null)
+    } catch (error) {
+      toast.error('Error al eliminar el paquete')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingPaquete) return
+    
+    setIsLoading(true)
+    try {
+      // Simular llamada a API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setPaquetes(prev => prev.map(p => 
+        p.id === editingPaquete.id ? editingPaquete : p
+      ))
+      toast.success('Paquete actualizado exitosamente')
+      setEditModalOpen(false)
+      setEditingPaquete(null)
+    } catch (error) {
+      toast.error('Error al actualizar el paquete')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleInputChange = (field: keyof Paquete, value: any) => {
+    if (!editingPaquete) return
+    
+    setEditingPaquete(prev => {
+      if (!prev) return prev
+      
+      if (field === 'servicios' || field === 'idiomas') {
+        // Manejar arrays
+        const currentValue = prev[field] as string[]
+        const newValue = value.includes(',') ? value.split(',').map((s: string) => s.trim()) : [value]
+        return { ...prev, [field]: newValue }
+      }
+      
+      if (field === 'precioOriginal' || field === 'precioDescuento' || field === 'capacidad' || field === 'reservas' || field === 'minimoPersonas') {
+        // Manejar números
+        return { ...prev, [field]: parseFloat(value) || 0 }
+      }
+      
+      return { ...prev, [field]: value }
+    })
+  }
 
   const getStatusBadge = (estado: string) => {
     const variants = {
@@ -304,7 +405,7 @@ export const PaquetesTable = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleNewPaquete}>
               <Package className="w-4 h-4 mr-2" />
               Nuevo Paquete
             </Button>
@@ -427,13 +528,31 @@ export const PaquetesTable = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
+                        onClick={() => handleView(paquete)}
+                        title="Ver detalles"
+                      >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
+                        onClick={() => handleEdit(paquete)}
+                        title="Editar paquete"
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-red-100"
+                        onClick={() => handleDelete(paquete)}
+                        title="Eliminar paquete"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -445,8 +564,421 @@ export const PaquetesTable = () => {
         </CardContent>
       </Card>
 
-      
-    
+      {/* Modal de Vista Detallada */}
+      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-primary" />
+              Detalles del Paquete
+            </DialogTitle>
+            <DialogDescription>
+              Información completa del paquete turístico
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedPaquete && (
+            <div className="space-y-6">
+              {/* Header del Paquete */}
+              <div className="flex items-start gap-4">
+                <Avatar className="w-20 h-20">
+                  <AvatarImage src={selectedPaquete.imagen} alt={selectedPaquete.nombre} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-lg">
+                    <Package className="w-8 h-8" />
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground">{selectedPaquete.nombre}</h3>
+                    <p className="text-muted-foreground">{selectedPaquete.categoria}</p>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{selectedPaquete.destino}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{selectedPaquete.duracion}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">Mín. {selectedPaquete.minimoPersonas} personas</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    {getStatusBadge(selectedPaquete.estado)}
+                    {getTipoTuristaBadge(selectedPaquete.tipoTurista)}
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      <span className="text-sm font-medium">{selectedPaquete.calificacion}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información de Precios */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Información de Precios</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Precio con Descuento</Label>
+                      <p className="text-2xl font-bold text-green-600">
+                        S/ {formatNumber(selectedPaquete.precioDescuento)}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Precio Original</Label>
+                      <p className="text-lg text-muted-foreground line-through">
+                        S/ {formatNumber(selectedPaquete.precioOriginal)}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedPaquete.ahorro > 0 && (
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <p className="text-green-700 font-medium">
+                        Ahorras S/ {formatNumber(selectedPaquete.ahorro)}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Información de Capacidad */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Capacidad y Reservas</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Capacidad Total</Label>
+                      <p className="text-lg font-medium">{selectedPaquete.capacidad} personas</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Reservas Actuales</Label>
+                      <p className="text-lg font-medium">{selectedPaquete.reservas} personas</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Ocupación</span>
+                      <span>{ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-3">
+                      <div 
+                        className={`h-3 rounded-full transition-all duration-300 ${
+                          ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 80 
+                            ? 'bg-red-500' 
+                            : ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 60 
+                              ? 'bg-yellow-500' 
+                              : 'bg-green-500'
+                        }`}
+                        style={{ width: `${ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%` }}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Servicios e Idiomas */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Servicios Incluidos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedPaquete.servicios.map((servicio, index) => (
+                        <Badge key={index} variant="secondary">
+                          {servicio}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Idiomas Disponibles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedPaquete.idiomas.map((idioma, index) => (
+                        <Badge key={index} variant="outline">
+                          {idioma}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Información Adicional */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Información Adicional</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Fecha de Creación</Label>
+                      <p className="text-sm">{new Date(selectedPaquete.fechaCreacion).toLocaleDateString('es-ES')}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground">ID del Paquete</Label>
+                      <p className="text-sm font-mono text-muted-foreground">#{selectedPaquete.id}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Edición */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="w-5 h-5 text-primary" />
+              Editar Paquete
+            </DialogTitle>
+            <DialogDescription>
+              Modifica la información del paquete turístico
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingPaquete && (
+            <div className="space-y-6">
+              {/* Información Básica */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nombre">Nombre del Paquete</Label>
+                  <Input
+                    id="nombre"
+                    value={editingPaquete.nombre}
+                    onChange={(e) => handleInputChange('nombre', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="destino">Destino</Label>
+                  <Select value={editingPaquete.destino} onValueChange={(value) => handleInputChange('destino', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {destinos.map(destino => (
+                        <SelectItem key={destino} value={destino}>{destino}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="categoria">Categoría</Label>
+                  <Select value={editingPaquete.categoria} onValueChange={(value) => handleInputChange('categoria', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categorias.map(categoria => (
+                        <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="tipoTurista">Tipo de Turista</Label>
+                  <Select value={editingPaquete.tipoTurista} onValueChange={(value) => handleInputChange('tipoTurista', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nacional">Nacional</SelectItem>
+                      <SelectItem value="extranjero">Extranjero</SelectItem>
+                      <SelectItem value="ambos">Ambos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="duracion">Duración</Label>
+                  <Input
+                    id="duracion"
+                    value={editingPaquete.duracion}
+                    onChange={(e) => handleInputChange('duracion', e.target.value)}
+                    placeholder="Ej: 4 Días / 3 Noches"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="capacidad">Capacidad</Label>
+                  <Input
+                    id="capacidad"
+                    type="number"
+                    value={editingPaquete.capacidad}
+                    onChange={(e) => handleInputChange('capacidad', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="minimoPersonas">Mín. Personas</Label>
+                  <Input
+                    id="minimoPersonas"
+                    type="number"
+                    value={editingPaquete.minimoPersonas}
+                    onChange={(e) => handleInputChange('minimoPersonas', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Precios */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="precioOriginal">Precio Original</Label>
+                  <Input
+                    id="precioOriginal"
+                    type="number"
+                    step="0.01"
+                    value={editingPaquete.precioOriginal}
+                    onChange={(e) => handleInputChange('precioOriginal', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="precioDescuento">Precio con Descuento</Label>
+                  <Input
+                    id="precioDescuento"
+                    type="number"
+                    step="0.01"
+                    value={editingPaquete.precioDescuento}
+                    onChange={(e) => handleInputChange('precioDescuento', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Estado y Calificación */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <Select value={editingPaquete.estado} onValueChange={(value) => handleInputChange('estado', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="activo">Activo</SelectItem>
+                      <SelectItem value="inactivo">Inactivo</SelectItem>
+                      <SelectItem value="agotado">Agotado</SelectItem>
+                      <SelectItem value="promocional">Promocional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="calificacion">Calificación</Label>
+                  <Input
+                    id="calificacion"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={editingPaquete.calificacion}
+                    onChange={(e) => handleInputChange('calificacion', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Servicios e Idiomas */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="servicios">Servicios (separados por comas)</Label>
+                  <Textarea
+                    id="servicios"
+                    value={editingPaquete.servicios.join(', ')}
+                    onChange={(e) => handleInputChange('servicios', e.target.value)}
+                    placeholder="Hoteles, Tours, Español, Visitas guiadas"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="idiomas">Idiomas (separados por comas)</Label>
+                  <Textarea
+                    id="idiomas"
+                    value={editingPaquete.idiomas.join(', ')}
+                    onChange={(e) => handleInputChange('idiomas', e.target.value)}
+                    placeholder="Español, Inglés"
+                  />
+                </div>
+              </div>
+
+              {/* Botones de Acción */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditModalOpen(false)}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSaveEdit}
+                  disabled={isLoading}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Confirmación de Eliminación */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              ¿Eliminar Paquete?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente el paquete 
+              <strong> "{selectedPaquete?.nombre}"</strong> y toda su información asociada.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? 'Eliminando...' : 'Eliminar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de Nuevo Paquete */}
+      <ConstructorPaquetes 
+        isOpen={constructorPaquetesOpen}
+        onClose={() => setConstructorPaquetesOpen(false)}
+      />
     </div>
   )
 }

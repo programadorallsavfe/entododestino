@@ -34,8 +34,40 @@ import {
   Heart,
   AlertCircle,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Route,
+  Package
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+// Importación dinámica del mapa para evitar errores de SSR
+const SimpleMap = dynamic(
+  () => import('../../clientes/components/SimpleMap').then(mod => ({ default: mod.SimpleMap })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full min-h-[300px] rounded-lg border bg-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-muted-foreground text-sm">Cargando mapa...</p>
+        </div>
+      </div>
+    )
+  }
+)
+
+interface Destination {
+  id: string
+  name: string
+  lat: number
+  lng: number
+  type: 'start' | 'destination' | 'end'
+  image?: string
+  description?: string
+  nights?: number
+  transportIncluded?: boolean
+  accommodationIncluded?: boolean
+}
 
 interface SolicitudPaquete {
   id: string
@@ -56,6 +88,8 @@ interface SolicitudPaquete {
     tipo: 'aventura' | 'cultural' | 'relax' | 'gastronomico' | 'ecoturismo'
     servicios: string[]
     imagen: string
+    categoria: 'paquete_viaje' | 'paquete_itinerario'
+    destinos: Destination[] // Nueva propiedad para los destinos del paquete
   }
   fechaSolicitud: string
   fechaViaje: string
@@ -76,6 +110,7 @@ export default function SolicitudesPaquetesPage() {
     estado: 'todos',
     prioridad: 'todos',
     destino: 'todos',
+    categoriaPaquete: 'todos', // Nuevo filtro
     fechaDesde: '',
     fechaHasta: ''
   })
@@ -106,7 +141,13 @@ export default function SolicitudesPaquetesPage() {
           precio: 2800,
           tipo: 'aventura',
           servicios: ['Guía local', 'Transporte', 'Alojamiento', 'Alimentación'],
-          imagen: '/assets/banner.jpg'
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_viaje',
+          destinos: [
+            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'start' },
+            { id: 'machu', name: 'Machu Picchu', lat: -13.1631, lng: -72.5450, type: 'destination' },
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
+          ]
         },
         fechaSolicitud: '2024-01-15',
         fechaViaje: '2024-03-20',
@@ -138,7 +179,13 @@ export default function SolicitudesPaquetesPage() {
           precio: 1200,
           tipo: 'gastronomico',
           servicios: ['Chef privado', 'Degustaciones', 'Alojamiento boutique'],
-          imagen: '/assets/banner.jpg'
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_itinerario',
+          destinos: [
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
+            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'destination' },
+            { id: 'arequipa', name: 'Arequipa', lat: -16.4090, lng: -71.5375, type: 'end' }
+          ]
         },
         fechaSolicitud: '2024-01-14',
         fechaViaje: '2024-02-15',
@@ -170,7 +217,13 @@ export default function SolicitudesPaquetesPage() {
           precio: 1800,
           tipo: 'ecoturismo',
           servicios: ['Guía especializado', 'Lodge ecológico', 'Actividades sostenibles'],
-          imagen: '/assets/banner.jpg'
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_viaje',
+          destinos: [
+            { id: 'iquitos', name: 'Iquitos', lat: -3.7450, lng: -73.2422, type: 'start' },
+            { id: 'amazonas', name: 'Amazonas', lat: -3.2500, lng: -65.0000, type: 'destination' },
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
+          ]
         },
         fechaSolicitud: '2024-01-13',
         fechaViaje: '2024-04-10',
@@ -202,7 +255,13 @@ export default function SolicitudesPaquetesPage() {
           precio: 800,
           tipo: 'relax',
           servicios: ['Spa', 'Yoga', 'Alojamiento frente al mar'],
-          imagen: '/assets/banner.jpg'
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_itinerario',
+          destinos: [
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
+            { id: 'paracas', name: 'Paracas', lat: -13.7500, lng: -76.1667, type: 'destination' },
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
+          ]
         },
         fechaSolicitud: '2024-01-12',
         fechaViaje: '2024-02-28',
@@ -215,6 +274,82 @@ export default function SolicitudesPaquetesPage() {
           moneda: 'USD'
         },
         preferencias: ['Habitación con vista al mar', 'Masajes relajantes', 'Silencio']
+      },
+      {
+        id: '5',
+        cliente: {
+          nombre: 'Elena Morales',
+          email: 'elena.morales@email.com',
+          telefono: '+51 995 321 654',
+          avatar: '/assets/banner.jpg',
+          pais: 'México',
+          calificacion: 4.7
+        },
+        paquete: {
+          nombre: 'Ruta Cultural Cusco',
+          destino: 'Cusco, Perú',
+          duracion: 8,
+          personas: 6,
+          precio: 3200,
+          tipo: 'cultural',
+          servicios: ['Guía arqueólogo', 'Museos', 'Sitios históricos', 'Alojamiento colonial'],
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_itinerario',
+          destinos: [
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
+            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'destination' },
+            { id: 'arequipa', name: 'Arequipa', lat: -16.4090, lng: -71.5375, type: 'end' }
+          ]
+        },
+        fechaSolicitud: '2024-01-16',
+        fechaViaje: '2024-05-15',
+        estado: 'pendiente',
+        prioridad: 'alta',
+        comentarios: 'Grupo familiar interesado en historia inca',
+        presupuesto: {
+          min: 3000,
+          max: 4000,
+          moneda: 'USD'
+        },
+        preferencias: ['Guía especializado en historia', 'Hoteles con encanto', 'Experiencias auténticas']
+      },
+      {
+        id: '6',
+        cliente: {
+          nombre: 'Roberto Jiménez',
+          email: 'roberto.jimenez@email.com',
+          telefono: '+51 994 789 123',
+          avatar: '/assets/banner.jpg',
+          pais: 'Colombia',
+          calificacion: 4.6
+        },
+        paquete: {
+          nombre: 'Aventura en Huaraz',
+          destino: 'Huaraz, Perú',
+          duracion: 10,
+          personas: 2,
+          precio: 2200,
+          tipo: 'aventura',
+          servicios: ['Guía de montaña', 'Equipamiento', 'Refugios', 'Alimentación'],
+          imagen: '/assets/banner.jpg',
+          categoria: 'paquete_viaje',
+          destinos: [
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
+            { id: 'huaraz', name: 'Huaraz', lat: -9.0350, lng: -77.6200, type: 'destination' },
+            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
+          ]
+        },
+        fechaSolicitud: '2024-01-17',
+        fechaViaje: '2024-06-20',
+        estado: 'en_revision',
+        prioridad: 'media',
+        comentarios: 'Montañista experimentado, busca desafíos técnicos',
+        presupuesto: {
+          min: 2000,
+          max: 2500,
+          moneda: 'USD'
+        },
+        preferencias: ['Rutas difíciles', 'Equipamiento profesional', 'Guía certificado']
       }
     ]
     setSolicitudes(solicitudesData)
@@ -224,6 +359,7 @@ export default function SolicitudesPaquetesPage() {
     if (filtros.estado !== 'todos' && solicitud.estado !== filtros.estado) return false
     if (filtros.prioridad !== 'todos' && solicitud.prioridad !== filtros.prioridad) return false
     if (filtros.destino !== 'todos' && !solicitud.paquete.destino.includes(filtros.destino)) return false
+    if (filtros.categoriaPaquete !== 'todos' && solicitud.paquete.categoria !== filtros.categoriaPaquete) return false
     return true
   })
 
@@ -302,12 +438,29 @@ export default function SolicitudesPaquetesPage() {
     )
   }
 
+  const renderCategoriaPaquete = (categoria: string) => {
+    const categorias = {
+      paquete_viaje: { color: 'bg-blue-100 text-blue-800', icon: Plane, label: 'Paquete de Viaje' },
+      paquete_itinerario: { color: 'bg-purple-100 text-purple-800', icon: Route, label: 'Paquete de Itinerario' }
+    }
+    const { color, icon: Icon, label } = categorias[categoria as keyof typeof categorias]
+    
+    return (
+      <Badge className={color}>
+        <Icon className="w-3 h-3 mr-1" />
+        {label}
+      </Badge>
+    )
+  }
+
   const estadisticas = {
     total: solicitudes.length,
     pendientes: solicitudes.filter(s => s.estado === 'pendiente').length,
     enRevision: solicitudes.filter(s => s.estado === 'en_revision').length,
     aprobadas: solicitudes.filter(s => s.estado === 'aprobada').length,
-    rechazadas: solicitudes.filter(s => s.estado === 'rechazada').length
+    rechazadas: solicitudes.filter(s => s.estado === 'rechazada').length,
+    paquetesViaje: solicitudes.filter(s => s.paquete.categoria === 'paquete_viaje').length,
+    paquetesItinerario: solicitudes.filter(s => s.paquete.categoria === 'paquete_itinerario').length
   }
 
   return (
@@ -332,7 +485,7 @@ export default function SolicitudesPaquetesPage() {
         </div>
 
         {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-6">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
@@ -402,6 +555,34 @@ export default function SolicitudesPaquetesPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Plane className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Paquetes de Viaje</p>
+                  <p className="text-2xl font-bold text-blue-600">{estadisticas.paquetesViaje}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Route className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Paquetes de Itinerario</p>
+                  <p className="text-2xl font-bold text-purple-600">{estadisticas.paquetesItinerario}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -417,6 +598,32 @@ export default function SolicitudesPaquetesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Categoría de Paquete - NUEVO FILTRO */}
+              <div>
+                <h3 className="font-medium mb-2">Tipo de Paquete</h3>
+                <div className="space-y-2">
+                  {['todos', 'paquete_viaje', 'paquete_itinerario'].map((categoria) => (
+                    <label key={categoria} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="categoriaPaquete"
+                        value={categoria}
+                        checked={filtros.categoriaPaquete === categoria}
+                        onChange={(e) => setFiltros({...filtros, categoriaPaquete: e.target.value})}
+                        className="text-primary"
+                      />
+                      <span className="text-sm">
+                        {categoria === 'todos' ? 'Todos los tipos' : 
+                         categoria === 'paquete_viaje' ? 'Paquetes de Viaje' : 
+                         'Paquetes de Itinerario'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
               {/* Estado */}
               <div>
                 <h3 className="font-medium mb-2">Estado</h3>
@@ -465,7 +672,7 @@ export default function SolicitudesPaquetesPage() {
               <div>
                 <h3 className="font-medium mb-2">Destino</h3>
                 <div className="space-y-2">
-                  {['todos', 'Cusco', 'Lima', 'Iquitos', 'Paracas'].map((destino) => (
+                  {['todos', 'Cusco', 'Lima', 'Iquitos', 'Paracas', 'Huaraz'].map((destino) => (
                     <label key={destino} className="flex items-center space-x-2 cursor-pointer">
                       <input
                         type="radio"
@@ -517,7 +724,10 @@ export default function SolicitudesPaquetesPage() {
                         {/* Detalles del Paquete */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <h4 className="font-medium text-foreground">{solicitud.paquete.nombre}</h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-foreground">{solicitud.paquete.nombre}</h4>
+                              {renderCategoriaPaquete(solicitud.paquete.categoria)}
+                            </div>
                             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                               <MapPin className="w-4 h-4" />
                               <span>{solicitud.paquete.destino}</span>
@@ -611,7 +821,7 @@ export default function SolicitudesPaquetesPage() {
       {/* Modal de Detalle */}
       {modalDetalle && solicitudSeleccionada && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-background rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
             <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-foreground">Detalle de Solicitud</h2>
               <Button
@@ -624,8 +834,8 @@ export default function SolicitudesPaquetesPage() {
             </div>
             
             <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Información del Cliente */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Columna 1: Información del Cliente */}
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold mb-4 text-primary">Información del Cliente</h3>
@@ -668,9 +878,30 @@ export default function SolicitudesPaquetesPage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Presupuesto */}
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <h4 className="font-medium mb-3">Presupuesto</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Rango:</span>
+                        <span className="font-semibold">
+                          {solicitudSeleccionada.presupuesto.moneda} {solicitudSeleccionada.presupuesto.min} - {solicitudSeleccionada.presupuesto.max}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Fecha Solicitud:</span>
+                        <span className="font-medium">{solicitudSeleccionada.fechaSolicitud}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Fecha Viaje:</span>
+                        <span className="font-medium">{solicitudSeleccionada.fechaViaje}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Información del Paquete */}
+                {/* Columna 2: Información del Paquete */}
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold mb-4 text-primary">Detalles del Paquete</h3>
@@ -681,7 +912,8 @@ export default function SolicitudesPaquetesPage() {
                           alt={solicitudSeleccionada.paquete.nombre}
                           className="w-full h-48 object-cover rounded-lg"
                         />
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 right-3 flex gap-2">
+                          {renderCategoriaPaquete(solicitudSeleccionada.paquete.categoria)}
                           {renderTipoPaquete(solicitudSeleccionada.paquete.tipo)}
                         </div>
                       </div>
@@ -722,24 +954,54 @@ export default function SolicitudesPaquetesPage() {
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Presupuesto */}
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <h4 className="font-medium mb-3">Presupuesto</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Rango:</span>
-                        <span className="font-semibold">
-                          {solicitudSeleccionada.presupuesto.moneda} {solicitudSeleccionada.presupuesto.min} - {solicitudSeleccionada.presupuesto.max}
-                        </span>
+                {/* Columna 3: Mapa de la Ruta */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Ruta del Viaje</h3>
+                    
+                    {/* Lista de Destinos */}
+                    <div className="mb-4">
+                      <h4 className="font-medium mb-3">Destinos del Paquete</h4>
+                      <div className="space-y-2">
+                        {solicitudSeleccionada.paquete.destinos.map((destino, index) => (
+                          <div key={destino.id} className="flex items-center space-x-3 p-2 bg-muted/30 rounded-lg">
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                              destino.type === 'start' ? 'bg-green-500' : 
+                              destino.type === 'end' ? 'bg-red-500' : 'bg-blue-500'
+                            }`}>
+                              {destino.type === 'start' ? 'I' : destino.type === 'end' ? 'F' : index}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{destino.name}</p>
+                              {destino.description && (
+                                <p className="text-xs text-muted-foreground">{destino.description}</p>
+                              )}
+                            </div>
+                            {destino.nights && (
+                              <Badge variant="outline" className="text-xs">
+                                {destino.nights} noche{destino.nights > 1 ? 's' : ''}
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Fecha Solicitud:</span>
-                        <span className="font-medium">{solicitudSeleccionada.fechaSolicitud}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Fecha Viaje:</span>
-                        <span className="font-medium">{solicitudSeleccionada.fechaViaje}</span>
+                    </div>
+
+                    {/* Mapa */}
+                    <div className="h-80 w-full">
+                      <SimpleMap destinations={solicitudSeleccionada.paquete.destinos} />
+                    </div>
+
+                    {/* Información de la Ruta */}
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-800 mb-2">Información de la Ruta</h4>
+                      <div className="text-sm text-blue-700 space-y-1">
+                        <p>• <strong>Inicio:</strong> {solicitudSeleccionada.paquete.destinos.find(d => d.type === 'start')?.name}</p>
+                        <p>• <strong>Destinos intermedios:</strong> {solicitudSeleccionada.paquete.destinos.filter(d => d.type === 'destination').length} paradas</p>
+                        <p>• <strong>Final:</strong> {solicitudSeleccionada.paquete.destinos.find(d => d.type === 'end')?.name}</p>
+                        <p>• <strong>Duración total:</strong> {solicitudSeleccionada.paquete.duracion} días</p>
                       </div>
                     </div>
                   </div>
@@ -814,4 +1076,44 @@ export default function SolicitudesPaquetesPage() {
       )}
     </div>
   )
+}
+
+// Estilos CSS personalizados para el mapa
+const mapStyles = `
+  .custom-image-marker {
+    background: transparent !important;
+    border: none !important;
+  }
+  
+  .custom-div-icon {
+    background: transparent !important;
+    border: none !important;
+  }
+  
+  .custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-popup .leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .arrow-marker {
+    background: transparent !important;
+    border: none !important;
+  }
+  
+  .return-arrow-marker {
+    background: transparent !important;
+    border: none !important;
+  }
+`
+
+// Agregar estilos al head del documento
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style')
+  styleElement.textContent = mapStyles
+  document.head.appendChild(styleElement)
 } 

@@ -195,7 +195,35 @@ export const ClientesTable = () => {
           </div>
         </CardContent>
       </Card>
-
+{/* Resumen */}
+<Card className="bg-muted/30">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-primary">{clientes.length}</div>
+              <div className="text-sm text-muted-foreground">Total Clientes</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-600">
+                {clientes.filter(c => c.estado === 'activo').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Activos</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {clientes.filter(c => c.estado === 'premium').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Premium</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-purple-600">
+                S/ {clientes.reduce((sum, c) => sum + c.valorTotal, 0).toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground">Valor Total</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       {/* Tabla de Clientes */}
       <Card>
         <CardContent className="p-0">
@@ -297,37 +325,9 @@ export const ClientesTable = () => {
         </CardContent>
       </Card>
 
-      {/* Resumen */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-primary">{clientes.length}</div>
-              <div className="text-sm text-muted-foreground">Total Clientes</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-green-600">
-                {clientes.filter(c => c.estado === 'activo').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Activos</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {clientes.filter(c => c.estado === 'premium').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Premium</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-purple-600">
-                S/ {clientes.reduce((sum, c) => sum + c.valorTotal, 0).toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">Valor Total</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
     </div>
   )
 }
-
 export default ClientesTable
+
