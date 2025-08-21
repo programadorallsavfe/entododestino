@@ -28,7 +28,9 @@ export default function ConfigurarTourPage() {
       name: 'Lima, Perú',
       lat: -12.0464,
       lng: -77.0428,
-      type: 'start'
+      type: 'start',
+      image: '/assets/banner.jpg',
+      description: 'Capital del Perú, centro gastronómico y cultural'
     }
   ])
 
@@ -40,35 +42,87 @@ export default function ConfigurarTourPage() {
     setIsClient(true)
   }, [])
 
-  // Base de datos simple de destinos
+  // Base de datos simple de destinos con imágenes
   const destinationDatabase = {
-    'Río de Janeiro': { lat: -22.9068, lng: -43.1729 },
-    'São Paulo': { lat: -23.5505, lng: -46.6333 },
-    'Buenos Aires': { lat: -34.6118, lng: -58.3960 },
-    'Santiago': { lat: -33.4489, lng: -70.6693 },
-    'Bogotá': { lat: 4.7110, lng: -74.0721 },
-    'Quito': { lat: -0.2299, lng: -78.5249 },
-    'La Paz': { lat: -16.4897, lng: -68.1193 },
-    'Asunción': { lat: -25.2802, lng: -57.6341 },
-    'Montevideo': { lat: -34.9011, lng: -56.1645 },
-    'Caracas': { lat: 10.4806, lng: -66.9036 }
+    'Río de Janeiro': { 
+      lat: -22.9068, 
+      lng: -43.1729,
+      image: '/assets/banner.jpg',
+      description: 'Ciudad maravillosa con playas y montañas icónicas'
+    },
+    'São Paulo': { 
+      lat: -23.5505, 
+      lng: -46.6333,
+      image: '/assets/banner.jpg',
+      description: 'Metrópolis financiera y cultural de Brasil'
+    },
+    'Buenos Aires': { 
+      lat: -34.6118, 
+      lng: -58.3960,
+      image: '/assets/banner.jpg',
+      description: 'Capital del tango y la cultura porteña'
+    },
+    'Santiago': { 
+      lat: -33.4489, 
+      lng: -70.6693,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Chile entre la cordillera y el mar'
+    },
+    'Bogotá': { 
+      lat: 4.7110, 
+      lng: -74.0721,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Colombia en los Andes'
+    },
+    'Quito': { 
+      lat: -0.2299, 
+      lng: -78.5249,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Ecuador, patrimonio de la humanidad'
+    },
+    'La Paz': { 
+      lat: -16.4897, 
+      lng: -68.1193,
+      image: '/assets/banner.jpg',
+      description: 'Capital administrativa de Bolivia en el altiplano'
+    },
+    'Asunción': { 
+      lat: -25.2802, 
+      lng: -57.6341,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Paraguay a orillas del río'
+    },
+    'Montevideo': { 
+      lat: -34.9011, 
+      lng: -56.1645,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Uruguay con hermosas playas'
+    },
+    'Caracas': { 
+      lat: 10.4806, 
+      lng: -66.9036,
+      image: '/assets/banner.jpg',
+      description: 'Capital de Venezuela en el valle de Caracas'
+    }
   }
 
   const addDestination = () => {
     if (!newDestination.trim()) return
 
-    const coords = destinationDatabase[newDestination as keyof typeof destinationDatabase]
+    const destData = destinationDatabase[newDestination as keyof typeof destinationDatabase]
     
-    if (coords) {
+    if (destData) {
       const newDest: Destination = {
         id: Date.now().toString(),
         name: newDestination,
-        lat: coords.lat,
-        lng: coords.lng,
+        lat: destData.lat,
+        lng: destData.lng,
         type: 'destination',
         nights: 1,
         transportIncluded: true,
-        accommodationIncluded: true
+        accommodationIncluded: true,
+        image: destData.image,
+        description: destData.description
       }
 
       setDestinations(prev => [...prev, newDest])

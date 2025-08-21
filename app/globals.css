@@ -189,12 +189,11 @@
 
 /* Estilos básicos de Leaflet para evitar problemas de importación */
 
-/* Estilos para mapa estático */
+/* Estilos para mapa con navegación habilitada */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  position: sticky !important;
-  top: 0 !important;
+  position: relative !important;
   z-index: 10 !important;
 }
 
@@ -225,21 +224,31 @@
   padding: 2px 4px;
 }
 
-/* Deshabilitar interacciones del mapa */
-.leaflet-container.leaflet-disabled {
-  pointer-events: none;
+/* Permitir interacciones del mapa */
+.leaflet-container {
+  pointer-events: auto;
 }
 
-.leaflet-container.leaflet-disabled .leaflet-control-zoom {
-  display: none;
+.leaflet-container .leaflet-control-zoom {
+  display: block;
 }
 
-/* Asegurar que el mapa no se mueva */
-.map-container-static {
-  position: sticky !important;
-  top: 0 !important;
+/* Mapa con navegación habilitada */
+.map-container-navigable {
+  position: relative !important;
   z-index: 10 !important;
-  transform: none !important;
-  transition: none !important;
+  transition: all 0.3s ease;
+}
+
+/* Estilos para la flecha de retorno */
+.return-arrow-marker {
+  background: transparent !important;
+  border: none !important;
+  filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.4));
+}
+
+.return-arrow-marker div {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  font-weight: bold;
 }
 
