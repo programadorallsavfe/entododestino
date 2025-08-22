@@ -30,7 +30,12 @@ export default function ConfigurarTourPage() {
       lng: -77.0428,
       type: 'start',
       image: '/assets/banner.jpg',
-      description: 'Capital del Perú, centro gastronómico y cultural'
+      description: 'Capital del Perú, centro gastronómico y cultural',
+      startDate: '08 sept 2025',
+      endDate: '09 sept 2025',
+      nights: 1,
+      transportIncluded: true,
+      accommodationIncluded: true
     }
   ])
 
@@ -112,23 +117,30 @@ export default function ConfigurarTourPage() {
     const destData = destinationDatabase[newDestination as keyof typeof destinationDatabase]
     
     if (destData) {
+      // Calcular fecha de inicio basada en el destino anterior
+      const lastDest = destinations[destinations.length - 1]
+      const startDate = lastDest ? lastDest.endDate : '08 sept 2025'
+      
+      // Calcular fecha de fin (1 día después)
+      const endDate = '10 sept 2025' // Esto se puede mejorar con una lógica más sofisticada
+
       const newDest: Destination = {
         id: Date.now().toString(),
         name: newDestination,
         lat: destData.lat,
         lng: destData.lng,
-        type: 'destination',
+        type: destinations.length === 0 ? 'start' : 'destination',
         nights: 1,
         transportIncluded: true,
         accommodationIncluded: true,
         image: destData.image,
-        description: destData.description
+        description: destData.description,
+        startDate,
+        endDate
       }
 
       setDestinations(prev => [...prev, newDest])
       setNewDestination('')
-    } else {
-      alert('Destino no encontrado. Prueba con: Río de Janeiro, São Paulo, Buenos Aires, Santiago, Bogotá, Quito, La Paz, Asunción, Montevideo, Caracas')
     }
   }
 
@@ -145,7 +157,7 @@ export default function ConfigurarTourPage() {
   }
 
   const finishItinerary = () => {
-    // Agregar punto final
+    // Agregar punto final si no existe
     const lastDest = destinations[destinations.length - 1]
     if (lastDest && lastDest.type !== 'end') {
       const endDest: Destination = {
@@ -153,7 +165,12 @@ export default function ConfigurarTourPage() {
         name: 'Lima, Perú',
         lat: -12.0464,
         lng: -77.0428,
-        type: 'end'
+        type: 'end',
+        startDate: lastDest.endDate,
+        endDate: '13 sept 2025',
+        nights: 1,
+        transportIncluded: true,
+        accommodationIncluded: false
       }
       setDestinations(prev => [...prev, endDest])
     }

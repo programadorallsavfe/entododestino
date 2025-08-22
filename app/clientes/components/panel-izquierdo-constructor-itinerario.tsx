@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import { 
   Users, 
@@ -44,6 +45,20 @@ interface PanelIzquierdoConstructorItinerarioProps {
   isWizard?: boolean
 }
 
+// Base de datos de destinos disponibles
+const AVAILABLE_DESTINATIONS = [
+  { name: 'Río de Janeiro', lat: -22.9068, lng: -43.1729, image: '/assets/banner.jpg', description: 'Ciudad maravillosa con playas y montañas icónicas' },
+  { name: 'São Paulo', lat: -23.5505, lng: -46.6333, image: '/assets/banner.jpg', description: 'Metrópolis financiera y cultural de Brasil' },
+  { name: 'Buenos Aires', lat: -34.6118, lng: -58.3960, image: '/assets/banner.jpg', description: 'Capital del tango y la cultura porteña' },
+  { name: 'Santiago', lat: -33.4489, lng: -70.6693, image: '/assets/banner.jpg', description: 'Capital de Chile entre la cordillera y el mar' },
+  { name: 'Bogotá', lat: 4.7110, lng: -74.0721, image: '/assets/banner.jpg', description: 'Capital de Colombia en los Andes' },
+  { name: 'Quito', lat: -0.2299, lng: -78.5249, image: '/assets/banner.jpg', description: 'Capital de Ecuador, patrimonio de la humanidad' },
+  { name: 'La Paz', lat: -16.4897, lng: -68.1193, image: '/assets/banner.jpg', description: 'Capital administrativa de Bolivia en el altiplano' },
+  { name: 'Asunción', lat: -25.2802, lng: -57.6341, image: '/assets/banner.jpg', description: 'Capital de Paraguay a orillas del río' },
+  { name: 'Montevideo', lat: -34.9011, lng: -56.1645, image: '/assets/banner.jpg', description: 'Capital de Uruguay con hermosas playas' },
+  { name: 'Caracas', lat: 10.4806, lng: -66.9036, image: '/assets/banner.jpg', description: 'Capital de Venezuela en el valle de Caracas' }
+]
+
 export const PanelIzquierdoConstructorItinerario = ({
   destinations,
   newDestination,
@@ -81,6 +96,11 @@ export const PanelIzquierdoConstructorItinerario = ({
   const totalNights = destinations.reduce((total, dest) => total + (dest.nights || 0), 0)
   const startDate = destinations[0]?.startDate || '08 sept 2025'
   const endDate = destinations[destinations.length - 1]?.endDate || '13 sept 2025'
+
+  // Filtrar destinos ya agregados para no mostrarlos en el selector
+  const availableDestinations = AVAILABLE_DESTINATIONS.filter(
+    dest => !destinations.some(existing => existing.name === dest.name)
+  )
 
   return (
     <div className="h-full space-y-6 bg-white rounded-lg p-6">
@@ -151,18 +171,20 @@ export const PanelIzquierdoConstructorItinerario = ({
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">{destination.name}</h3>
-                      <Button variant="ghost" size="sm" className="p-1">
-                        <span className="sr-only">Opciones</span>
-                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                        <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="p-1 text-red-500 hover:text-red-700"
+                        onClick={() => removeDestination(destination.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
 
                     {/* Fechas del destino */}
-                                         <p className="text-sm text-gray-600">
-                       {destination.startDate} {'>'} {destination.endDate}
-                     </p>
+                    <p className="text-sm text-gray-600">
+                      {destination.startDate} {'>'} {destination.endDate}
+                    </p>
 
                     {/* Controles de transporte y alojamiento */}
                     <div className="space-y-3">
@@ -234,7 +256,7 @@ export const PanelIzquierdoConstructorItinerario = ({
         ))}
 
         {/* Línea conectora para el próximo destino */}
-        {destinations.length > 0 && (
+        {destinations.length > 0 && availableDestinations.length > 0 && (
           <div className="relative">
             <div className="absolute left-6 top-0 w-0.5 h-8 bg-gray-300 border-l-2 border-dashed border-gray-400">
               <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -252,32 +274,64 @@ export const PanelIzquierdoConstructorItinerario = ({
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-gray-700">¿Tu próximo destino?</h4>
                   
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      placeholder="Destino"
-                      value={newDestination}
-                      onChange={(e) => setNewDestination(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
+                  <div className="space-y-3">
+                    <Select value={newDestination} onValueChange={setNewDestination}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un destino" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableDestinations.map((dest) => (
+                          <SelectItem key={dest.name} value={dest.name}>
+                            <div className="flex items-center space-x-2">
+                              <span>{dest.name}</span>
+                              <span className="text-xs text-gray-500">🇵🇪</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                  {/* Destino sugerido */}
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-900">Lima, Perú</span>
-                      <span className="text-xs text-gray-500">🇵🇪</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-500">sáb. 13 sept 2025 - Fin</span>
-                      <Button variant="ghost" size="sm" className="p-1">
-                        <X className="w-3 h-3" />
+                    {newDestination && (
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-900">{newDestination}</span>
+                          <span className="text-xs text-gray-500">🇵🇪</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">sáb. 13 sept 2025 - Fin</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1"
+                            onClick={() => setNewDestination('')}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {newDestination && (
+                      <Button 
+                        onClick={addDestination}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Agregar Destino
                       </Button>
-                    </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* Mensaje cuando no hay más destinos disponibles */}
+        {availableDestinations.length === 0 && destinations.length > 0 && (
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">Todos los destinos disponibles han sido agregados</p>
           </div>
         )}
       </div>
@@ -287,6 +341,7 @@ export const PanelIzquierdoConstructorItinerario = ({
         <Button 
           onClick={handleFinishItinerario}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3"
+          disabled={destinations.length < 2}
         >
           Continuar
         </Button>

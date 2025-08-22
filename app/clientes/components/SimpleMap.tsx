@@ -193,13 +193,13 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
 
   // Agregar marcadores y líneas cuando cambien los destinos
   useEffect(() => {
-    if (!mapInstanceRef.current || destinations.length < 2 || !isMapLoaded) return
+    if (!mapInstanceRef.current || !isMapLoaded) return
 
     const updateMap = async () => {
       try {
         const L = await import('leaflet')
         
-        // Limpiar capas anteriores
+        // Limpiar capas anteriores (marcadores y líneas)
         const layersToRemove: any[] = []
         mapInstanceRef.current.eachLayer((layer: any) => {
           if (layer instanceof L.Marker || layer instanceof L.Polyline) {
@@ -211,75 +211,80 @@ export const SimpleMap = ({ destinations, className = "" }: SimpleMapProps) => {
           mapInstanceRef.current?.removeLayer(layer)
         })
 
-        // Agregar marcadores con imágenes
-        destinations.forEach((dest, index) => {
-          const marker = L.marker([dest.lat, dest.lng], {
-            icon: createImageMarker(dest, index, L)
-          }).addTo(mapInstanceRef.current!)
+        // Solo agregar marcadores y líneas si hay destinos
+        if (destinations.length > 0) {
+          // Agregar marcadores con imágenes
+          destinations.forEach((dest, index) => {
+            const marker = L.marker([dest.lat, dest.lng], {
+              icon: createImageMarker(dest, index, L)
+            }).addTo(mapInstanceRef.current!)
 
-          // Crear popup personalizado
-          const popupContent = `
-            <div class="p-3 min-w-[200px]">
-              <div class="flex items-center space-x-3 mb-2">
-                ${dest.image ? `
-                  <div class="w-12 h-12 rounded-full overflow-hidden">
-                    <img 
-                      src="${dest.image}" 
-                      alt="${dest.name}"
-                      class="w-full h-full object-cover"
-                      onerror="this.src='/assets/banner.jpg'"
-                    />
+            // Crear popup personalizado
+            const popupContent = `
+              <div class="p-3 min-w-[200px]">
+                <div class="flex items-center space-x-3 mb-2">
+                  ${dest.image ? `
+                    <div class="w-12 h-12 rounded-full overflow-hidden">
+                      <img 
+                        src="${dest.image}" 
+                        alt="${dest.name}"
+                        class="w-full h-full object-cover"
+                        onerror="this.src='/assets/banner.jpg'"
+                      />
+                    </div>
+                  ` : ''}
+                  <div>
+                    <h3 class="font-semibold text-gray-800 text-sm">${dest.name}</h3>
+                    <span class="text-xs px-2 py-1 rounded-full text-white ${
+                      dest.type === 'start' ? 'bg-green-500' : 
+                      dest.type === 'end' ? 'bg-red-500' : 'bg-blue-500'
+                    }">${dest.type === 'start' ? 'Inicio' : dest.type === 'end' ? 'Final' : 'Destino'}</span>
                   </div>
-                ` : ''}
-                <div>
-                  <h3 class="font-semibold text-gray-800 text-sm">${dest.name}</h3>
-                  <span class="text-xs px-2 py-1 rounded-full text-white ${
-                    dest.type === 'start' ? 'bg-green-500' : 
-                    dest.type === 'end' ? 'bg-red-500' : 'bg-blue-500'
-                  }">${dest.type === 'start' ? 'Inicio' : dest.type === 'end' ? 'Final' : 'Destino'}</span>
                 </div>
+                ${dest.description ? `<p class="text-xs text-gray-600">${dest.description}</p>` : ''}
               </div>
-              ${dest.description ? `<p class="text-xs text-gray-600">${dest.description}</p>` : ''}
-            </div>
-          `
+            `
 
-          marker.bindPopup(popupContent, {
-            maxWidth: 250,
-            className: 'custom-popup'
-          })
-        })
-
-        // Agregar líneas con flechas entre destinos consecutivos
-        for (let i = 0; i < destinations.length - 1; i++) {
-          const current = destinations[i]
-          const next = destinations[i + 1]
-          
-          const line = L.polyline(
-            [[current.lat, current.lng], [next.lat, next.lng]],
-            { 
-              color: '#1605ac', 
-              weight: 4, 
-              opacity: 0.8,
-              dashArray: '10, 5'
-            }
-          ).addTo(mapInstanceRef.current!)
-
-          // Agregar flecha en el medio de la línea
-          const midLat = (current.lat + next.lat) / 2
-          const midLng = (current.lng + next.lng) / 2
-          
-          L.marker([midLat, midLng], {
-            icon: L.divIcon({
-              className: 'custom-div-icon arrow-marker',
-              html: `<div class="text-blue-600 text-2xl drop-shadow-lg">→</div>`,
-              iconSize: [24, 24],
-              iconAnchor: [12, 12]
+            marker.bindPopup(popupContent, {
+              maxWidth: 250,
+              className: 'custom-popup'
             })
-          }).addTo(mapInstanceRef.current!)
-        }
+          })
 
-        // Centrar mapa en los destinos
-        centerMapOnDestinations(L)
+          // Agregar líneas con flechas entre destinos consecutivos (solo si hay más de 1)
+          if (destinations.length > 1) {
+            for (let i = 0; i < destinations.length - 1; i++) {
+              const current = destinations[i]
+              const next = destinations[i + 1]
+              
+              const line = L.polyline(
+                [[current.lat, current.lng], [next.lat, next.lng]],
+                { 
+                  color: '#1605ac', 
+                  weight: 4, 
+                  opacity: 0.8,
+                  dashArray: '10, 5'
+                }
+              ).addTo(mapInstanceRef.current!)
+
+              // Agregar flecha en el medio de la línea
+              const midLat = (current.lat + next.lat) / 2
+              const midLng = (current.lng + next.lng) / 2
+              
+              L.marker([midLat, midLng], {
+                icon: L.divIcon({
+                  className: 'custom-div-icon arrow-marker',
+                  html: `<div class="text-blue-600 text-2xl drop-shadow-lg">→</div>`,
+                  iconSize: [24, 24],
+                  iconAnchor: [12, 12]
+                })
+              }).addTo(mapInstanceRef.current!)
+            }
+          }
+
+          // Centrar mapa en los destinos
+          centerMapOnDestinations(L)
+        }
       } catch (error) {
         console.error('Error updating map:', error)
       }
