@@ -88,18 +88,44 @@ const DetallesCotizacionContent = () => {
   const [itinerarioData, setItinerarioData] = useState<ItinerarioData | null>(null);
   const [currentStep, setCurrentStep] = useState<'resumen' | 'datos-cliente' | 'confirmacion' | 'exportacion'>('resumen');
   const [isCallDrawerOpen, setIsCallDrawerOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('+51 ');
+
+  // Función para agregar un número al marcador
+  const handleAddNumber = (digit: string) => {
+    setPhoneNumber(prev => prev + digit);
+  };
+
+  // Función para eliminar el último número
+  const handleDeleteNumber = () => {
+    setPhoneNumber(prev => {
+      if (prev.length <= 4) return '+51 '; // Mantener el prefijo mínimo
+      return prev.slice(0, -1);
+    });
+  };
+
+  // Función para limpiar todo el número
+  const handleClearNumber = () => {
+    setPhoneNumber('+51 ');
+  };
+
+  // Resetear número cuando se abre el drawer
+  useEffect(() => {
+    if (isCallDrawerOpen) {
+      setPhoneNumber('+51 ');
+    }
+  }, [isCallDrawerOpen]);
 
   // Función para iniciar llamada telefónica
-  const handleCall = (phoneNumber: string) => {
+  const handleCall = (phoneNumberToCall: string) => {
     try {
       // En dispositivos móviles, esto abrirá la app de teléfono
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        window.location.href = `tel:${phoneNumber}`;
+        window.location.href = `tel:${phoneNumberToCall}`;
       } else {
         // Para desktop, copiar al portapapeles sin mostrar alertas
-        navigator.clipboard.writeText(phoneNumber);
+        navigator.clipboard.writeText(phoneNumberToCall);
         // Opcional: mostrar un toast o notificación sutil
-        console.log(`Número ${phoneNumber} copiado al portapapeles`);
+        console.log(`Número ${phoneNumberToCall} copiado al portapapeles`);
       }
     } catch (error) {
       console.log('Error al procesar la llamada:', error);
@@ -546,8 +572,12 @@ const DetallesCotizacionContent = () => {
                             
                             {/* Número mostrado */}
                             <div className="px-6 py-6 text-center bg-slate-800/50">
-                              <div className="text-4xl font-bold text-white mb-2">+51 1 234 5678</div>
-                              <div className="text-sm text-slate-400 font-medium">LLAMANDO</div>
+                              <div className="text-4xl font-bold text-white mb-2">
+                                {phoneNumber === '+51 ' ? 'Ingresa número' : phoneNumber}
+                              </div>
+                              <div className="text-sm text-slate-400 font-medium">
+                                {phoneNumber === '+51 ' ? 'LISTO PARA MARCAR' : 'LLAMANDO'}
+                              </div>
                             </div>
                             
                             {/* Teclado numérico */}
@@ -556,19 +586,19 @@ const DetallesCotizacionContent = () => {
                                                                  {/* Primera fila: 1, 2, 3 */}
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('1')}
                                  >
                                    1
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('2')}
                                  >
                                    2
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('3')}
                                  >
                                    3
                                  </button>
@@ -576,19 +606,19 @@ const DetallesCotizacionContent = () => {
                                  {/* Segunda fila: 4, 5, 6 */}
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('4')}
                                  >
                                    4
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('5')}
                                  >
                                    5
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('6')}
                                  >
                                    6
                                  </button>
@@ -596,19 +626,19 @@ const DetallesCotizacionContent = () => {
                                  {/* Tercera fila: 7, 8, 9 */}
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('7')}
                                  >
                                    7
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('8')}
                                  >
                                    8
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('9')}
                                  >
                                    9
                                  </button>
@@ -616,45 +646,60 @@ const DetallesCotizacionContent = () => {
                                  {/* Cuarta fila: *, 0, # */}
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('*')}
                                  >
                                    *
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('0')}
                                  >
                                    0
                                  </button>
                                  <button 
                                    className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
+                                   onClick={() => handleAddNumber('#')}
                                  >
                                    #
                                  </button>
                               </div>
                               
-                              {/* Botón de llamada grande */}
-                              <div className="flex justify-center mb-6">
-                                <button 
-                                  className="w-24 h-24 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border-4 border-green-400/30"
-                                  onClick={() => handleCall('+5112345678')}
-                                >
-                                  <Phone className="w-10 h-10" />
-                                </button>
+
+                              
+                              {/* Botones de acción */}
+                              <div className="flex  gap-4 mb-6">
+                                
+                                {/* Botón de borrar - Centrado arriba */}
+                                <div className="flex justify-center mb-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="w-20 h-20 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg border-4 border-red-400/30"
+                                    onClick={handleDeleteNumber}
+                                    title="Borrar último número"
+                                  >
+                                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-6-2h2v-2h-2v2zm0-4h2v-2h-2v2zm-2-2v2h2v-2h-2zm-2 2h2v-2h-2v2zm0 4h2v-2h-2v2zm-2-2v2h2v-2h-2z"/>
+                                    </svg>
+                                  </Button>
+                                </div>
+                                
+                                {/* Botón de llamar - Centrado */}
+                                <div className=" mb-4 flex  px-4">
+                                  <Button 
+                                    className="w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border-4 border-green-400/30"
+                                    onClick={() => handleCall(phoneNumber)}
+                                    title="Llamar"
+                                  >
+                                    <Phone className="w-10 h-10" />
+                                  </Button>
+                                </div>
+                                
+                                {/* Botón de limpiar - Centrado abajo */}
+                                
                               </div>
                               
-                              {/* Botón de cerrar */}
-                              <div className="text-center">
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  className=""
-                                  onClick={() => setIsCallDrawerOpen(false)}
-                                >
-                                  Cerrar
-                                </Button>
-                              </div>
+                             
                             </div>
                           </div>
                         </DrawerContent>

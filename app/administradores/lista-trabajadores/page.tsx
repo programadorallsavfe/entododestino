@@ -217,10 +217,10 @@ export default function ListaTrabajadoresPageAdministradores() {
       
       {/* Contenido principal */}
       <div className="lg:ml-64 pt-16">
-        <div className="p-6 lg:p-8">
+        <div className="p-2 lg:p-8">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col lg:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-2">
                   Lista de Trabajadores
