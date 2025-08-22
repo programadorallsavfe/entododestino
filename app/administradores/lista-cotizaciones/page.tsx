@@ -589,7 +589,7 @@ export default function SolicitudesPaquetesPage() {
           <Button 
             size="sm" 
             className="bg-[#1605ac] hover:bg-[#1605ac]/90"
-            onClick={() => router.push('/trabajadores/crear-cotizacion')}
+            onClick={() => router.push('/administradores/crear-cotizacion')}
           >
             <Plus className="w-4 h-4 mr-2" />
             Agregar Cotizaciones
