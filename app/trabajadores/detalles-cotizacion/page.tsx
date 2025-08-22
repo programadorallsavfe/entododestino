@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -72,7 +72,18 @@ interface FlightSegment {
   prices: FlightPrice[];
 }
 
-export default function DetallesCotizacionPage() {
+// Componente de carga
+const LoadingComponent = () => (
+  <div className="min-h-screen bg-muted flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Cargando detalles del itinerario...</p>
+    </div>
+  </div>
+);
+
+// Componente principal que usa useSearchParams
+const DetallesCotizacionContent = () => {
   const searchParams = useSearchParams();
   const [itinerarioData, setItinerarioData] = useState<ItinerarioData | null>(null);
   const [currentStep, setCurrentStep] = useState<'resumen' | 'datos-cliente' | 'confirmacion' | 'exportacion'>('resumen');
@@ -293,14 +304,7 @@ export default function DetallesCotizacionPage() {
   };
 
   if (!itinerarioData) {
-    return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Cargando detalles del itinerario...</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   const renderResumen = () => (
@@ -388,7 +392,7 @@ export default function DetallesCotizacionPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {itinerarioData.destinations.map((destination, index) => (
+                {itinerarioData.destinations.map((destination: Destination, index: number) => (
                   <div key={destination.id} className="relative">
                     {/* Línea conectora */}
                     {index > 0 && (
@@ -451,7 +455,7 @@ export default function DetallesCotizacionPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                  {itinerarioData.serviciosIncluidos.map((servicio, index) => (
+                  {itinerarioData.serviciosIncluidos.map((servicio: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                       <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       <span className="text-sm text-foreground">{servicio}</span>
@@ -751,5 +755,13 @@ export default function DetallesCotizacionPage() {
         {currentStep === 'exportacion' && renderExportacion()}
       </div>
     </div>
+  );
+};
+
+export default function DetallesCotizacionPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <DetallesCotizacionContent />
+    </Suspense>
   );
 }
