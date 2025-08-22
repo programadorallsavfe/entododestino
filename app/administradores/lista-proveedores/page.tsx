@@ -318,8 +318,8 @@ const useProveedoresFiltrados = (proveedores: Proveedor[], filtros: FiltrosState
 // ============================================================================
 
 const PageHeader = () => (
-  <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border">
-    <div className="max-w-7xl mx-auto px-6 py-8">
+  <div className="">
+    <div className="">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -778,10 +778,10 @@ export default function ListaProveedoresPage() {
   const proveedoresFiltrados = useProveedoresFiltrados(proveedores, filtros);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="">
       <PageHeader />
       
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className=" px-6 py-8 space-y-8">
         <FiltrosAvanzados 
           filtros={filtros} 
           actualizarFiltro={actualizarFiltro} 
