@@ -152,7 +152,7 @@ export default function VuelosPage() {
   }, [])
 
   const handleComprar = (vueloId: string) => {
-    router.push(`/clientes/vuelos/${vueloId}`)
+    router.push(`/clientes/detalles-vuelos?id=${vueloId}`)
   }
 
   const renderCalificacion = (calificacion: number) => {
