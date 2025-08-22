@@ -99,7 +99,7 @@ export default function Home() {
                   <span>Gestión de usuarios</span>
                 </div>
               </div>
-              <Link href="/administradores">
+              <Link href="/administradores" target="_blank" rel="noopener noreferrer">
                 <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 group-hover:bg-primary transition-colors">
                   Acceder
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -136,7 +136,7 @@ export default function Home() {
                   <span>Explorar destinos</span>
                 </div>
               </div>
-              <Link href="/clientes">
+              <Link href="/clientes" target="_blank" rel="noopener noreferrer">
                 <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 group-hover:bg-secondary transition-colors">
                   Acceder
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -173,7 +173,7 @@ export default function Home() {
                   <span>Reportes operativos</span>
                 </div>
               </div>
-              <Link href="/trabajadores">
+              <Link href="/trabajadores" target="_blank" rel="noopener noreferrer">
                 <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 group-hover:bg-accent transition-colors">
                   Acceder
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
