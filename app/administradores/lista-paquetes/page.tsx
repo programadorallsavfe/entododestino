@@ -11,10 +11,12 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
+import { CustomCalendar } from '@/components/ui/custom-calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { 
   Search, 
   MapPin, 
-  Calendar, 
+  Calendar as CalendarIcon, 
   Users, 
   Plane, 
   Bed,
@@ -101,8 +103,8 @@ interface Paquete {
 export default function PaquetesPage() {
   const [origen, setOrigen] = useState('Lima, Lima, Perú')
   const [destino, setDestino] = useState('Buenos Aires, Argentina')
-  const [fechaInicio, setFechaInicio] = useState('sáb. 23 ago. 2025')
-  const [fechaFin, setFechaFin] = useState('lun. 1 sep. 2025')
+  const [fechaInicio, setFechaInicio] = useState<Date | undefined>(new Date(2025, 7, 23)) // 23 de agosto 2025
+  const [fechaFin, setFechaFin] = useState<Date | undefined>(new Date(2025, 8, 1)) // 1 de septiembre 2025
   const [noches, setNoches] = useState(9)
   const [habitaciones, setHabitaciones] = useState(1)
   const [personas, setPersonas] = useState(2)
@@ -118,6 +120,34 @@ export default function PaquetesPage() {
     calificacion: 0,
     estrellas: 0
   })
+
+  // Función para calcular noches entre dos fechas
+  const calcularNoches = (inicio: Date | undefined, fin: Date | undefined) => {
+    if (!inicio || !fin) return 0
+    const diffTime = Math.abs(fin.getTime() - inicio.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
+  // Actualizar noches cuando cambien las fechas
+  useEffect(() => {
+    const nuevasNoches = calcularNoches(fechaInicio, fechaFin)
+    setNoches(nuevasNoches)
+  }, [fechaInicio, fechaFin])
+
+  // Función para formatear fecha en español
+  const formatearFecha = (fecha: Date | undefined) => {
+    if (!fecha) return 'Seleccionar fecha'
+    
+    const opciones: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }
+    
+    return fecha.toLocaleDateString('es-ES', opciones)
+  }
 
   useEffect(() => {
     // Simular carga de datos de paquetes
@@ -354,12 +384,18 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
                 <Label className="text-sm font-medium text-white">ORIGEN</Label>
                 <div className="relative mt-1">
                   <div className="absolute left-3 top-3 w-3 h-3 bg-white rounded-full"></div>
-                  <Input
-                    placeholder="Ciudad de origen"
-                    value={origen}
-                    onChange={(e) => setOrigen(e.target.value)}
-                    className="pl-8 bg-white text-gray-900"
-                  />
+                  <Select value={origen} onValueChange={setOrigen}>
+                    <SelectTrigger className="pl-8 bg-white text-gray-900 border-0">
+                      <SelectValue placeholder="Ciudad de origen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Lima, Lima, Perú">Lima, Lima, Perú</SelectItem>
+                      <SelectItem value="Cusco, Cusco, Perú">Cusco, Cusco, Perú</SelectItem>
+                      <SelectItem value="Arequipa, Arequipa, Perú">Arequipa, Arequipa, Perú</SelectItem>
+                      <SelectItem value="Trujillo, La Libertad, Perú">Trujillo, La Libertad, Perú</SelectItem>
+                      <SelectItem value="Piura, Piura, Perú">Piura, Piura, Perú</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -384,12 +420,21 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
                 <Label className="text-sm font-medium text-white">DESTINO</Label>
                 <div className="relative mt-1">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <Input
-                    placeholder="Ciudad de destino"
-                    value={destino}
-                    onChange={(e) => setDestino(e.target.value)}
-                    className="pl-10 bg-white text-gray-900"
-                  />
+                  <Select value={destino} onValueChange={setDestino}>
+                    <SelectTrigger className="pl-10 bg-white text-gray-900 border-0">
+                      <SelectValue placeholder="Ciudad de destino" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Buenos Aires, Argentina">Buenos Aires, Argentina</SelectItem>
+                      <SelectItem value="Santiago, Chile">Santiago, Chile</SelectItem>
+                      <SelectItem value="Bogotá, Colombia">Bogotá, Colombia</SelectItem>
+                      <SelectItem value="Ciudad de México, México">Ciudad de México, México</SelectItem>
+                      <SelectItem value="Madrid, España">Madrid, España</SelectItem>
+                      <SelectItem value="París, Francia">París, Francia</SelectItem>
+                      <SelectItem value="Roma, Italia">Roma, Italia</SelectItem>
+                      <SelectItem value="Nueva York, Estados Unidos">Nueva York, Estados Unidos</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -397,11 +442,25 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
               <div>
                 <Label className="text-sm font-medium text-white">FECHAS</Label>
                 <div className="mt-1">
-                  <Input
-                    value={fechaInicio}
-                    onChange={(e) => setFechaInicio(e.target.value)}
-                    className="bg-white text-gray-900"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal bg-white text-gray-900 border-0 hover:bg-gray-50"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {fechaInicio ? formatearFecha(fechaInicio) : <span className="text-muted-foreground">Seleccionar fecha inicio</span>}
+                      </Button>
+                    </PopoverTrigger>
+                                         <PopoverContent className="w-auto p-0 bg-white border border-gray-200 shadow-lg rounded-md" align="start" side="bottom" sideOffset={4}>
+                       <CustomCalendar
+                         selected={fechaInicio}
+                         onSelect={setFechaInicio}
+                         disabled={(date: Date) => date < new Date()}
+                         className="rounded-md"
+                       />
+                     </PopoverContent>
+                  </Popover>
                 </div>
               </div>
 
@@ -409,11 +468,25 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
               <div>
                 <Label className="text-sm font-medium text-white">{noches} NOCHES</Label>
                 <div className="mt-1">
-                  <Input
-                    value={fechaFin}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                    className="bg-white text-gray-900"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal bg-white text-gray-900 border-0 hover:bg-gray-50"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {fechaFin ? formatearFecha(fechaFin) : <span className="text-muted-foreground">Seleccionar fecha fin</span>}
+                      </Button>
+                    </PopoverTrigger>
+                                         <PopoverContent className="w-auto p-0 bg-white border border-gray-200 shadow-lg rounded-md" align="start" side="bottom" sideOffset={4}>
+                       <CustomCalendar
+                         selected={fechaFin}
+                         onSelect={setFechaFin}
+                         disabled={(date: Date) => date <= (fechaInicio || new Date())}
+                         className="rounded-md"
+                       />
+                     </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
@@ -425,11 +498,32 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
                 <Label className="text-sm font-medium text-white">HABITACIONES</Label>
                 <div className="relative mt-1">
                   <Bed className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <Input
-                    value={`${habitaciones} habitación, ${personas} personas`}
-                    className="pl-10 bg-white text-gray-900"
-                    readOnly
-                  />
+                  <Select 
+                    value={`${habitaciones}-${personas}`} 
+                    onValueChange={(value) => {
+                      const [h, p] = value.split('-').map(Number)
+                      setHabitaciones(h)
+                      setPersonas(p)
+                    }}
+                  >
+                    <SelectTrigger className="pl-10 bg-white text-gray-900 border-0">
+                      <SelectValue placeholder="Seleccionar habitaciones y personas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1-1">1 habitación, 1 persona</SelectItem>
+                      <SelectItem value="1-2">1 habitación, 2 personas</SelectItem>
+                      <SelectItem value="1-3">1 habitación, 3 personas</SelectItem>
+                      <SelectItem value="1-4">1 habitación, 4 personas</SelectItem>
+                      <SelectItem value="2-2">2 habitaciones, 2 personas</SelectItem>
+                      <SelectItem value="2-3">2 habitaciones, 3 personas</SelectItem>
+                      <SelectItem value="2-4">2 habitaciones, 4 personas</SelectItem>
+                      <SelectItem value="2-5">2 habitaciones, 5 personas</SelectItem>
+                      <SelectItem value="3-3">3 habitaciones, 3 personas</SelectItem>
+                      <SelectItem value="3-4">3 habitaciones, 4 personas</SelectItem>
+                      <SelectItem value="3-5">3 habitaciones, 5 personas</SelectItem>
+                      <SelectItem value="3-6">3 habitaciones, 6 personas</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -439,10 +533,7 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
                   <Edit className="w-4 h-4 mr-2" />
                   Cambiar ciudad o fechas del alojamiento
                 </Button>
-                <Button variant="ghost" className="text-white hover:text-primary-foreground p-0 h-auto">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Agregar segundo destino para alojarme
-                </Button>
+               
               </div>
 
               {/* Botón de Búsqueda */}
@@ -622,11 +713,11 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
             <Card className="mb-6 bg-orange-50 border-orange-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-5 h-5 text-orange-600" />
-                    <h3 className="text-lg font-semibold text-orange-800">
-                      ¡Paquetes más convenientes!
-                    </h3>
+                                     <div className="flex items-center space-x-2">
+                     <CalendarIcon className="w-5 h-5 text-orange-600" />
+                     <h3 className="text-lg font-semibold text-orange-800">
+                       ¡Paquetes más convenientes!
+                     </h3>
                     <div className="flex space-x-1">
                       <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
                       <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
