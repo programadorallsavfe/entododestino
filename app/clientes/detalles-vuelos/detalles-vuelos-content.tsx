@@ -349,7 +349,7 @@ export function DetallesVuelosContent() {
           {/* Sidebar de reserva y contacto */}
           <div className="space-y-6">
             {/* Tarjeta de reserva */}
-            <Card className="sticky top-24">
+            <Card className=" top-24">
               <CardHeader>
                 <CardTitle className="text-xl">Reservar Vuelo</CardTitle>
               </CardHeader>

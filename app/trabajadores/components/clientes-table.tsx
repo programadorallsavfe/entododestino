@@ -13,7 +13,8 @@ import {
   Star,
   Calendar,
   Phone,
-  Mail
+  Mail,
+  X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,308 +23,158 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 interface Cliente {
   id: string
   nombre: string
+  apellido: string
   email: string
   telefono: string
+  dni: string
   pais: string
   ciudad: string
+  direccion: string
   fechaRegistro: string
   estado: 'lead' | 'cliente'
   calificacion: number
   totalReservas: number
   valorTotal: number
+  notas?: string
+}
+
+interface NuevoCliente {
+  nombre: string
+  apellido: string
+  email: string
+  telefono: string
+  dni: string
+  pais: string
+  ciudad: string
+  direccion: string
+  estado: 'lead' | 'cliente'
+  notas: string
 }
 
 export const ClientesTable = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [estadoFilter, setEstadoFilter] = useState<string>('todos')
   const [paisFilter, setPaisFilter] = useState<string>('todos')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [nuevoCliente, setNuevoCliente] = useState<NuevoCliente>({
+    nombre: '',
+    apellido: '',
+    email: '',
+    telefono: '',
+    dni: '',
+    pais: '',
+    ciudad: '',
+    direccion: '',
+    estado: 'lead',
+    notas: ''
+  })
 
   // Datos de ejemplo
-  const clientes: Cliente[] = [
+  const [clientes, setClientes] = useState<Cliente[]>([
     {
       id: '1',
-      nombre: 'María González',
+      nombre: 'María',
+      apellido: 'González',
       email: 'maria.gonzalez@email.com',
       telefono: '+51 999 123 456',
+      dni: '12345678',
       pais: 'Perú',
       ciudad: 'Lima',
+      direccion: 'Av. Arequipa 123, Lima',
       fechaRegistro: '2024-01-15',
       estado: 'cliente',
       calificacion: 4.8,
       totalReservas: 12,
-      valorTotal: 8500
+      valorTotal: 8500,
+      notas: 'Cliente frecuente, prefiere hoteles de 4-5 estrellas'
     },
     {
       id: '2',
-      nombre: 'Carlos Rodríguez',
+      nombre: 'Carlos',
+      apellido: 'Rodríguez',
       email: 'carlos.rodriguez@email.com',
       telefono: '+51 998 234 567',
+      dni: '23456789',
       pais: 'Perú',
       ciudad: 'Cusco',
+      direccion: 'Calle San Agustín 456, Cusco',
       fechaRegistro: '2024-02-01',
       estado: 'cliente',
       calificacion: 4.5,
       totalReservas: 8,
-      valorTotal: 5200
+      valorTotal: 5200,
+      notas: 'Interesado en tours culturales'
     },
     {
       id: '3',
-      nombre: 'Ana Silva',
+      nombre: 'Ana',
+      apellido: 'Silva',
       email: 'ana.silva@email.com',
       telefono: '+51 997 345 678',
+      dni: '34567890',
       pais: 'Colombia',
       ciudad: 'Bogotá',
+      direccion: 'Carrera 15 #45-67, Bogotá',
       fechaRegistro: '2024-01-20',
       estado: 'cliente',
       calificacion: 4.9,
       totalReservas: 15,
-      valorTotal: 12000
+      valorTotal: 12000,
+      notas: 'Cliente VIP, viaja frecuentemente por trabajo'
     },
     {
       id: '4',
-      nombre: 'Luis Martínez',
+      nombre: 'Luis',
+      apellido: 'Martínez',
       email: 'luis.martinez@email.com',
       telefono: '+51 996 456 789',
+      dni: '45678901',
       pais: 'Chile',
       ciudad: 'Santiago',
+      direccion: 'Av. Providencia 2345, Santiago',
       fechaRegistro: '2024-02-10',
       estado: 'lead',
       calificacion: 4.2,
       totalReservas: 0,
-      valorTotal: 0
+      valorTotal: 0,
+      notas: 'Lead caliente, interesado en paquetes a Perú'
     },
     {
       id: '5',
-      nombre: 'Sofia Herrera',
-      email: 'sofia.herrera@email.com',
-      telefono: '+57 300 123 456',
-      pais: 'Colombia',
-      ciudad: 'Medellín',
-      fechaRegistro: '2024-01-25',
-      estado: 'cliente',
-      calificacion: 4.7,
-      totalReservas: 9,
-      valorTotal: 6800
-    },
-    {
-      id: '6',
-      nombre: 'Diego Morales',
-      email: 'diego.morales@email.com',
-      telefono: '+56 9 8765 4321',
-      pais: 'Chile',
-      ciudad: 'Valparaíso',
+      nombre: 'Carmen',
+      apellido: 'López',
+      email: 'carmen.lopez@email.com',
+      telefono: '+51 995 567 890',
+      dni: '56789012',
+      pais: 'Perú',
+      ciudad: 'Arequipa',
+      direccion: 'Calle San Francisco 789, Arequipa',
       fechaRegistro: '2024-02-15',
       estado: 'lead',
       calificacion: 4.0,
       totalReservas: 0,
-      valorTotal: 0
-    },
-    {
-      id: '7',
-      nombre: 'Carmen Vargas',
-      email: 'carmen.vargas@email.com',
-      telefono: '+51 995 567 890',
-      pais: 'Perú',
-      ciudad: 'Arequipa',
-      fechaRegistro: '2024-01-10',
-      estado: 'cliente',
-      calificacion: 4.6,
-      totalReservas: 6,
-      valorTotal: 4200
-    },
-    {
-      id: '8',
-      nombre: 'Roberto Jiménez',
-      email: 'roberto.jimenez@email.com',
-      telefono: '+54 9 11 2345 6789',
-      pais: 'Argentina',
-      ciudad: 'Buenos Aires',
-      fechaRegistro: '2024-02-20',
-      estado: 'cliente',
-      calificacion: 4.8,
-      totalReservas: 11,
-      valorTotal: 9500
-    },
-    {
-      id: '9',
-      nombre: 'Patricia López',
-      email: 'patricia.lopez@email.com',
-      telefono: '+57 310 987 654',
-      pais: 'Colombia',
-      ciudad: 'Cali',
-      fechaRegistro: '2024-01-30',
-      estado: 'lead',
-      calificacion: 4.3,
-      totalReservas: 0,
-      valorTotal: 0
-    },
-    {
-      id: '10',
-      nombre: 'Fernando Castro',
-      email: 'fernando.castro@email.com',
-      telefono: '+51 994 678 901',
-      pais: 'Perú',
-      ciudad: 'Trujillo',
-      fechaRegistro: '2024-02-05',
-      estado: 'cliente',
-      calificacion: 4.4,
-      totalReservas: 7,
-      valorTotal: 5800
-    },
-    {
-      id: '11',
-      nombre: 'Lucía Mendoza',
-      email: 'lucia.mendoza@email.com',
-      telefono: '+56 9 7654 3210',
-      pais: 'Chile',
-      ciudad: 'Concepción',
-      fechaRegistro: '2024-01-18',
-      estado: 'cliente',
-      calificacion: 4.9,
-      totalReservas: 14,
-      valorTotal: 11000
-    },
-    {
-      id: '12',
-      nombre: 'Miguel Torres',
-      email: 'miguel.torres@email.com',
-      telefono: '+54 9 11 3456 7890',
-      pais: 'Argentina',
-      ciudad: 'Córdoba',
-      fechaRegistro: '2024-02-12',
-      estado: 'lead',
-      calificacion: 4.1,
-      totalReservas: 0,
-      valorTotal: 0
-    },
-    {
-      id: '13',
-      nombre: 'Elena Ruiz',
-      email: 'elena.ruiz@email.com',
-      telefono: '+57 320 456 789',
-      pais: 'Colombia',
-      ciudad: 'Cartagena',
-      fechaRegistro: '2024-01-22',
-      estado: 'cliente',
-      calificacion: 4.7,
-      totalReservas: 10,
-      valorTotal: 7800
-    },
-    {
-      id: '14',
-      nombre: 'Javier Moreno',
-      email: 'javier.moreno@email.com',
-      telefono: '+51 993 789 012',
-      pais: 'Perú',
-      ciudad: 'Piura',
-      fechaRegistro: '2024-02-08',
-      estado: 'cliente',
-      calificacion: 4.5,
-      totalReservas: 5,
-      valorTotal: 3600
-    },
-    {
-      id: '15',
-      nombre: 'Isabella Santos',
-      email: 'isabella.santos@email.com',
-      telefono: '+55 11 98765 4321',
-      pais: 'Brasil',
-      ciudad: 'São Paulo',
-      fechaRegistro: '2024-01-28',
-      estado: 'lead',
-      calificacion: 4.0,
-      totalReservas: 0,
-      valorTotal: 0
-    },
-    {
-      id: '16',
-      nombre: 'Ricardo Flores',
-      email: 'ricardo.flores@email.com',
-      telefono: '+56 9 6543 2109',
-      pais: 'Chile',
-      ciudad: 'La Serena',
-      fechaRegistro: '2024-02-18',
-      estado: 'cliente',
-      calificacion: 4.6,
-      totalReservas: 8,
-      valorTotal: 6200
-    },
-    {
-      id: '17',
-      nombre: 'Valentina Rojas',
-      email: 'valentina.rojas@email.com',
-      telefono: '+57 315 321 654',
-      pais: 'Colombia',
-      ciudad: 'Barranquilla',
-      fechaRegistro: '2024-01-12',
-      estado: 'cliente',
-      calificacion: 4.8,
-      totalReservas: 13,
-      valorTotal: 9200
-    },
-    {
-      id: '18',
-      nombre: 'Andrés Vega',
-      email: 'andres.vega@email.com',
-      telefono: '+51 992 890 123',
-      pais: 'Perú',
-      ciudad: 'Chiclayo',
-      fechaRegistro: '2024-02-25',
-      estado: 'lead',
-      calificacion: 4.2,
-      totalReservas: 0,
-      valorTotal: 0
-    },
-    {
-      id: '19',
-      nombre: 'Camila Ortiz',
-      email: 'camila.ortiz@email.com',
-      telefono: '+54 9 11 4567 8901',
-      pais: 'Argentina',
-      ciudad: 'Rosario',
-      fechaRegistro: '2024-01-05',
-      estado: 'cliente',
-      calificacion: 4.9,
-      totalReservas: 16,
-      valorTotal: 13500
-    },
-    {
-      id: '20',
-      nombre: 'Gabriel Paredes',
-      email: 'gabriel.paredes@email.com',
-      telefono: '+56 9 5432 1098',
-      pais: 'Chile',
-      ciudad: 'Antofagasta',
-      fechaRegistro: '2024-02-22',
-      estado: 'cliente',
-      calificacion: 4.4,
-      totalReservas: 6,
-      valorTotal: 4800
+      valorTotal: 0,
+      notas: 'Interesada en tours gastronómicos'
     }
-  ]
+  ])
 
   const paises = ['Perú', 'Colombia', 'Chile', 'Argentina', 'Brasil', 'Ecuador', 'Bolivia']
 
-  const getEstadoBadge = (estado: string) => {
-    const variants = {
-      cliente: 'bg-green-100 text-green-800 border-green-200',
-      lead: 'bg-blue-100 text-blue-800 border-blue-200'
-    }
-    
-    return (
-      <Badge className={`${variants[estado as keyof typeof variants]} border`}>
-        {estado === 'cliente' ? 'Cliente' : 'Lead'}
-      </Badge>
-    )
-  }
-
+  // Filtrar clientes
   const filteredClientes = clientes.filter(cliente => {
     const matchesSearch = cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cliente.email.toLowerCase().includes(searchTerm.toLowerCase())
+                         cliente.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cliente.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cliente.telefono.includes(searchTerm) ||
+                         cliente.dni.includes(searchTerm)
+    
     const matchesEstado = estadoFilter === 'todos' || cliente.estado === estadoFilter
     const matchesPais = paisFilter === 'todos' || cliente.pais === paisFilter
     
@@ -336,73 +187,361 @@ export const ClientesTable = () => {
     setPaisFilter('todos')
   }
 
+  const getEstadoBadge = (estado: string) => {
+    if (estado === 'cliente') {
+      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Cliente</Badge>
+    } else {
+      return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Lead</Badge>
+    }
+  }
+
+  const handleInputChange = (field: keyof NuevoCliente, value: string) => {
+    setNuevoCliente(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const [editingClienteId, setEditingClienteId] = useState<string | null>(null)
+
+  const handleSubmit = () => {
+    if (!nuevoCliente.nombre || !nuevoCliente.apellido || !nuevoCliente.email || !nuevoCliente.telefono || !nuevoCliente.dni) {
+      alert('Por favor completa todos los campos obligatorios')
+      return
+    }
+
+    if (editingClienteId) {
+      // Editar cliente existente
+      setClientes(prev => prev.map(cliente => 
+        cliente.id === editingClienteId 
+          ? { ...cliente, ...nuevoCliente }
+          : cliente
+      ))
+      setEditingClienteId(null)
+    } else {
+      // Crear nuevo cliente
+      const nuevoClienteCompleto: Cliente = {
+        id: (clientes.length + 1).toString(),
+        ...nuevoCliente,
+        fechaRegistro: new Date().toISOString().split('T')[0],
+        calificacion: 0,
+        totalReservas: 0,
+        valorTotal: 0
+      }
+      setClientes(prev => [...prev, nuevoClienteCompleto])
+    }
+    
+    // Limpiar formulario
+    setNuevoCliente({
+      nombre: '',
+      apellido: '',
+      email: '',
+      telefono: '',
+      dni: '',
+      pais: '',
+      ciudad: '',
+      direccion: '',
+      estado: 'lead',
+      notas: ''
+    })
+    
+    setEditingClienteId(null)
+    setIsModalOpen(false)
+  }
+
+  const resetForm = () => {
+    setNuevoCliente({
+      nombre: '',
+      apellido: '',
+      email: '',
+      telefono: '',
+      dni: '',
+      pais: '',
+      ciudad: '',
+      direccion: '',
+      estado: 'lead',
+      notas: ''
+    })
+    setEditingClienteId(null)
+  }
+
+  const handleDeleteCliente = (id: string) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+      setClientes(prev => prev.filter(cliente => cliente.id !== id))
+    }
+  }
+
+  const handleEditCliente = (cliente: Cliente) => {
+    setNuevoCliente({
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
+      email: cliente.email,
+      telefono: cliente.telefono,
+      dni: cliente.dni,
+      pais: cliente.pais,
+      ciudad: cliente.ciudad,
+      direccion: cliente.direccion,
+      estado: cliente.estado,
+      notas: cliente.notas || ''
+    })
+    setEditingClienteId(cliente.id)
+    setIsModalOpen(true)
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header y Filtros */}
+      {/* Header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Users className="w-5 h-5 text-primary" />
+            <Users className="w-6 h-6" />
             <span>Gestión de Clientes</span>
-            <Badge variant="secondary" className="ml-2">
-              {filteredClientes.length} clientes
-            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nombre o email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-border bg-background text-foreground"
-              />
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            {/* Filtros */}
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar por nombre, email, teléfono o DNI..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={estadoFilter} onValueChange={setEstadoFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los estados</SelectItem>
+                  <SelectItem value="cliente">Clientes</SelectItem>
+                  <SelectItem value="lead">Leads</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={paisFilter} onValueChange={setPaisFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="País" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los países</SelectItem>
+                  <SelectItem value="Perú">Perú</SelectItem>
+                  <SelectItem value="Colombia">Colombia</SelectItem>
+                  <SelectItem value="Chile">Chile</SelectItem>
+                  <SelectItem value="Argentina">Argentina</SelectItem>
+                  <SelectItem value="México">México</SelectItem>
+                  <SelectItem value="España">España</SelectItem>
+                  <SelectItem value="Estados Unidos">Estados Unidos</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
-            <Select value={estadoFilter} onValueChange={setEstadoFilter}>
-              <SelectTrigger className="w-full sm:w-40 border-border bg-background text-foreground">
-                <SelectValue placeholder="Estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los estados</SelectItem>
-                <SelectItem value="cliente">Clientes</SelectItem>
-                <SelectItem value="lead">Leads</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={paisFilter} onValueChange={setPaisFilter}>
-              <SelectTrigger className="w-full sm:w-40 border-border bg-background text-foreground">
-                <SelectValue placeholder="País" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los países</SelectItem>
-                {paises.map(pais => (
-                  <SelectItem key={pais} value={pais}>{pais}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
+            {/* Botones de acción */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
                 onClick={limpiarFiltros}
                 className="border-border hover:bg-accent hover:text-accent-foreground"
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Limpiar
               </Button>
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Cliente
-              </Button>
+              
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nuevo Cliente
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                     <DialogHeader>
+                     <DialogTitle className="flex items-center space-x-2">
+                       {editingClienteId ? (
+                         <>
+                           <Edit className="w-5 h-5" />
+                           <span>Editar Cliente</span>
+                         </>
+                       ) : (
+                         <>
+                           <Plus className="w-5 h-5" />
+                           <span>Registrar Nuevo Cliente</span>
+                         </>
+                       )}
+                     </DialogTitle>
+                   </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Información Personal */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold border-b pb-2">Información Personal</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="nombre">Nombre *</Label>
+                          <Input
+                            id="nombre"
+                            value={nuevoCliente.nombre}
+                            onChange={(e) => handleInputChange('nombre', e.target.value)}
+                            placeholder="Ingresa el nombre"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="apellido">Apellido *</Label>
+                          <Input
+                            id="apellido"
+                            value={nuevoCliente.apellido}
+                            onChange={(e) => handleInputChange('apellido', e.target.value)}
+                            placeholder="Ingresa el apellido"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="dni">DNI *</Label>
+                          <Input
+                            id="dni"
+                            value={nuevoCliente.dni}
+                            onChange={(e) => handleInputChange('dni', e.target.value)}
+                            placeholder="Ingresa el DNI"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="estado">Estado *</Label>
+                          <Select value={nuevoCliente.estado} onValueChange={(value) => handleInputChange('estado', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="lead">Lead</SelectItem>
+                              <SelectItem value="cliente">Cliente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información de Contacto */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold border-b pb-2">Información de Contacto</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={nuevoCliente.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            placeholder="correo@ejemplo.com"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="telefono">Teléfono *</Label>
+                          <Input
+                            id="telefono"
+                            value={nuevoCliente.telefono}
+                            onChange={(e) => handleInputChange('telefono', e.target.value)}
+                            placeholder="+51 999 999 999"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información de Ubicación */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold border-b pb-2">Información de Ubicación</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="pais">País</Label>
+                          <Select value={nuevoCliente.pais} onValueChange={(value) => handleInputChange('pais', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona un país" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Perú">Perú</SelectItem>
+                              <SelectItem value="Colombia">Colombia</SelectItem>
+                              <SelectItem value="Chile">Chile</SelectItem>
+                              <SelectItem value="Argentina">Argentina</SelectItem>
+                              <SelectItem value="México">México</SelectItem>
+                              <SelectItem value="España">España</SelectItem>
+                              <SelectItem value="Estados Unidos">Estados Unidos</SelectItem>
+                              <SelectItem value="Otro">Otro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="ciudad">Ciudad</Label>
+                          <Input
+                            id="ciudad"
+                            value={nuevoCliente.ciudad}
+                            onChange={(e) => handleInputChange('ciudad', e.target.value)}
+                            placeholder="Ingresa la ciudad"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="direccion">Dirección</Label>
+                        <Input
+                          id="direccion"
+                          value={nuevoCliente.direccion}
+                          onChange={(e) => handleInputChange('direccion', e.target.value)}
+                          placeholder="Ingresa la dirección completa"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Notas Adicionales */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold border-b pb-2">Notas Adicionales</h3>
+                      <div className="space-y-2">
+                        <Label htmlFor="notas">Observaciones</Label>
+                        <Textarea
+                          id="notas"
+                          value={nuevoCliente.notas}
+                          onChange={(e) => handleInputChange('notas', e.target.value)}
+                          placeholder="Información adicional sobre el cliente..."
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Botones de acción */}
+                    <div className="flex justify-end space-x-3 pt-4 border-t">
+                      <Button
+                        variant="outline"
+                        onClick={resetForm}
+                        type="button"
+                      >
+                        Limpiar
+                      </Button>
+                                             <Button
+                         onClick={handleSubmit}
+                         className="bg-primary text-primary-foreground hover:bg-primary/90"
+                       >
+                         {editingClienteId ? (
+                           <>
+                             <Edit className="w-4 h-4 mr-2" />
+                             Actualizar Cliente
+                           </>
+                         ) : (
+                           <>
+                             <Plus className="w-4 h-4 mr-2" />
+                             Registrar Cliente
+                           </>
+                         )}
+                       </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardContent>
       </Card>
-{/* Resumen */}
-<Card className="bg-muted/30">
+
+      {/* Resumen */}
+      <Card className="bg-muted/30">
         <CardContent className="p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
@@ -452,14 +591,17 @@ export const ClientesTable = () => {
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Avatar className="w-10 h-10">
-                        <AvatarImage src={`/assets/avatar-${cliente.id}.jpg`} alt={cliente.nombre} />
+                        <AvatarImage src={`/assets/avatar-${cliente.id}.jpg`} alt={`${cliente.nombre} ${cliente.apellido}`} />
                         <AvatarFallback className="bg-primary/10 text-primary">
-                          {cliente.nombre.split(' ').map(n => n[0]).join('')}
+                          {cliente.nombre[0]}{cliente.apellido[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium text-foreground">{cliente.nombre}</div>
+                        <div className="font-medium text-foreground">{cliente.nombre} {cliente.apellido}</div>
                         <div className="text-sm text-muted-foreground">
+                          DNI: {cliente.dni}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
                           Registrado: {new Date(cliente.fechaRegistro).toLocaleDateString()}
                         </div>
                       </div>
@@ -513,13 +655,25 @@ export const ClientesTable = () => {
                   
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Ver detalles">
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0" 
+                        title="Editar cliente"
+                        onClick={() => handleEditCliente(cliente)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive" 
+                        title="Eliminar cliente"
+                        onClick={() => handleDeleteCliente(cliente.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
