@@ -93,6 +93,7 @@ interface Paquete {
     horaLlegada: string
     escalas: number
     equipaje: 'mano' | 'bodega' | 'ambos'
+    telefono: string
   }
   disponibilidad: number
   reservaFlexible: boolean
@@ -180,7 +181,8 @@ export default function PaquetesPage() {
           horaSalida: '16:30',
           horaLlegada: '03:40+1',
           escalas: 1,
-          equipaje: 'ambos'
+          equipaje: 'ambos',
+          telefono: '+51 1 234 5678'
         },
         disponibilidad: 1,
         reservaFlexible: true,
@@ -215,7 +217,8 @@ export default function PaquetesPage() {
           horaSalida: '14:20',
           horaLlegada: '01:15+1',
           escalas: 1,
-          equipaje: 'ambos'
+          equipaje: 'ambos',
+          telefono: '+51 1 234 5679'
         },
         disponibilidad: 3,
         reservaFlexible: true,
@@ -250,7 +253,8 @@ export default function PaquetesPage() {
           horaSalida: '08:15',
           horaLlegada: '19:30',
           escalas: 0,
-          equipaje: 'ambos'
+          equipaje: 'ambos',
+          telefono: '+51 1 234 5680'
         },
         disponibilidad: 5,
         reservaFlexible: false,
@@ -358,6 +362,25 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
     const numeroWhatsApp = '51999999999' // Número de WhatsApp de la empresa
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`
     window.open(urlWhatsApp, '_blank')
+  }
+
+  const handleLlamar = (telefono: string) => {
+    try {
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // En dispositivos móviles, abrir el marcador telefónico
+        window.location.href = `tel:${telefono}`
+      } else {
+        // En dispositivos de escritorio, copiar el número al portapapeles
+        navigator.clipboard.writeText(telefono)
+        console.log(`Número ${telefono} copiado al portapapeles`)
+        // Opcional: mostrar una notificación al usuario
+        alert(`Número ${telefono} copiado al portapapeles`)
+      }
+    } catch (error) {
+      console.log('Error al procesar la llamada:', error)
+      // Fallback: mostrar el número para que el usuario lo copie manualmente
+      alert(`Número de teléfono: ${telefono}`)
+    }
   }
 
   return (
