@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -66,6 +67,7 @@ export default function AlojamientosPage() {
     habitaciones: ''
   })
   const [ordenarPor, setOrdenarPor] = useState('recomendados')
+  const router = useRouter()
 
   useEffect(() => {
     // Simular carga de datos
@@ -175,8 +177,7 @@ export default function AlojamientosPage() {
 
   // Event handlers para las tarjetas
   const handleVerDetalles = (id: string) => {
-    console.log('Ver detalles del alojamiento:', id)
-    // Aquí iría la navegación a la página de detalles
+    router.push(`/clientes/detalles-alojamientos?id=${id}`)
   }
 
   const handleContactar = (id: string) => {

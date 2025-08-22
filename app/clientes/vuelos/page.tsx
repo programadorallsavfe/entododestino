@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -78,6 +79,8 @@ export default function VuelosPage() {
     horariosVuelta: [0, 24]
   })
 
+  const router = useRouter()
+
   useEffect(() => {
     // Simular carga de datos de vuelos
     const vuelosData: Vuelo[] = [
@@ -147,6 +150,10 @@ export default function VuelosPage() {
     ]
     setVuelos(vuelosData)
   }, [])
+
+  const handleComprar = (vueloId: string) => {
+    router.push(`/clientes/vuelos/${vueloId}`)
+  }
 
   const renderCalificacion = (calificacion: number) => {
     let texto = ''
@@ -698,7 +705,7 @@ export default function VuelosPage() {
                             <Button variant="outline" size="icon">
                               <Heart className="w-4 h-4" />
                             </Button>
-                            <Button className="flex-1 bg-primary hover:bg-primary/90">
+                            <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => handleComprar(vuelo.id)}>
                               Comprar
                             </Button>
                           </div>
