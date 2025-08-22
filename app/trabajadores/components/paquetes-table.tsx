@@ -19,10 +19,11 @@ import {
   X,
   AlertTriangle,
   CheckCircle,
-  Info
+  Info,
+  Globe
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
@@ -351,6 +352,70 @@ export const PaquetesTable = () => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   }
 
+  // Funciones auxiliares para el itinerario
+  const getDayName = (dayIndex: number, destino: string): string => {
+    const dayNames = ['Llegada', 'Exploración', 'Aventura', 'Cultura', 'Naturaleza', 'Despedida']
+    return dayNames[dayIndex] || `Día ${dayIndex + 1}`
+  }
+
+  const getDayActivities = (dayIndex: number, destino: string): string[] => {
+    const activitiesByDestino: { [key: string]: string[][] } = {
+      'Arequipa': [
+        ['Plaza de Armas', 'Monasterio de Santa Catalina', 'Mirador de Yanahuara'],
+        ['Valle del Colca', 'Mirador Cruz del Cóndor', 'Pueblo de Chivay'],
+        ['Centro Histórico', 'Iglesia de la Compañía', 'Mercado San Camilo'],
+        ['Barrio de San Lázaro', 'Mansión del Fundador', 'Cena de despedida']
+      ],
+      'Cusco': [
+        ['Plaza de Armas', 'Catedral', 'Barrio de San Blas'],
+        ['Machu Picchu', 'Ciudadela Inca', 'Templo del Sol'],
+        ['Valle Sagrado', 'Pisac', 'Ollantaytambo'],
+        ['Sacsayhuamán', 'Qenqo', 'Puka Pukara']
+      ],
+      'Chachapoyas': [
+        ['Plaza de Armas', 'Museo', 'Casa de la Cultura'],
+        ['Fortaleza de Kuélap', 'Mirador', 'Pueblo de María'],
+        ['Sarcófagos de Karajía', 'Caverna de Quiocta'],
+        ['Catarata de Gocta', 'Pueblo de Cocachimba'],
+        ['Valle de Utcubamba', 'Mercado artesanal'],
+        ['Museo de Sitio', 'Compras de recuerdos']
+      ],
+      'Ayacucho': [
+        ['Plaza de Armas', 'Catedral', 'Iglesias coloniales'],
+        ['Pampa de Ayacucho', 'Santuario histórico'],
+        ['Centro artesanal', 'Mercado de artesanías']
+      ]
+    }
+    
+    const activities = activitiesByDestino[destino] || []
+    return activities[dayIndex] || ['Actividades del día', 'Exploración del destino']
+  }
+
+  const getDayMeals = (dayIndex: number): string[] => {
+    const meals = [
+      ['Cena de bienvenida'],
+      ['Desayuno', 'Almuerzo'],
+      ['Desayuno', 'Almuerzo'],
+      ['Desayuno', 'Almuerzo'],
+      ['Desayuno', 'Almuerzo'],
+      ['Desayuno', 'Almuerzo']
+    ]
+    return meals[dayIndex] || ['Desayuno', 'Almuerzo']
+  }
+
+  const getDayServices = (dayIndex: number, servicios: string[]): string[] => {
+    // Distribuir servicios a lo largo de los días
+    const servicesPerDay = Math.ceil(servicios.length / 6)
+    const startIndex = dayIndex * servicesPerDay
+    const endIndex = Math.min(startIndex + servicesPerDay, servicios.length)
+    
+    if (startIndex >= servicios.length) {
+      return ['Traslados', 'Guía turístico']
+    }
+    
+    return servicios.slice(startIndex, endIndex)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header y Filtros */}
@@ -564,389 +629,670 @@ export const PaquetesTable = () => {
         </CardContent>
       </Card>
 
-      {/* Modal de Vista Detallada */}
-      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-primary" />
-              Detalles del Paquete
-            </DialogTitle>
-            <DialogDescription>
-              Información completa del paquete turístico
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedPaquete && (
-            <div className="space-y-6">
-              {/* Header del Paquete */}
-              <div className="flex items-start gap-4">
-                <Avatar className="w-20 h-20">
-                  <AvatarImage src={selectedPaquete.imagen} alt={selectedPaquete.nombre} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                    <Package className="w-8 h-8" />
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 space-y-3">
-                  <div>
-                    <h3 className="text-2xl font-bold text-foreground">{selectedPaquete.nombre}</h3>
-                    <p className="text-muted-foreground">{selectedPaquete.categoria}</p>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{selectedPaquete.destino}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{selectedPaquete.duracion}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">Mín. {selectedPaquete.minimoPersonas} personas</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    {getStatusBadge(selectedPaquete.estado)}
-                    {getTipoTuristaBadge(selectedPaquete.tipoTurista)}
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      <span className="text-sm font-medium">{selectedPaquete.calificacion}</span>
-                    </div>
-                  </div>
+      {/* Modal de Vista Detallada Personalizado */}
+      {viewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header del Modal */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                  <Package className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Detalles del Paquete Turístico</h2>
+                  <p className="text-gray-600">Información completa y estructurada del paquete turístico</p>
                 </div>
               </div>
-
-              {/* Información de Precios */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Información de Precios</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Precio con Descuento</Label>
-                      <p className="text-2xl font-bold text-green-600">
-                        S/ {formatNumber(selectedPaquete.precioDescuento)}
-                      </p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Precio Original</Label>
-                      <p className="text-lg text-muted-foreground line-through">
-                        S/ {formatNumber(selectedPaquete.precioOriginal)}
-                      </p>
-                    </div>
-                  </div>
-                  {selectedPaquete.ahorro > 0 && (
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-green-700 font-medium">
-                        Ahorras S/ {formatNumber(selectedPaquete.ahorro)}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Información de Capacidad */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Capacidad y Reservas</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Capacidad Total</Label>
-                      <p className="text-lg font-medium">{selectedPaquete.capacidad} personas</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Reservas Actuales</Label>
-                      <p className="text-lg font-medium">{selectedPaquete.reservas} personas</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Ocupación</span>
-                      <span>{ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-3">
-                      <div 
-                        className={`h-3 rounded-full transition-all duration-300 ${
-                          ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 80 
-                            ? 'bg-red-500' 
-                            : ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 60 
-                              ? 'bg-yellow-500' 
-                              : 'bg-green-500'
-                        }`}
-                        style={{ width: `${ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%` }}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Servicios e Idiomas */}
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Servicios Incluidos</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedPaquete.servicios.map((servicio, index) => (
-                        <Badge key={index} variant="secondary">
-                          {servicio}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Idiomas Disponibles</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedPaquete.idiomas.map((idioma, index) => (
-                        <Badge key={index} variant="outline">
-                          {idioma}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Información Adicional */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Información Adicional</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Fecha de Creación</Label>
-                      <p className="text-sm">{new Date(selectedPaquete.fechaCreacion).toLocaleDateString('es-ES')}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">ID del Paquete</Label>
-                      <p className="text-sm font-mono text-muted-foreground">#{selectedPaquete.id}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <button
+                onClick={() => setViewModalOpen(false)}
+                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            
+            {/* Contenido del Modal */}
+            <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6 space-y-8">
+              {selectedPaquete && (
+                <>
+                  {/* Header del Paquete con Imagen de Fondo */}
+                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-50 to-indigo-100 p-6">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5"></div>
+                    <div className="relative flex items-start gap-6">
+                      <div className="w-24 h-24 bg-primary/10 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                        <Package className="w-12 h-12 text-primary" />
+                      </div>
+                      
+                      <div className="flex-1 space-y-4">
+                        <div>
+                          <h3 className="text-3xl font-bold text-gray-900 mb-2">{selectedPaquete.nombre}</h3>
+                          <div className="flex items-center gap-3">
+                            <span className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-lg font-medium">
+                              {selectedPaquete.categoria}
+                            </span>
+                            {getStatusBadge(selectedPaquete.estado)}
+                            {getTipoTuristaBadge(selectedPaquete.tipoTurista)}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                              <MapPin className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Destino</p>
+                              <p className="font-semibold text-gray-900">{selectedPaquete.destino}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Clock className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Duración</p>
+                              <p className="font-semibold text-gray-900">{selectedPaquete.duracion}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Users className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Mín. Personas</p>
+                              <p className="font-semibold text-gray-900">{selectedPaquete.minimoPersonas}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Modal de Edición */}
-      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit className="w-5 h-5 text-primary" />
-              Editar Paquete
-            </DialogTitle>
-            <DialogDescription>
-              Modifica la información del paquete turístico
-            </DialogDescription>
-          </DialogHeader>
-          
-          {editingPaquete && (
-            <div className="space-y-6">
-              {/* Información Básica */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nombre">Nombre del Paquete</Label>
-                  <Input
-                    id="nombre"
-                    value={editingPaquete.nombre}
-                    onChange={(e) => handleInputChange('nombre', e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="destino">Destino</Label>
-                  <Select value={editingPaquete.destino} onValueChange={(value) => handleInputChange('destino', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {destinos.map(destino => (
-                        <SelectItem key={destino} value={destino}>{destino}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                  {/* Línea del Tiempo del Itinerario */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-primary" />
+                        Itinerario Detallado
+                      </h3>
+                      <p className="text-gray-600 mt-1">Cronograma completo de actividades y servicios por día</p>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-6">
+                        {Array.from({ length: parseInt(selectedPaquete.duracion.split(' ')[0]) }, (_, index) => (
+                          <div key={index} className="relative">
+                            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary to-gray-300"></div>
+                            
+                            <div className="flex items-start gap-6">
+                              <div className="relative z-10 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+                                {index + 1}
+                              </div>
+                              
+                              <div className="flex-1 bg-gray-50 rounded-lg p-4 space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="text-lg font-semibold text-gray-900">
+                                    Día {index + 1} - {getDayName(index, selectedPaquete.destino)}
+                                  </h4>
+                                  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                                    {index === 0 ? 'Llegada' : index === parseInt(selectedPaquete.duracion.split(' ')[0]) - 1 ? 'Partida' : 'Actividades'}
+                                  </span>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div className="space-y-3">
+                                    <h5 className="font-medium text-gray-900 flex items-center gap-2">
+                                      <Eye className="w-4 h-4 text-blue-600" />
+                                      Lugares a Visitar
+                                    </h5>
+                                    <div className="space-y-2">
+                                      {getDayActivities(index, selectedPaquete.destino).map((lugar, lugarIndex) => (
+                                        <div key={lugarIndex} className="flex items-center gap-2 text-sm">
+                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                          <span className="text-gray-700">{lugar}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="space-y-3">
+                                    <h5 className="font-medium text-gray-900 flex items-center gap-2">
+                                      <UtensilsCrossed className="w-4 h-4 text-green-600" />
+                                      Comidas Incluidas
+                                    </h5>
+                                    <div className="space-y-2">
+                                      {getDayMeals(index).map((comida, comidaIndex) => (
+                                        <div key={comidaIndex} className="flex items-center gap-2 text-sm">
+                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                          <span className="text-gray-700">{comida}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="pt-3 border-t border-gray-200">
+                                  <h5 className="font-medium text-gray-900 flex items-center gap-2 mb-2">
+                                    <Bus className="w-4 h-4 text-purple-600" />
+                                    Servicios del Día
+                                  </h5>
+                                  <div className="flex flex-wrap gap-2">
+                                    {getDayServices(index, selectedPaquete.servicios).map((servicio, servicioIndex) => (
+                                      <span key={servicioIndex} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                                        {servicio}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="categoria">Categoría</Label>
-                  <Select value={editingPaquete.categoria} onValueChange={(value) => handleInputChange('categoria', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categorias.map(categoria => (
-                        <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="tipoTurista">Tipo de Turista</Label>
-                  <Select value={editingPaquete.tipoTurista} onValueChange={(value) => handleInputChange('tipoTurista', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nacional">Nacional</SelectItem>
-                      <SelectItem value="extranjero">Extranjero</SelectItem>
-                      <SelectItem value="ambos">Ambos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                  {/* Información de Precios y Descuentos */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <DollarSign className="w-5 h-5 text-green-600" />
+                        Información de Precios
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                          <p className="text-sm text-green-700 mb-1">Precio Final</p>
+                          <p className="text-3xl font-bold text-green-600">
+                            S/ {formatNumber(selectedPaquete.precioDescuento)}
+                          </p>
+                          <p className="text-xs text-green-600">por persona</p>
+                        </div>
+                        
+                        <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <p className="text-sm text-gray-600 mb-1">Precio Original</p>
+                          <p className="text-2xl font-bold text-gray-500 line-through">
+                            S/ {formatNumber(selectedPaquete.precioOriginal)}
+                          </p>
+                          <p className="text-xs text-gray-500">por persona</p>
+                        </div>
+                        
+                        {selectedPaquete.ahorro > 0 && (
+                          <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+                            <p className="text-sm text-orange-700 mb-1">Ahorro Total</p>
+                            <p className="text-2xl font-bold text-orange-600">
+                              S/ {formatNumber(selectedPaquete.ahorro)}
+                            </p>
+                            <p className="text-xs text-orange-600">por persona</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {selectedPaquete.ahorro > 0 && (
+                        <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                          <div className="flex items-center gap-2 text-green-700">
+                            <CheckCircle className="w-5 h-5" />
+                            <span className="font-medium">¡Oferta Especial!</span>
+                          </div>
+                          <p className="text-sm text-green-600 mt-1">
+                            Ahorras un {Math.round((selectedPaquete.ahorro / selectedPaquete.precioOriginal) * 100)}% en este paquete
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="duracion">Duración</Label>
-                  <Input
-                    id="duracion"
-                    value={editingPaquete.duracion}
-                    onChange={(e) => handleInputChange('duracion', e.target.value)}
-                    placeholder="Ej: 4 Días / 3 Noches"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="capacidad">Capacidad</Label>
-                  <Input
-                    id="capacidad"
-                    type="number"
-                    value={editingPaquete.capacidad}
-                    onChange={(e) => handleInputChange('capacidad', e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="minimoPersonas">Mín. Personas</Label>
-                  <Input
-                    id="minimoPersonas"
-                    type="number"
-                    value={editingPaquete.minimoPersonas}
-                    onChange={(e) => handleInputChange('minimoPersonas', e.target.value)}
-                  />
-                </div>
-              </div>
+                  {/* Capacidad y Reservas */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-600" />
+                        Capacidad y Reservas
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-sm text-blue-700 mb-1">Capacidad Total</p>
+                          <p className="text-2xl font-bold text-blue-600">{selectedPaquete.capacidad}</p>
+                          <p className="text-xs text-blue-600">personas</p>
+                        </div>
+                        
+                        <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <p className="text-sm text-orange-700 mb-1">Reservas Actuales</p>
+                          <p className="text-2xl font-bold text-orange-600">{selectedPaquete.reservas}</p>
+                          <p className="text-xs text-orange-600">personas</p>
+                        </div>
+                        
+                        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                          <p className="text-sm text-green-700 mb-1">Disponibilidad</p>
+                          <p className="text-2xl font-bold text-green-600">
+                            {selectedPaquete.capacidad - selectedPaquete.reservas}
+                          </p>
+                          <p className="text-xs text-green-600">plazas libres</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-6 space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="font-medium text-gray-700">Nivel de Ocupación</span>
+                          <span className="text-gray-500">
+                            {ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                          <div 
+                            className={`h-4 rounded-full transition-all duration-500 ${
+                              ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 80 
+                                ? 'bg-red-500' 
+                                : ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad) > 60 
+                                  ? 'bg-yellow-500' 
+                                  : 'bg-green-500'
+                            }`}
+                            style={{ width: `${ocupacionPorcentaje(selectedPaquete.reservas, selectedPaquete.capacidad)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>Baja ocupación</span>
+                          <span>Media ocupación</span>
+                          <span>Alta ocupación</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Precios */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="precioOriginal">Precio Original</Label>
-                  <Input
-                    id="precioOriginal"
-                    type="number"
-                    step="0.01"
-                    value={editingPaquete.precioOriginal}
-                    onChange={(e) => handleInputChange('precioOriginal', e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="precioDescuento">Precio con Descuento</Label>
-                  <Input
-                    id="precioDescuento"
-                    type="number"
-                    step="0.01"
-                    value={editingPaquete.precioDescuento}
-                    onChange={(e) => handleInputChange('precioDescuento', e.target.value)}
-                  />
-                </div>
-              </div>
+                  {/* Servicios e Idiomas Detallados */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div className="p-6 border-b border-gray-200">
+                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          Servicios Incluidos
+                        </h3>
+                        <p className="text-gray-600 mt-1">Todos los servicios que están incluidos en el paquete</p>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-2 gap-3">
+                          {selectedPaquete.servicios.map((servicio, index) => (
+                            <div key={index} className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <span className="text-sm font-medium text-gray-700">{servicio}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Estado y Calificación */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="estado">Estado</Label>
-                  <Select value={editingPaquete.estado} onValueChange={(value) => handleInputChange('estado', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="activo">Activo</SelectItem>
-                      <SelectItem value="inactivo">Inactivo</SelectItem>
-                      <SelectItem value="agotado">Agotado</SelectItem>
-                      <SelectItem value="promocional">Promocional</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="calificacion">Calificación</Label>
-                  <Input
-                    id="calificacion"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={editingPaquete.calificacion}
-                    onChange={(e) => handleInputChange('calificacion', e.target.value)}
-                  />
-                </div>
-              </div>
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div className="p-6 border-b border-gray-200">
+                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                          <Globe className="w-5 h-5 text-blue-600" />
+                          Idiomas Disponibles
+                        </h3>
+                        <p className="text-gray-600 mt-1">Idiomas en los que se ofrece el servicio</p>
+                      </div>
+                      <div className="p-6">
+                        <div className="flex flex-wrap gap-2">
+                          {selectedPaquete.idiomas.map((idioma, index) => (
+                            <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm border border-gray-200">
+                              {idioma}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Servicios e Idiomas */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="servicios">Servicios (separados por comas)</Label>
-                  <Textarea
-                    id="servicios"
-                    value={editingPaquete.servicios.join(', ')}
-                    onChange={(e) => handleInputChange('servicios', e.target.value)}
-                    placeholder="Hoteles, Tours, Español, Visitas guiadas"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="idiomas">Idiomas (separados por comas)</Label>
-                  <Textarea
-                    id="idiomas"
-                    value={editingPaquete.idiomas.join(', ')}
-                    onChange={(e) => handleInputChange('idiomas', e.target.value)}
-                    placeholder="Español, Inglés"
-                  />
-                </div>
-              </div>
-
-              {/* Botones de Acción */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => setEditModalOpen(false)}
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleSaveEdit}
-                  disabled={isLoading}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
-                </Button>
-              </div>
+                  {/* Información Adicional */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <Info className="w-5 h-5 text-purple-600" />
+                        Información Adicional
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">ID del Paquete</p>
+                          <p className="font-mono font-bold text-gray-900">#{selectedPaquete.id}</p>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Fecha de Creación</p>
+                          <p className="font-medium text-gray-900">{new Date(selectedPaquete.fechaCreacion).toLocaleDateString('es-ES')}</p>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Calificación</p>
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                            <span className="font-bold text-gray-900">{selectedPaquete.calificacion}</span>
+                          </div>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Estado</p>
+                          {getStatusBadge(selectedPaquete.estado)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Edición Personalizado */}
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header del Modal */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                  <Edit className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Editar Paquete</h2>
+                  <p className="text-gray-600">Modifica la información del paquete turístico</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            
+            {/* Contenido del Modal */}
+            <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6 space-y-8">
+              {editingPaquete && (
+                <>
+                  {/* Información Básica */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Package className="w-5 h-5 text-primary" />
+                        Información Básica
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+                            Nombre del Paquete
+                          </label>
+                          <input
+                            id="nombre"
+                            type="text"
+                            value={editingPaquete.nombre}
+                            onChange={(e) => handleInputChange('nombre', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                            placeholder="Nombre del paquete"
+                          />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="destino" className="block text-sm font-medium text-gray-700">
+                            Destino
+                          </label>
+                          <select
+                            id="destino"
+                            value={editingPaquete.destino}
+                            onChange={(e) => handleInputChange('destino', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          >
+                            {destinos.map(destino => (
+                              <option key={destino} value={destino}>{destino}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div className="space-y-3">
+                          <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">
+                            Categoría
+                          </label>
+                          <select
+                            id="categoria"
+                            value={editingPaquete.categoria}
+                            onChange={(e) => handleInputChange('categoria', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          >
+                            {categorias.map(categoria => (
+                              <option key={categoria} value={categoria}>{categoria}</option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="tipoTurista" className="block text-sm font-medium text-gray-700">
+                            Tipo de Turista
+                          </label>
+                          <select
+                            id="tipoTurista"
+                            value={editingPaquete.tipoTurista}
+                            onChange={(e) => handleInputChange('tipoTurista', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          >
+                            <option value="nacional">Nacional</option>
+                            <option value="extranjero">Extranjero</option>
+                            <option value="ambos">Ambos</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Duración y Capacidad */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-primary" />
+                        Duración y Capacidad
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-3">
+                          <label htmlFor="duracion" className="block text-sm font-medium text-gray-700">
+                            Duración
+                          </label>
+                          <input
+                            id="duracion"
+                            type="text"
+                            value={editingPaquete.duracion}
+                            onChange={(e) => handleInputChange('duracion', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                            placeholder="Ej: 4 Días / 3 Noches"
+                          />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="capacidad" className="block text-sm font-medium text-gray-700">
+                            Capacidad
+                          </label>
+                          <input
+                            id="capacidad"
+                            type="number"
+                            value={editingPaquete.capacidad}
+                            onChange={(e) => handleInputChange('capacidad', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="minimoPersonas" className="block text-sm font-medium text-gray-700">
+                            Mín. Personas
+                          </label>
+                          <input
+                            id="minimoPersonas"
+                            type="number"
+                            value={editingPaquete.minimoPersonas}
+                            onChange={(e) => handleInputChange('minimoPersonas', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Precios */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <DollarSign className="w-5 h-5 text-green-600" />
+                        Información de Precios
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label htmlFor="precioOriginal" className="block text-sm font-medium text-gray-700">
+                            Precio Original
+                          </label>
+                          <input
+                            id="precioOriginal"
+                            type="number"
+                            step="0.01"
+                            value={editingPaquete.precioOriginal}
+                            onChange={(e) => handleInputChange('precioOriginal', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="precioDescuento" className="block text-sm font-medium text-gray-700">
+                            Precio con Descuento
+                          </label>
+                          <input
+                            id="precioDescuento"
+                            type="number"
+                            step="0.01"
+                            value={editingPaquete.precioDescuento}
+                            onChange={(e) => handleInputChange('precioDescuento', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Estado y Calificación */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Info className="w-5 h-5 text-purple-600" />
+                        Estado y Calificación
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
+                            Estado
+                          </label>
+                          <select
+                            id="estado"
+                            value={editingPaquete.estado}
+                            onChange={(e) => handleInputChange('estado', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          >
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="agotado">Agotado</option>
+                            <option value="promocional">Promocional</option>
+                          </select>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="calificacion" className="block text-sm font-medium text-gray-700">
+                            Calificación
+                          </label>
+                          <input
+                            id="calificacion"
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            max="5"
+                            value={editingPaquete.calificacion}
+                            onChange={(e) => handleInputChange('calificacion', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Servicios e Idiomas */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        Servicios e Idiomas
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label htmlFor="servicios" className="block text-sm font-medium text-gray-700">
+                            Servicios (separados por comas)
+                          </label>
+                          <textarea
+                            id="servicios"
+                            value={editingPaquete.servicios.join(', ')}
+                            onChange={(e) => handleInputChange('servicios', e.target.value)}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
+                            placeholder="Hoteles, Tours, Español, Visitas guiadas"
+                          />
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <label htmlFor="idiomas" className="block text-sm font-medium text-gray-700">
+                            Idiomas (separados por comas)
+                          </label>
+                          <textarea
+                            id="idiomas"
+                            value={editingPaquete.idiomas.join(', ')}
+                            onChange={(e) => handleInputChange('idiomas', e.target.value)}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
+                            placeholder="Español, Inglés"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botones de Acción */}
+                  <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={() => setEditModalOpen(false)}
+                      disabled={isLoading}
+                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 transition-colors disabled:opacity-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={isLoading}
+                      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 transition-colors disabled:opacity-50"
+                    >
+                      {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dialog de Confirmación de Eliminación */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

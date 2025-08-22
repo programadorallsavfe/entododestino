@@ -1143,8 +1143,8 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 <div className="relative mb-8">
                   <div className="grid gap-1 sm:gap-2 mb-8" style={{ gridTemplateColumns: 'repeat(21, minmax(0, 1fr))' }}>
                     {pricesForDates.map((dateData, index) => {
-                      // Corregir la lógica: precios más bajos = barras más altas
-                      const priceHeight = ((highestPrice - dateData.price) / (highestPrice - lowestPrice)) * 120 + 40;
+                      // Lógica corregida: precios más altos = barras más altas
+                      const priceHeight = ((dateData.price - lowestPrice) / (highestPrice - lowestPrice)) * 120 + 40;
                       const isBestPrice = dateData.isLowest;
                       const isSelected = dateData.isSelected;
                       const priceDifference = selectedItem.price - dateData.price;
@@ -1162,36 +1162,36 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                           <div
                             className={`w-full rounded-t-lg transition-all duration-300 ${
                               isBestPrice
-                                ? 'bg-gradient-to-t from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                                ? 'bg-green-500 hover:bg-green-600'
                                 : isSelected
-                                ? 'bg-gradient-to-t from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                                ? 'bg-blue-500 hover:bg-blue-600'
                                 : isGoodDeal
-                                ? 'bg-gradient-to-t from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600'
-                                : 'bg-gradient-to-t from-slate-300 to-slate-400 hover:from-slate-400 hover:to-slate-500'
+                                ? 'bg-emerald-500 hover:bg-emerald-600'
+                                : 'bg-slate-400 hover:bg-slate-500'
                             }`}
                             style={{ height: `${priceHeight}px` }}
                           />
                           
-                                            {/* Indicador de Mejor Precio */}
-                  {isBestPrice && (
-                    <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs px-1 sm:px-2 py-1 rounded-full font-bold shadow-lg z-20 animate-pulse">
-                      <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3" />
-                    </div>
-                  )}
-                  
-                  {/* Indicador de Fecha Seleccionada */}
-                  {isSelected && !isBestPrice && (
-                    <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs px-1 sm:px-2 py-1 rounded-full font-bold shadow-lg z-20">
-                      <Calendar className="w-2 h-2 sm:w-3 sm:h-3" />
-                    </div>
-                  )}
-                  
-                  {/* Indicador de Buen Precio */}
-                  {!isBestPrice && !isSelected && isGoodDeal && (
-                    <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-xs px-1 sm:px-2 py-1 rounded-full font-bold shadow-lg z-20">
-                      <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3" />
-                    </div>
-                  )}
+                          {/* Indicador de Mejor Precio */}
+                          {isBestPrice && (
+                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
+                              <TrendingDown className="w-3 h-3" />
+                            </div>
+                          )}
+                          
+                          {/* Indicador de Fecha Seleccionada */}
+                          {isSelected && !isBestPrice && (
+                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
+                              <Calendar className="w-3 h-3" />
+                            </div>
+                          )}
+                          
+                          {/* Indicador de Buen Precio */}
+                          {!isBestPrice && !isSelected && isGoodDeal && (
+                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
+                              <TrendingDown className="w-3 h-3" />
+                            </div>
+                          )}
                           
                           {/* Fecha */}
                           <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-slate-600 whitespace-nowrap font-medium">
@@ -1210,17 +1210,17 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                             </div>
                           )}
                           
-                                            {/* Tooltip Detallado */}
-                  <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-2 sm:px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-xl hidden sm:block">
-                    <div className="text-center">
-                      <div className="font-medium">{new Date(dateData.date).toLocaleDateString('es-ES')}</div>
-                      <div className="text-green-400 font-bold">{formatPrice(dateData.price)}</div>
-                      {isBestPrice && <div className="text-green-300 text-xs mt-1">🎯 Mejor precio</div>}
-                      {isSelected && !isBestPrice && <div className="text-blue-300 text-xs mt-1">📅 Seleccionada</div>}
-                      {isGoodDeal && !isBestPrice && <div className="text-emerald-300 text-xs mt-1">💰 Buen precio</div>}
-                    </div>
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
-                  </div>
+                          {/* Tooltip Detallado */}
+                          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-xl hidden sm:block">
+                            <div className="text-center">
+                              <div className="font-medium">{new Date(dateData.date).toLocaleDateString('es-ES')}</div>
+                              <div className="text-green-400 font-bold">{formatPrice(dateData.price)}</div>
+                              {isBestPrice && <div className="text-green-300 text-xs mt-1">Mejor precio</div>}
+                              {isSelected && !isBestPrice && <div className="text-blue-300 text-xs mt-1">Fecha seleccionada</div>}
+                              {isGoodDeal && !isBestPrice && <div className="text-emerald-300 text-xs mt-1">Buen precio</div>}
+                            </div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
+                          </div>
                         </div>
                       );
                     })}
@@ -1229,7 +1229,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   {/* Línea de Referencia del Precio Base */}
                   <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-400 opacity-50" 
                        style={{ 
-                         top: `${((highestPrice - selectedItem.price) / (highestPrice - lowestPrice)) * 120 + 40}px` 
+                         top: `${((selectedItem.price - lowestPrice) / (highestPrice - lowestPrice)) * 120 + 40}px` 
                        }} />
                   <div className="absolute right-0 top-0 bg-slate-400 text-white text-xs px-2 py-1 rounded transform translate-y-[-50%] hidden sm:block">
                     Precio Base: {formatPrice(selectedItem.price)}
