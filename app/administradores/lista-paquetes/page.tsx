@@ -932,17 +932,13 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
                      <h3 className="text-xl font-semibold mb-4 text-primary">Información del Alojamiento</h3>
                      
                      {/* Imagen Principal */}
-                     <div className="relative mb-4">
+                     <div className="">
                        <img
                          src={paqueteSeleccionado.imagen}
                          alt={paqueteSeleccionado.nombre}
-                         className="w-full h-64 object-cover rounded-lg"
+                         className="w-full object-cover "
                        />
-                       {paqueteSeleccionado.disponibilidad <= 3 && (
-                         <Badge className="absolute top-4 right-4 bg-red-500 text-white">
-                           Solo queda {paqueteSeleccionado.disponibilidad}
-                         </Badge>
-                       )}
+                       
                      </div>
 
                      {/* Detalles del Hotel */}

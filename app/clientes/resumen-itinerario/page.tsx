@@ -114,10 +114,9 @@ function ResumenItinerarioContent() {
     router.push('/clientes/configurar-tour')
   }
 
-  const handleProcederPago = () => {
-    // Aquí iría la lógica de integración con pasarela de pagos
-    alert('Redirigiendo a pasarela de pagos...')
-  }
+      const handleProcederPago = () => {
+          router.push('/clientes/proceder-pago')
+      }
 
   const handleEnviarWhatsApp = () => {
     const mensaje = `¡Hola! Me interesa este itinerario:\n\n` +

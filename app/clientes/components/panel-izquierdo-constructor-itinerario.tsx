@@ -260,7 +260,6 @@ export const PanelIzquierdoConstructorItinerario = ({
               <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <div className="flex items-center space-x-2 bg-white px-2 py-1 rounded-full shadow-sm">
                   <Plane className="w-3 h-3 text-blue-600" />
-                  <span className="text-xs text-gray-600">Transporte incluido</span>
                   <Switch defaultChecked className="scale-75" />
                 </div>
               </div>
