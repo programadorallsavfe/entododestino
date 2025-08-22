@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -56,7 +56,8 @@ interface PaqueteData {
   tipoVuelo: string
 }
 
-export default function ProcederPagoPage() {
+// Componente interno que usa useSearchParams
+function ProcederPagoContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   
@@ -475,5 +476,21 @@ export default function ProcederPagoPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Componente principal que envuelve en Suspense
+export default function ProcederPagoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Cargando página de pago...</p>
+        </div>
+      </div>
+    }>
+      <ProcederPagoContent />
+    </Suspense>
   )
 }
