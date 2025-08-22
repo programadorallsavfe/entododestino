@@ -216,7 +216,7 @@ export default function ListaTrabajadoresPageAdministradores() {
     <div className="min-h-screen bg-background">
       
       {/* Contenido principal */}
-      <div className="lg:ml-64 pt-16">
+      <div className="">
         <div className="p-2 lg:p-8">
           {/* Header */}
           <div className="mb-8">

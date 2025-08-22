@@ -45,232 +45,255 @@ import {
 
 // Componente de gráfico de barras apiladas para administradores
 const AdminStackedBarChart = () => (
-    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-        <div className="text-center mb-4 px-2">
-        </div>
-        <div className="flex items-end justify-between h-40 space-x-1">
-            {/* Enero */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '70px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '45px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '25px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">Ene</span>
-            </div>
-            {/* Febrero */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '85px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '55px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '30px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">Feb</span>
-            </div>
-            {/* Marzo */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '75px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '65px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '35px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">Mar</span>
-            </div>
-            {/* Abril */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '95px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '75px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">Abr</span>
-            </div>
-            {/* Mayo */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '110px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '85px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '50px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">May</span>
-            </div>
-            {/* Junio */}
-            <div className="flex flex-col items-center space-y-1">
-                <div className="w-8 bg-primary rounded-t" style={{ height: '90px' }}></div>
-                <div className="w-8 bg-secondary" style={{ height: '70px' }}></div>
-                <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
-                <span className="text-xs text-muted-foreground font-medium">Jun</span>
-            </div>
-        </div>
-        <div className="flex justify-center space-x-4 mt-4 text-xs">
-            <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-primary rounded"></div>
-                <span className="text-muted-foreground font-medium">Administradores</span>
-            </div>
-            <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-secondary rounded"></div>
-                <span className="text-muted-foreground font-medium">Trabajadores</span>
-            </div>
-            <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-accent rounded"></div>
-                <span className="text-muted-foreground font-medium">Clientes</span>
-            </div>
-        </div>
+  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4 animate-in slide-in-from-bottom-4 duration-700">
+    <div className="text-center mb-4 px-2">
     </div>
+    <div className="flex items-end justify-between h-40 space-x-1">
+      {/* Enero */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '70px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '45px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '25px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Ene</span>
+      </div>
+      {/* Febrero */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '85px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '55px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '30px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Feb</span>
+      </div>
+      {/* Marzo */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '75px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '65px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '35px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Mar</span>
+      </div>
+      {/* Abril */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '95px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '75px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '40px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Abr</span>
+      </div>
+      {/* Mayo */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '110px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '85px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '50px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">May</span>
+      </div>
+      {/* Junio */}
+      <div className="flex flex-col items-center space-y-1 group">
+        <div className="w-8 bg-primary rounded-t transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '90px' }}></div>
+        <div className="w-8 bg-secondary transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '70px' }}></div>
+        <div className="w-8 bg-accent rounded-b transition-all duration-500 hover:scale-110 hover:shadow-lg" style={{ height: '40px' }}></div>
+        <span className="text-xs text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Jun</span>
+      </div>
+    </div>
+    <div className="flex justify-center space-x-4 mt-4 text-xs">
+      <div className="flex items-center space-x-2 group">
+        <div className="w-3 h-3 bg-primary rounded transition-all duration-300 group-hover:scale-125 group-hover:shadow-md"></div>
+        <span className="text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Administradores</span>
+      </div>
+      <div className="flex items-center space-x-2 group">
+        <div className="w-3 h-3 bg-secondary rounded transition-all duration-300 group-hover:scale-125 group-hover:shadow-md"></div>
+        <span className="text-muted-foreground font-medium group-hover:text-secondary transition-colors duration-300">Trabajadores</span>
+      </div>
+      <div className="flex items-center space-x-2 group">
+        <div className="w-3 h-3 bg-accent rounded transition-all duration-300 group-hover:scale-125 group-hover:shadow-md"></div>
+        <span className="text-muted-foreground font-medium group-hover:text-accent transition-colors duration-300">Clientes</span>
+      </div>
+    </div>
+  </div>
 )
 
 // Componente de gráfico de dona para métricas del sistema
 const SystemDonutChart = () => (
-    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-        <div className="text-center mb-4">
-            <h4 className="font-semibold text-foreground">Estado del Sistema</h4>
-        </div>
-        <div className="relative w-32 h-32 mx-auto">
-            <svg className="w-full h-full" viewBox="0 0 100 100">
-                {/* Segmento 1 - Activo (75%) */}
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="35"
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="15"
-                    strokeDasharray="165 220"
-                    strokeDashoffset="0"
-                    transform="rotate(-90 50 50)"
-                />
-                {/* Segmento 2 - Mantenimiento (20%) */}
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="35"
-                    fill="none"
-                    stroke="hsl(var(--secondary))"
-                    strokeWidth="15"
-                    strokeDasharray="44 220"
-                    strokeDashoffset="-165"
-                    transform="rotate(-90 50 50)"
-                />
-                {/* Segmento 3 - Crítico (5%) */}
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="35"
-                    fill="none"
-                    stroke="hsl(var(--destructive))"
-                    strokeWidth="15"
-                    strokeDasharray="11 220"
-                    strokeDashoffset="-209"
-                    transform="rotate(-90 50 50)"
-                />
-                {/* Centro */}
-                <circle cx="50" cy="50" r="20" fill="hsl(var(--card))" className="shadow-lg" />
-                <text x="50" y="55" textAnchor="middle" className="text-xs font-bold" fill="hsl(var(--card-foreground))">75%</text>
-            </svg>
-        </div>
-        <div className="grid grid-cols-3 gap-2 text-xs mt-4">
-            <div className="text-center">
-                <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-1"></div>
-                <div className="text-muted-foreground font-medium">Activo 75%</div>
-            </div>
-            <div className="text-center">
-                <div className="w-3 h-3 bg-secondary rounded-full mx-auto mb-1"></div>
-                <div className="text-muted-foreground font-medium">Mant. 20%</div>
-            </div>
-            <div className="text-center">
-                <div className="w-3 h-3 bg-destructive rounded-full mx-auto mb-1"></div>
-                <div className="text-muted-foreground font-medium">Crítico 5%</div>
-            </div>
-        </div>
+  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4 animate-in slide-in-from-right-4 duration-700">
+    <div className="text-center mb-4">
+      <h4 className="font-semibold text-foreground">Estado del Sistema</h4>
     </div>
+    <div className="relative w-32 h-32 mx-auto group">
+      <svg className="w-full h-full transition-all duration-500 group-hover:scale-110" viewBox="0 0 100 100">
+        {/* Segmento 1 - Activo (75%) */}
+        <circle
+          cx="50"
+          cy="50"
+          r="35"
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="15"
+          strokeDasharray="165 220"
+          strokeDashoffset="0"
+          transform="rotate(-90 50 50)"
+          className="animate-pulse"
+        />
+        {/* Segmento 2 - Mantenimiento (20%) */}
+        <circle
+          cx="50"
+          cy="50"
+          r="35"
+          fill="none"
+          stroke="hsl(var(--secondary))"
+          strokeWidth="15"
+          strokeDasharray="44 220"
+          strokeDashoffset="-165"
+          transform="rotate(-90 50 50)"
+        />
+        {/* Segmento 3 - Crítico (5%) */}
+        <circle
+          cx="50"
+          cy="50"
+          r="35"
+          fill="none"
+          stroke="hsl(var(--destructive))"
+          strokeWidth="15"
+          strokeDasharray="11 220"
+          strokeDashoffset="-209"
+          transform="rotate(-90 50 50)"
+        />
+        {/* Centro */}
+        <circle cx="50" cy="50" r="20" fill="hsl(var(--card))" className="shadow-lg transition-all duration-300 group-hover:shadow-xl" />
+        <text x="50" y="55" textAnchor="middle" className="text-xs font-bold transition-all duration-300 group-hover:text-lg" fill="hsl(var(--card-foreground))">75%</text>
+      </svg>
+    </div>
+    <div className="grid grid-cols-3 gap-2 text-xs mt-4">
+      <div className="text-center group">
+        <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-1 transition-all duration-300 group-hover:scale-150 group-hover:shadow-md"></div>
+        <div className="text-muted-foreground font-medium group-hover:text-primary transition-colors duration-300">Activo 75%</div>
+      </div>
+      <div className="text-center group">
+        <div className="w-3 h-3 bg-secondary rounded-full mx-auto mb-1 transition-all duration-300 group-hover:scale-150 group-hover:shadow-md"></div>
+        <div className="text-muted-foreground font-medium group-hover:text-secondary transition-colors duration-300">Mant. 20%</div>
+      </div>
+      <div className="text-center group">
+        <div className="w-3 h-3 bg-destructive rounded-full mx-auto mb-1 transition-all duration-300 group-hover:scale-150 group-hover:shadow-md"></div>
+        <div className="text-muted-foreground font-medium group-hover:text-destructive transition-colors duration-300">Crítico 5%</div>
+      </div>
+    </div>
+  </div>
 )
 
 // Componente de gráfico de área para rendimiento
 const PerformanceAreaChart = () => (
-    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-        <div className="text-center mb-4">
-            <h4 className="font-semibold text-foreground">Rendimiento del Sistema</h4>
-        </div>
-        <div className="relative h-32">
-            <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
-                <defs>
-                    <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-                    </linearGradient>
-                </defs>
-                {/* Área sombreada */}
-                <path
-                    d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15 L100,40 Z"
-                    fill="url(#performanceGradient)"
-                />
-                {/* Línea del gráfico */}
-                <path
-                    d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                {/* Puntos de datos */}
-                <circle cx="20" cy="35" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-                <circle cx="40" cy="30" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-                <circle cx="60" cy="25" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-                <circle cx="80" cy="20" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-                <circle cx="100" cy="15" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-            </svg>
-        </div>
-        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mt-4 font-medium">
-            <div className="text-center">Ene</div>
-            <div className="text-center">Feb</div>
-            <div className="text-center">Mar</div>
-            <div className="text-center">Abr</div>
-            <div className="text-center">May</div>
-        </div>
+  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4 animate-in slide-in-from-left-4 duration-700">
+    <div className="text-center mb-4">
+      <h4 className="font-semibold text-foreground">Rendimiento del Sistema</h4>
     </div>
+    <div className="relative h-32 group">
+      <svg className="w-full h-full transition-all duration-500 group-hover:scale-105" viewBox="0 0 100 40" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+          </linearGradient>
+        </defs>
+        {/* Área sombreada */}
+        <path
+          d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15 L100,40 Z"
+          fill="url(#performanceGradient)"
+          className="transition-all duration-500 group-hover:opacity-80"
+        />
+        {/* Línea del gráfico */}
+        <path
+          d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="transition-all duration-500 group-hover:stroke-width-3"
+        />
+        {/* Puntos de datos */}
+        <circle cx="20" cy="35" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" className="transition-all duration-300 hover:r-4 hover:shadow-lg" />
+        <circle cx="40" cy="30" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" className="transition-all duration-300 hover:r-4 hover:shadow-lg" />
+        <circle cx="60" cy="25" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" className="transition-all duration-300 hover:r-4 hover:shadow-lg" />
+        <circle cx="80" cy="20" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" className="transition-all duration-300 hover:r-4 hover:shadow-lg" />
+        <circle cx="100" cy="15" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" className="transition-all duration-300 hover:r-4 hover:shadow-lg" />
+      </svg>
+    </div>
+    <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mt-4 font-medium">
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Ene</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Feb</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Mar</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Abr</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">May</span>
+      </div>
+    </div>
+  </div>
 )
 
 // Componente de gráfico de radar para métricas de seguridad
 const SecurityRadarChart = () => (
-    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-        <div className="text-center mb-4">
-            <h4 className="font-semibold text-foreground">Métricas de Seguridad</h4>
-        </div>
-        <div className="relative w-32 h-32 mx-auto">
-            <svg className="w-full h-full" viewBox="0 0 100 100">
-                {/* Círculos concéntricos */}
-                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <circle cx="50" cy="50" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <circle cx="50" cy="50" r="20" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <circle cx="50" cy="50" r="10" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-
-                {/* Líneas del radar */}
-                <line x1="50" y1="10" x2="50" y2="90" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <line x1="10" y1="50" x2="90" y2="50" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <line x1="20" y1="20" x2="80" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
-                <line x1="80" y1="20" x2="20" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
-
-                {/* Datos del radar */}
-                <polygon
-                    points="50,15 70,35 65,50 45,50 40,35"
-                    fill="hsl(var(--primary))"
-                    fillOpacity="0.3"
-                />
-                <polygon
-                    points="50,15 70,35 65,50 45,50 40,35"
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-
-                {/* Puntos de datos */}
-                <circle cx="50" cy="15" r="2" fill="hsl(var(--primary))" />
-                <circle cx="70" cy="35" r="2" fill="hsl(var(--primary))" />
-                <circle cx="65" cy="50" r="2" fill="hsl(var(--primary))" />
-                <circle cx="45" cy="50" r="2" fill="hsl(var(--primary))" />
-                <circle cx="40" cy="35" r="2" fill="hsl(var(--primary))" />
-            </svg>
-        </div>
-        <div className="grid grid-cols-4 gap-1 text-xs mt-4 text-muted-foreground font-medium">
-            <div className="text-center">Firewall</div>
-            <div className="text-center">SSL</div>
-            <div className="text-center">Backup</div>
-            <div className="text-center">Auth</div>
-        </div>
+  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4 animate-in slide-in-from-bottom-4 duration-700">
+    <div className="text-center mb-4">
+      <h4 className="font-semibold text-foreground">Métricas de Seguridad</h4>
     </div>
+    <div className="relative w-32 h-32 mx-auto group">
+      <svg className="w-full h-full transition-all duration-500 group-hover:scale-110" viewBox="0 0 100 100">
+        {/* Círculos concéntricos */}
+        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <circle cx="50" cy="50" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <circle cx="50" cy="50" r="20" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <circle cx="50" cy="50" r="10" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        
+        {/* Líneas del radar */}
+        <line x1="50" y1="10" x2="50" y2="90" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <line x1="10" y1="50" x2="90" y2="50" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <line x1="20" y1="20" x2="80" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        <line x1="80" y1="20" x2="20" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" className="transition-all duration-300 group-hover:stroke-width-2" />
+        
+        {/* Datos del radar */}
+        <polygon
+          points="50,15 70,35 65,50 45,50 40,35"
+          fill="hsl(var(--primary))"
+          fillOpacity="0.3"
+          className="transition-all duration-500 group-hover:fill-opacity-50"
+        />
+        <polygon
+          points="50,15 70,35 65,50 45,50 40,35"
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="transition-all duration-500 group-hover:stroke-width-3"
+        />
+        
+        {/* Puntos de datos */}
+        <circle cx="50" cy="15" r="2" fill="hsl(var(--primary))" className="transition-all duration-300 group-hover:r-3 group-hover:shadow-lg" />
+        <circle cx="70" cy="35" r="2" fill="hsl(var(--primary))" className="transition-all duration-300 group-hover:r-3 group-hover:shadow-lg" />
+        <circle cx="65" cy="50" r="2" fill="hsl(var(--primary))" className="transition-all duration-300 group-hover:r-3 group-hover:shadow-lg" />
+        <circle cx="45" cy="50" r="2" fill="hsl(var(--primary))" className="transition-all duration-300 group-hover:r-3 group-hover:shadow-lg" />
+        <circle cx="40" cy="35" r="2" fill="hsl(var(--primary))" className="transition-all duration-300 group-hover:r-3 group-hover:shadow-lg" />
+      </svg>
+    </div>
+    <div className="grid grid-cols-4 gap-1 text-xs mt-4 text-muted-foreground font-medium">
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Firewall</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">SSL</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Backup</span>
+      </div>
+      <div className="text-center group">
+        <span className="transition-all duration-300 group-hover:text-primary group-hover:font-bold">Auth</span>
+      </div>
+    </div>
+  </div>
 )
 
 export default function AdministradoresPage() {
