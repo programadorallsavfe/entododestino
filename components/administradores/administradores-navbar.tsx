@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation"
 import { ChevronDown, User, Flag, HelpCircle, Menu, Users, Package, Calendar, Settings, Bell, X, ChevronLeft, ChevronRight, MapPin, Building, Hotel, Plane, Shield, BarChart3, Database, Key, FileText, CreditCard, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ModeToggle } from "@/components/mode-toggle"
 import { useIsMobile } from "@/hooks/use-mobile"
 import Image from "next/image"
 
@@ -264,10 +263,7 @@ export const AdministradoresNavbar = ({ className }: AdministradoresNavbarProps)
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Botón de Dark Theme */}
-              <div className="transition-all duration-200 hover:scale-105">
-                <ModeToggle />
-              </div>
+             
 
               {/* Botón de menú móvil */}
               <Button 

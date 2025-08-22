@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -118,6 +119,8 @@ export default function PaquetesPage() {
     calificacion: 0,
     estrellas: 0
   })
+
+  const router = useRouter()
 
   useEffect(() => {
     // Simular carga de datos de paquetes
@@ -295,8 +298,7 @@ export default function PaquetesPage() {
   })
 
   const handleVerDetalle = (paquete: Paquete) => {
-    setPaqueteSeleccionado(paquete)
-    setModalAbierto(true)
+    router.push(`/clientes/detalle-paquete?id=${paquete.id}`)
   }
 
   const handleCerrarModal = () => {

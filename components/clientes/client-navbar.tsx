@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { ChevronDown, User, Flag, HelpCircle, ShoppingCart, Heart, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ModeToggle } from "@/components/mode-toggle"
 import { useIsMobile } from "@/hooks/use-mobile"
 import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
@@ -164,9 +163,7 @@ const ClientNavbar = ({ className }: ClientNavbarProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Botón de Dark Theme */}
-            <ModeToggle />
-
+        
             {/* Botón de menú móvil */}
             <Button 
               variant="ghost" 
