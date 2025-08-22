@@ -39,6 +39,7 @@ interface Cliente {
   direccion: string
   fechaRegistro: string
   estado: 'lead' | 'cliente'
+  prioridad: 'A' | 'B'
   calificacion: number
   totalReservas: number
   valorTotal: number
@@ -55,6 +56,7 @@ interface NuevoCliente {
   ciudad: string
   direccion: string
   estado: 'lead' | 'cliente'
+  prioridad: 'A' | 'B'
   notas: string
 }
 
@@ -62,6 +64,7 @@ export const ClientesTable = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [estadoFilter, setEstadoFilter] = useState<string>('todos')
   const [paisFilter, setPaisFilter] = useState<string>('todos')
+  const [prioridadFilter, setPrioridadFilter] = useState<string>('todos')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [nuevoCliente, setNuevoCliente] = useState<NuevoCliente>({
     nombre: '',
@@ -73,6 +76,7 @@ export const ClientesTable = () => {
     ciudad: '',
     direccion: '',
     estado: 'lead',
+    prioridad: 'B',
     notas: ''
   })
 
@@ -90,6 +94,7 @@ export const ClientesTable = () => {
       direccion: 'Av. Arequipa 123, Lima',
       fechaRegistro: '2024-01-15',
       estado: 'cliente',
+      prioridad: 'A',
       calificacion: 4.8,
       totalReservas: 12,
       valorTotal: 8500,
@@ -107,6 +112,7 @@ export const ClientesTable = () => {
       direccion: 'Calle San Agustín 456, Cusco',
       fechaRegistro: '2024-02-01',
       estado: 'cliente',
+      prioridad: 'A',
       calificacion: 4.5,
       totalReservas: 8,
       valorTotal: 5200,
@@ -124,6 +130,7 @@ export const ClientesTable = () => {
       direccion: 'Carrera 15 #45-67, Bogotá',
       fechaRegistro: '2024-01-20',
       estado: 'cliente',
+      prioridad: 'A',
       calificacion: 4.9,
       totalReservas: 15,
       valorTotal: 12000,
@@ -141,6 +148,7 @@ export const ClientesTable = () => {
       direccion: 'Av. Providencia 2345, Santiago',
       fechaRegistro: '2024-02-10',
       estado: 'lead',
+      prioridad: 'B',
       calificacion: 4.2,
       totalReservas: 0,
       valorTotal: 0,
@@ -158,6 +166,7 @@ export const ClientesTable = () => {
       direccion: 'Calle San Francisco 789, Arequipa',
       fechaRegistro: '2024-02-15',
       estado: 'lead',
+      prioridad: 'B',
       calificacion: 4.0,
       totalReservas: 0,
       valorTotal: 0,
@@ -177,14 +186,16 @@ export const ClientesTable = () => {
     
     const matchesEstado = estadoFilter === 'todos' || cliente.estado === estadoFilter
     const matchesPais = paisFilter === 'todos' || cliente.pais === paisFilter
+    const matchesPrioridad = prioridadFilter === 'todos' || cliente.prioridad === prioridadFilter
     
-    return matchesSearch && matchesEstado && matchesPais
+    return matchesSearch && matchesEstado && matchesPais && matchesPrioridad
   })
 
   const limpiarFiltros = () => {
     setSearchTerm('')
     setEstadoFilter('todos')
     setPaisFilter('todos')
+    setPrioridadFilter('todos')
   }
 
   const getEstadoBadge = (estado: string) => {
@@ -192,6 +203,22 @@ export const ClientesTable = () => {
       return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Cliente</Badge>
     } else {
       return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Lead</Badge>
+    }
+  }
+
+  const getPrioridadBadge = (prioridad: string) => {
+    if (prioridad === 'A') {
+      return (
+        <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">
+          Prioridad A
+        </Badge>
+      )
+    } else {
+      return (
+        <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100 border-gray-200">
+          Prioridad B
+        </Badge>
+      )
     }
   }
 
@@ -242,6 +269,7 @@ export const ClientesTable = () => {
       ciudad: '',
       direccion: '',
       estado: 'lead',
+      prioridad: 'B',
       notas: ''
     })
     
@@ -260,6 +288,7 @@ export const ClientesTable = () => {
       ciudad: '',
       direccion: '',
       estado: 'lead',
+      prioridad: 'B',
       notas: ''
     })
     setEditingClienteId(null)
@@ -282,6 +311,7 @@ export const ClientesTable = () => {
       ciudad: cliente.ciudad,
       direccion: cliente.direccion,
       estado: cliente.estado,
+      prioridad: cliente.prioridad,
       notas: cliente.notas || ''
     })
     setEditingClienteId(cliente.id)
@@ -336,6 +366,17 @@ export const ClientesTable = () => {
                   <SelectItem value="México">México</SelectItem>
                   <SelectItem value="España">España</SelectItem>
                   <SelectItem value="Estados Unidos">Estados Unidos</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={prioridadFilter} onValueChange={setPrioridadFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas las prioridades</SelectItem>
+                  <SelectItem value="A">Prioridad A - Atención especial</SelectItem>
+                  <SelectItem value="B">Prioridad B - Clientes normales</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -416,6 +457,18 @@ export const ClientesTable = () => {
                             <SelectContent>
                               <SelectItem value="lead">Lead</SelectItem>
                               <SelectItem value="cliente">Cliente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="prioridad">Prioridad *</Label>
+                          <Select value={nuevoCliente.prioridad} onValueChange={(value) => handleInputChange('prioridad', value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="A">Prioridad A - Clientes concurrentes que requieren atención especial</SelectItem>
+                              <SelectItem value="B">Prioridad B - Clientes normales</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -543,7 +596,7 @@ export const ClientesTable = () => {
       {/* Resumen */}
       <Card className="bg-muted/30">
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-primary">{clientes.length}</div>
               <div className="text-sm text-muted-foreground">Total Clientes</div>
@@ -559,6 +612,12 @@ export const ClientesTable = () => {
                 {clientes.filter(c => c.estado === 'lead').length}
               </div>
               <div className="text-sm text-muted-foreground">Leads</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-red-600">
+                {clientes.filter(c => c.prioridad === 'A').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Prioridad A</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-purple-600">
@@ -579,6 +638,7 @@ export const ClientesTable = () => {
                 <TableHead>Contacto</TableHead>
                 <TableHead>Ubicación</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Prioridad</TableHead>
                 <TableHead>Calificación</TableHead>
                 <TableHead>Reservas</TableHead>
                 <TableHead>Valor Total</TableHead>
@@ -632,6 +692,10 @@ export const ClientesTable = () => {
                   
                   <TableCell>
                     {getEstadoBadge(cliente.estado)}
+                  </TableCell>
+                  
+                  <TableCell>
+                    {getPrioridadBadge(cliente.prioridad)}
                   </TableCell>
                   
                   <TableCell>
