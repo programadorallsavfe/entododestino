@@ -973,16 +973,10 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
           {/* Header del Modal con Botón de Cerrar */}
           <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Building className="w-6 h-6 text-blue-600" />
-              </div>
+              
               <div>
-                <h3 className="text-xl font-bold text-slate-900">
-                  Comparación de Precios
-                </h3>
-                <p className="text-sm text-slate-600">
-                  {selectedItem.name || selectedItem.title}
-                </p>
+               
+             
               </div>
             </div>
             

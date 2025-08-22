@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from 'next/navigation'
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -84,11 +85,31 @@ const LoadingComponent = () => (
 
 // Componente principal que usa useSearchParams
 const DetallesCotizacionContent = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [itinerarioData, setItinerarioData] = useState<ItinerarioData | null>(null);
   const [currentStep, setCurrentStep] = useState<'resumen' | 'datos-cliente' | 'confirmacion' | 'exportacion'>('resumen');
   const [isCallDrawerOpen, setIsCallDrawerOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('+51 ');
+  const handleProcederPago = () => {
+    if (!itinerarioData) return;
+    
+    // Navegar a la página de proceder al pago con los datos del paquete
+    const params = new URLSearchParams({
+      paqueteId: '1', // ID por defecto ya que no está en la interfaz
+      nombre: itinerarioData.destinations[0]?.name || 'Paquete Turístico',
+      precio: itinerarioData.precioDescuento.toString(),
+      personas: itinerarioData.personas.toString(),
+      fechaInicio: itinerarioData.fechaInicio,
+      fechaFin: itinerarioData.fechaFin,
+      origen: itinerarioData.destinations[0]?.name || 'Lima',
+      destino: itinerarioData.destinations[itinerarioData.destinations.length - 1]?.name || 'Destino',
+      aerolinea: 'SKY',
+      tipoVuelo: 'con-escalas'
+    });
+    
+    router.push(`/administradores/proceder-pago?${params.toString()}`);
+  }
 
   // Función para agregar un número al marcador
   const handleAddNumber = (digit: string) => {
@@ -532,7 +553,10 @@ const DetallesCotizacionContent = () => {
 
                 {/* Botones de Acción */}
                 <div className="space-y-3 pt-4">
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-white">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
+                    onClick={handleProcederPago}
+                  >
                     <CreditCard className="w-4 h-4 mr-2" />
                     Proceder al Pago
                   </Button>
