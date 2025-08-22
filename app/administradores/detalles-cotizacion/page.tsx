@@ -649,7 +649,7 @@ const DetallesCotizacionContent = () => {
                                 <Button 
                                   variant="outline" 
                                   size="sm"
-                                  className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                                  className=""
                                   onClick={() => setIsCallDrawerOpen(false)}
                                 >
                                   Cerrar
