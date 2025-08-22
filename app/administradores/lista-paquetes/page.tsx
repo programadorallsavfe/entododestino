@@ -461,27 +461,7 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
           {/* Banner Principal */}
          
 
-          {/* Banner de Pago del 50% */}
-          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-green-100 p-2 rounded-full">
-                    <DollarSign className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-green-800 text-lg">¡Asegura tu paquete!</span>
-                    <div className="text-sm text-green-700">Pagando solo el 50% del monto total</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="bg-green-100 px-3 py-1 rounded-full">
-                    <span className="text-sm font-medium text-green-800">50% OFF</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+         
         </div>
 
         {/* Resultados y Filtros */}
