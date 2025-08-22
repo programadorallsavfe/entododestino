@@ -1322,6 +1322,58 @@ export const AITripsForm = ({ onSearch }: { onSearch: (params: any) => void }) =
 
 // Formulario de Trip Planner
 export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void }) => {
+  const [showGuestSelector, setShowGuestSelector] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [guestConfig, setGuestConfig] = useState({
+    rooms: 1,
+    adults: 2,
+    children: 0
+  });
+
+  const handleGuestChange = (type: 'rooms' | 'adults' | 'children', action: 'increase' | 'decrease') => {
+    setGuestConfig(prev => {
+      const newConfig = { ...prev };
+      
+      if (action === 'increase') {
+        if (type === 'rooms') {
+          newConfig.rooms = Math.min(prev.rooms + 1, 5);
+        } else if (type === 'adults') {
+          newConfig.adults = Math.min(prev.adults + 1, 4 * prev.rooms);
+        } else if (type === 'children') {
+          newConfig.children = Math.min(prev.children + 1, 4 * prev.rooms - prev.adults);
+        }
+      } else {
+        if (type === 'rooms') {
+          if (prev.rooms > 1) {
+            newConfig.rooms = prev.rooms - 1;
+            // Ajustar adultos y niños si es necesario
+            const maxPeople = newConfig.rooms * 4;
+            if (prev.adults + prev.children > maxPeople) {
+              newConfig.adults = Math.min(prev.adults, maxPeople);
+              newConfig.children = Math.max(0, maxPeople - newConfig.adults);
+            }
+          }
+        } else if (type === 'adults') {
+          if (prev.adults > 1) {
+            newConfig.adults = prev.adults - 1;
+          }
+        } else if (type === 'children') {
+          if (prev.children > 0) {
+            newConfig.children = prev.children - 1;
+          }
+        }
+      }
+      
+      return newConfig;
+    });
+  };
+
+  const resetGuestConfig = () => {
+    setGuestConfig({ rooms: 1, adults: 2, children: 0 });
+  };
+
+  const availablePeople = guestConfig.rooms * 4 - guestConfig.adults - guestConfig.children;
+
   return (
     <Card className="border-0 shadow-none w-full bg-transparent">
       <CardContent className="space-y-8 p-0">
@@ -1357,30 +1409,50 @@ export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void 
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-3">
-            <Label htmlFor="start-date" className="text-base font-medium">Fecha de inicio</Label>
-            <div className="relative">
-               <CalendarIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                id="start-date"
-                type="date"
-                className="pl-12 h-12 border-input focus:ring-ring text-base"
-              />
-            </div>
-          </div>
+                     <div className="space-y-3">
+             <Label htmlFor="start-date" className="text-base font-medium">Fecha de inicio</Label>
+             <Popover>
+               <PopoverTrigger asChild>
+                 <div className="relative">
+                   <CalendarIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                   <div className="w-full pl-12 pr-12 h-12 border border-input rounded-md bg-background cursor-pointer hover:border-ring transition-colors flex items-center justify-between">
+                     <span className={startDate ? "text-foreground" : "text-muted-foreground"}>
+                       {startDate ? startDate.toLocaleDateString('es-ES', { 
+                         day: 'numeric',
+                         month: 'long', 
+                         year: 'numeric' 
+                       }) : "Seleccionar fecha..."}
+                     </span>
+                     <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                   </div>
+                 </div>
+               </PopoverTrigger>
+               <PopoverContent className="w-auto p-0" align="start">
+                 <CalendarComponent
+                   mode="single"
+                   className="rounded-md border"
+                   disabled={(date) => date < new Date()}
+                 />
+               </PopoverContent>
+             </Popover>
+           </div>
           
-          <div className="space-y-3">
-            <Label htmlFor="guests" className="text-base font-medium">Seleccionar huéspedes</Label>
-            <div className="relative">
-              <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                id="guests"
-                placeholder="1 Habitación, 2 adultos"
-                className="pl-12 pr-12 h-12 border-input focus:ring-ring text-base"
-              />
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            </div>
-          </div>
+                     <div className="space-y-3">
+             <Label htmlFor="guests" className="text-base font-medium">Seleccionar huéspedes</Label>
+             <div className="relative">
+               <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+               <div 
+                 onClick={() => setShowGuestSelector(true)}
+                 className="w-full pl-12 pr-12 h-12 border border-input rounded-md bg-background cursor-pointer hover:border-ring transition-colors flex items-center justify-between"
+               >
+                 <span className={guestConfig.rooms > 0 ? "text-foreground" : "text-muted-foreground"}>
+                   {guestConfig.rooms} Habitación{guestConfig.rooms > 1 ? 'es' : ''}, {guestConfig.adults} adulto{guestConfig.adults > 1 ? 's' : ''}
+                   {guestConfig.children > 0 && `, ${guestConfig.children} niño${guestConfig.children > 1 ? 's' : ''}`}
+                 </span>
+                 <ChevronDown className="text-muted-foreground w-5 h-5" />
+               </div>
+             </div>
+           </div>
         </div>
 
         <div className="flex justify-end">
@@ -1388,6 +1460,141 @@ export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void 
             Buscar
           </Button>
         </div>
+
+        {/* Modal Selector de Huéspedes */}
+        {showGuestSelector && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+              {/* Header */}
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-slate-900">Seleccionar huéspedes</h3>
+              </div>
+
+              {/* Campo de resumen */}
+              <div className="mb-6">
+                <div className="w-full p-4 border-2 border-blue-200 rounded-xl bg-blue-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-6 h-6 text-blue-600" />
+                      <span className="text-base font-medium text-slate-900">
+                        {guestConfig.rooms} Habitación{guestConfig.rooms > 1 ? 'es' : ''}, {guestConfig.adults} adulto{guestConfig.adults > 1 ? 's' : ''}
+                        {guestConfig.children > 0 && `, ${guestConfig.children} niño${guestConfig.children > 1 ? 's' : ''}`}
+                      </span>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-blue-600 transform rotate-180" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Controles de selección */}
+              <div className="space-y-6">
+                {/* Habitaciones */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900">Habitaciones</h4>
+                    <p className="text-sm text-slate-600">Cada habitación puede tener hasta 4 personas</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleGuestChange('rooms', 'decrease')}
+                      disabled={guestConfig.rooms <= 1}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-slate-900">{guestConfig.rooms}</span>
+                    <button
+                      onClick={() => handleGuestChange('rooms', 'increase')}
+                      disabled={guestConfig.rooms >= 5}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Personas disponibles */}
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <span className="text-sm font-medium text-green-700">
+                    {availablePeople} persona{availablePeople !== 1 ? 's' : ''} disponible{availablePeople !== 1 ? 's' : ''}
+                  </span>
+                  <button
+                    onClick={resetGuestConfig}
+                    className="text-sm text-blue-600 hover:text-blue-700 underline"
+                  >
+                    Resetear
+                  </button>
+                </div>
+
+                {/* Adultos */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900">Adultos</h4>
+                    <p className="text-sm text-slate-600">13 años o más</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleGuestChange('adults', 'decrease')}
+                      disabled={guestConfig.adults <= 1}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-slate-900">{guestConfig.adults}</span>
+                    <button
+                      onClick={() => handleGuestChange('adults', 'increase')}
+                      disabled={guestConfig.adults >= 4 * guestConfig.rooms}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Niños */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900">Niños</h4>
+                    <p className="text-sm text-slate-600">0 a 12 años</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleGuestChange('children', 'decrease')}
+                      disabled={guestConfig.children <= 0}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-slate-900">{guestConfig.children}</span>
+                    <button
+                      onClick={() => handleGuestChange('children', 'increase')}
+                      disabled={guestConfig.children >= 4 * guestConfig.rooms - guestConfig.adults}
+                      className="w-8 h-8 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => setShowGuestSelector(false)}
+                  className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => setShowGuestSelector(false)}
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Separator />
 
@@ -1404,19 +1611,17 @@ export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void 
 export const PackagesForm = ({ onSearch }: { onSearch: (params: any) => void }) => {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedNights, setSelectedNights] = useState<string>("");
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   
   const [showCountriesDropdown, setShowCountriesDropdown] = useState(false);
   const [showDestinationsDropdown, setShowDestinationsDropdown] = useState(false);
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showNightsDropdown, setShowNightsDropdown] = useState(false);
   const [showThemesDropdown, setShowThemesDropdown] = useState(false);
   
   const countriesRef = useRef<HTMLDivElement>(null);
   const destinationsRef = useRef<HTMLDivElement>(null);
-  const dateRef = useRef<HTMLDivElement>(null);
   const nightsRef = useRef<HTMLDivElement>(null);
   const themesRef = useRef<HTMLDivElement>(null);
 
@@ -1429,9 +1634,7 @@ export const PackagesForm = ({ onSearch }: { onSearch: (params: any) => void }) 
       if (destinationsRef.current && !destinationsRef.current.contains(event.target as Node)) {
         setShowDestinationsDropdown(false);
       }
-      if (dateRef.current && !dateRef.current.contains(event.target as Node)) {
-        setShowDateDropdown(false);
-      }
+
       if (nightsRef.current && !nightsRef.current.contains(event.target as Node)) {
         setShowNightsDropdown(false);
       }
@@ -1461,10 +1664,7 @@ export const PackagesForm = ({ onSearch }: { onSearch: (params: any) => void }) 
     "Malinas", "Cabo Verde", "Bangkok", "Phuket", "Tokio", "Singapur"
   ];
 
-  const months = [
-    "Enero 2025", "Febrero 2025", "Marzo 2025", "Abril 2025", "Mayo 2025", "Junio 2025",
-    "Julio 2025", "Agosto 2025", "Septiembre 2025", "Octubre 2025", "Noviembre 2025", "Diciembre 2025"
-  ];
+
 
   const nightsOptions = [
     "1-3 noches", "4-6 noches", "7-10 noches", "11-15 noches", "16-20 noches", "21+ noches"
@@ -1583,48 +1783,36 @@ export const PackagesForm = ({ onSearch }: { onSearch: (params: any) => void }) 
             </div>
           </div>
           
-          {/* Selección de Fecha */}
-          <div className="space-y-3">
-            <Label htmlFor="when-packages" className="text-base font-medium text-foreground">Cuándo</Label>
-            <div className="relative" ref={dateRef}>
-               <CalendarIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 z-10" />
-              <div 
-                className="w-full pl-12 pr-12 py-4 border border-input rounded-md bg-background cursor-pointer hover:border-ring transition-colors"
-                onClick={() => setShowDateDropdown(!showDateDropdown)}
-              >
-                <span className={selectedDate ? "text-foreground" : "text-muted-foreground"}>
-                  {selectedDate || "Seleccionar fecha..."}
-                </span>
-              </div>
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              
-              {/* Dropdown de Fechas */}
-              {showDateDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50">
-                  <div className="p-2">
-                    <div className="space-y-1">
-                      {months.map((month) => (
-                        <button
-                          key={month}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                            selectedDate === month
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-accent hover:text-accent-foreground'
-                          }`}
-                          onClick={() => {
-                            setSelectedDate(month);
-                            setShowDateDropdown(false);
-                          }}
-                        >
-                          {month}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+                     {/* Selección de Fecha */}
+           <div className="space-y-3">
+             <Label htmlFor="when-packages" className="text-base font-medium text-foreground">Cuándo</Label>
+             <Popover>
+               <PopoverTrigger asChild>
+                 <div className="relative">
+                   <CalendarIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 z-10" />
+                   <div className="w-full pl-12 pr-12 py-4 border border-input rounded-md bg-background cursor-pointer hover:border-ring transition-colors">
+                     <span className={selectedDate ? "text-foreground" : "text-muted-foreground"}>
+                       {selectedDate ? selectedDate.toLocaleDateString('es-ES', { 
+                         day: 'numeric',
+                         month: 'long', 
+                         year: 'numeric' 
+                       }) : "Seleccionar fecha..."}
+                     </span>
+                   </div>
+                   <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                 </div>
+               </PopoverTrigger>
+               <PopoverContent className="w-auto p-0" align="start">
+                 <CalendarComponent
+                   mode="single"
+                   selected={selectedDate}
+                   onSelect={(date) => setSelectedDate(date)}
+                   className="rounded-md border"
+                   disabled={(date) => date < new Date()}
+                 />
+               </PopoverContent>
+             </Popover>
+           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1815,7 +2003,7 @@ export const PackagesForm = ({ onSearch }: { onSearch: (params: any) => void }) 
             onClick={() => {
               onSearch({
                 countries: selectedCountries,
-                date: selectedDate,
+                date: selectedDate ? selectedDate.toISOString().split('T')[0] : "",
                 destinations: selectedDestinations,
                 nights: selectedNights,
                 themes: selectedThemes

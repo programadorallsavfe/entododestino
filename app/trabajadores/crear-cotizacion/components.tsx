@@ -1322,6 +1322,74 @@ export const AITripsForm = ({ onSearch }: { onSearch: (params: any) => void }) =
 
 // Formulario de Trip Planner
 export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void }) => {
+  const [guestSelection, setGuestSelection] = useState({
+    rooms: 1,
+    adults: 2,
+    children: 0,
+    childAges: [] as number[]
+  });
+  const [showGuestSelector, setShowGuestSelector] = useState(false);
+  
+  const guestSelectorRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar dropdowns al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (guestSelectorRef.current && !guestSelectorRef.current.contains(event.target as Node)) {
+        setShowGuestSelector(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Inicializar edades de niños
+  useEffect(() => {
+    if (guestSelection.children > 0) {
+      const newChildAges = Array(guestSelection.children).fill(0);
+      setGuestSelection(prev => ({ ...prev, childAges: newChildAges }));
+    }
+  }, [guestSelection.children]);
+
+  // Función para formatear la selección de huéspedes
+  const formatGuestSelection = () => {
+    const { rooms, adults, children } = guestSelection;
+    let result = `${rooms} Habitación${rooms !== 1 ? 'es' : ''}, ${adults} adulto${adults !== 1 ? 's' : ''}`;
+    if (children > 0) result += `, ${children} niño${children !== 1 ? 's' : ''}`;
+    return result;
+  };
+
+  // Función para obtener el total de personas
+  const getTotalPeople = () => {
+    return guestSelection.adults + guestSelection.children;
+  };
+
+  // Función para verificar si se pueden agregar más personas
+  const canAddMorePeople = () => {
+    return getTotalPeople() < 4; // Máximo 4 personas por habitación
+  };
+
+  // Función para obtener texto de ayuda
+  const getHelpText = () => {
+    const total = getTotalPeople();
+    if (total === 0) return "Selecciona al menos 1 adulto";
+    if (total > 4) return "Máximo 4 personas por habitación";
+    return `${total} persona${total !== 1 ? 's' : ''} seleccionada${total !== 1 ? 's' : ''}`;
+  };
+
+  // Función para resetear la selección
+  const resetGuestSelection = () => {
+    setGuestSelection({
+      rooms: 1,
+      adults: 2,
+      children: 0,
+      childAges: []
+    });
+  };
+
   return (
     <Card className="border-0 shadow-none w-full bg-transparent">
       <CardContent className="space-y-8 p-0">
@@ -1371,14 +1439,161 @@ export const TripPlannerForm = ({ onSearch }: { onSearch: (params: any) => void 
           
           <div className="space-y-3">
             <Label htmlFor="guests" className="text-base font-medium">Seleccionar huéspedes</Label>
-            <div className="relative">
+            <div className="relative" ref={guestSelectorRef}>
               <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                id="guests"
-                placeholder="1 Habitación, 2 adultos"
-                className="pl-12 pr-12 h-12 border-input focus:ring-ring text-base"
-              />
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <div
+                onClick={() => setShowGuestSelector(!showGuestSelector)}
+                className="w-full pl-12 pr-12 h-12 border border-input rounded-md flex items-center justify-between cursor-pointer hover:border-ring transition-colors bg-background"
+              >
+                <span className={getTotalPeople() > 0 ? "text-foreground" : "text-muted-foreground"}>
+                  {formatGuestSelection()}
+                </span>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </div>
+              
+              {showGuestSelector && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-lg z-50 p-4 min-w-[320px]">
+                  <div className="space-y-4">
+                    {/* Habitaciones */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium">Habitaciones</Label>
+                        <p className="text-xs text-muted-foreground">Número de habitaciones</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, rooms: Math.max(1, prev.rooms - 1) }))}
+                          disabled={guestSelection.rooms <= 1}
+                          className="w-8 h-8 p-0"
+                        >
+                          -
+                        </Button>
+                        <span className="w-8 text-center">{guestSelection.rooms}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, rooms: prev.rooms + 1 }))}
+                          className="w-8 h-8 p-0"
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Adultos */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium">Adultos</Label>
+                        <p className="text-xs text-muted-foreground">13+ años</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, adults: Math.max(1, prev.adults - 1) }))}
+                          disabled={guestSelection.adults <= 1}
+                          className="w-8 h-8 p-0"
+                        >
+                          -
+                        </Button>
+                        <span className="w-8 text-center">{guestSelection.adults}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, adults: prev.adults + 1 }))}
+                          disabled={!canAddMorePeople()}
+                          className="w-8 h-8 p-0"
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Niños */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium">Niños</Label>
+                        <p className="text-xs text-muted-foreground">2-12 años</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, children: Math.max(0, prev.children - 1) }))}
+                          disabled={guestSelection.children <= 0}
+                          className="w-8 h-8 p-0"
+                        >
+                          -
+                        </Button>
+                        <span className="w-8 text-center">{guestSelection.children}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setGuestSelection(prev => ({ ...prev, children: prev.children + 1 }))}
+                          disabled={!canAddMorePeople()}
+                          className="w-8 h-8 p-0"
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Edades de niños */}
+                    {guestSelection.children > 0 && (
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium">Edades de los niños</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {Array.from({ length: guestSelection.children }, (_, index) => (
+                            <Select
+                              key={index}
+                              value={guestSelection.childAges[index]?.toString() || "0"}
+                              onValueChange={(value) => {
+                                const newChildAges = [...guestSelection.childAges];
+                                newChildAges[index] = parseInt(value);
+                                setGuestSelection(prev => ({ ...prev, childAges: newChildAges }));
+                              }}
+                            >
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from({ length: 11 }, (_, age) => (
+                                  <SelectItem key={age} value={age.toString()}>
+                                    {age} años
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Separator />
+
+                    {/* Información y botón de reset */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-muted-foreground">
+                        {getHelpText()}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetGuestSelection}
+                        className="text-xs h-7 px-2"
+                      >
+                        Resetear
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
