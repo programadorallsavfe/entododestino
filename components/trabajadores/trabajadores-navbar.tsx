@@ -255,9 +255,11 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+ 
+
 
             
-           
+                  
 
               {/* Botón de menú móvil */}
               <Button 

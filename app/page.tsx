@@ -52,7 +52,7 @@ export default function Home() {
               Sistema de Turismo
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Gestiona itinerarios, reservas y experiencias turísticas en Sudamérica
+              Gestiona itinerarios, reservas y experiencias turísticas
             </p>
             
           </div>
