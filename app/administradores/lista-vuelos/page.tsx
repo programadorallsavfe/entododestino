@@ -1044,6 +1044,64 @@ export default function ListaVuelosPage() {
                     </div>
                   </div>
 
+                  {/* Calendario del Vuelo */}
+                  <div className="bg-muted/30 rounded-lg p-6 border border-border">
+                    <h4 className="text-xl font-semibold text-foreground mb-6 pb-3 border-b border-border">
+                      Calendario del Vuelo
+                    </h4>
+                    <div className="space-y-4">
+                      {/* Fechas principales */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-card rounded-lg border border-border shadow-sm">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-foreground">
+                              {new Date(vueloSeleccionado.fechaSalida).getDate()}
+                            </div>
+                            <div className="text-sm text-muted-foreground font-medium">
+                              {new Date(vueloSeleccionado.fechaSalida).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
+                              Salida
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-card rounded-lg border border-border shadow-sm">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-foreground">
+                              {new Date(vueloSeleccionado.fechaLlegada).getDate()}
+                            </div>
+                            <div className="text-sm text-muted-foreground font-medium">
+                              {new Date(vueloSeleccionado.fechaLlegada).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
+                              Llegada
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Información adicional de fechas */}
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 px-3 bg-card rounded-lg border border-border">
+                          <span className="text-sm font-medium text-card-foreground">Duración del viaje</span>
+                          <span className="text-sm font-semibold text-foreground">{vueloSeleccionado.duracion}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 px-3 bg-card rounded-lg border border-border">
+                          <span className="text-sm font-medium text-card-foreground">Última actualización</span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {new Date(vueloSeleccionado.ultimaActualizacion).toLocaleDateString('es-ES', { 
+                              day: '2-digit', 
+                              month: '2-digit', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Tripulación */}
                   <div className="bg-muted/30 rounded-lg p-6 border border-border">
                     <h4 className="text-xl font-semibold text-foreground mb-6 pb-3 border-b border-border">
