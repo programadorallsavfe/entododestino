@@ -502,13 +502,7 @@ const DashboardEstadisticas = ({ estadisticas }: { estadisticas: Estadisticas })
           <p className="text-sm text-muted-foreground mb-1">Ingresos Estimados</p>
           <p className="text-2xl font-bold text-green-600">{formatCurrency(estadisticas.ingresosEstimados)}</p>
         </div>
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-1">Estado del Sistema</p>
-          <Badge className="bg-green-100 text-green-800 border-green-200">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Operativo
-          </Badge>
-        </div>
+       
       </div>
     </div>
   </div>

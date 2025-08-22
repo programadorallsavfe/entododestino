@@ -374,178 +374,159 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Formulario de Búsqueda Principal */}
-        <Card className="mb-8 bg-primary text-white border-primary">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="mx-auto px-4 py-8">
+        {/* Filtros de Búsqueda */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+            {/* Filtros Principales */}
+            <div className="flex flex-wrap items-center gap-4">
               {/* Origen */}
-              <div>
-                <Label className="text-sm font-medium text-white">ORIGEN</Label>
-                <div className="relative mt-1">
-                  <div className="absolute left-3 top-3 w-3 h-3 bg-white rounded-full"></div>
-                  <Select value={origen} onValueChange={setOrigen}>
-                    <SelectTrigger className="pl-8 bg-white text-gray-900 border-0">
-                      <SelectValue placeholder="Ciudad de origen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Lima, Lima, Perú">Lima, Lima, Perú</SelectItem>
-                      <SelectItem value="Cusco, Cusco, Perú">Cusco, Cusco, Perú</SelectItem>
-                      <SelectItem value="Arequipa, Arequipa, Perú">Arequipa, Arequipa, Perú</SelectItem>
-                      <SelectItem value="Trujillo, La Libertad, Perú">Trujillo, La Libertad, Perú</SelectItem>
-                      <SelectItem value="Piura, Piura, Perú">Piura, Piura, Perú</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="flex flex-col space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Origen</Label>
+                <Select value={origen} onValueChange={setOrigen}>
+                  <SelectTrigger className="w-48 h-9 border border-border bg-background hover:bg-accent/50">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    <SelectValue placeholder="Ciudad de origen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Lima, Lima, Perú">Lima, Lima, Perú</SelectItem>
+                    <SelectItem value="Cusco, Cusco, Perú">Cusco, Cusco, Perú</SelectItem>
+                    <SelectItem value="Arequipa, Arequipa, Perú">Arequipa, Arequipa, Perú</SelectItem>
+                    <SelectItem value="Trujillo, La Libertad, Perú">Trujillo, La Libertad, Perú</SelectItem>
+                    <SelectItem value="Piura, Piura, Perú">Piura, Piura, Perú</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Botón de Intercambio */}
-              <div className="flex items-end justify-center">
+              <div className="flex items-end pt-6">
                 <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-10 h-10 rounded-full bg-white hover:bg-gray-100"
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 rounded-full hover:bg-accent"
                   onClick={() => {
                     const temp = origen
                     setOrigen(destino)
                     setDestino(temp)
                   }}
                 >
-                  <ArrowRightLeft className="w-4 h-4 text-primary" />
+                  <ArrowRightLeft className="w-3 h-3 text-muted-foreground" />
                 </Button>
               </div>
 
               {/* Destino */}
-              <div>
-                <Label className="text-sm font-medium text-white">DESTINO</Label>
-                <div className="relative mt-1">
-                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <Select value={destino} onValueChange={setDestino}>
-                    <SelectTrigger className="pl-10 bg-white text-gray-900 border-0">
-                      <SelectValue placeholder="Ciudad de destino" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Buenos Aires, Argentina">Buenos Aires, Argentina</SelectItem>
-                      <SelectItem value="Santiago, Chile">Santiago, Chile</SelectItem>
-                      <SelectItem value="Bogotá, Colombia">Bogotá, Colombia</SelectItem>
-                      <SelectItem value="Ciudad de México, México">Ciudad de México, México</SelectItem>
-                      <SelectItem value="Madrid, España">Madrid, España</SelectItem>
-                      <SelectItem value="París, Francia">París, Francia</SelectItem>
-                      <SelectItem value="Roma, Italia">Roma, Italia</SelectItem>
-                      <SelectItem value="Nueva York, Estados Unidos">Nueva York, Estados Unidos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="flex flex-col space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Destino</Label>
+                <Select value={destino} onValueChange={setDestino}>
+                  <SelectTrigger className="w-48 h-9 border border-border bg-background hover:bg-accent/50">
+                    <MapPin className="w-3 h-3 text-muted-foreground mr-2" />
+                    <SelectValue placeholder="Ciudad de destino" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Buenos Aires, Argentina">Buenos Aires, Argentina</SelectItem>
+                    <SelectItem value="Santiago, Chile">Santiago, Chile</SelectItem>
+                    <SelectItem value="Bogotá, Colombia">Bogotá, Colombia</SelectItem>
+                    <SelectItem value="Ciudad de México, México">Ciudad de México, México</SelectItem>
+                    <SelectItem value="Madrid, España">Madrid, España</SelectItem>
+                    <SelectItem value="París, Francia">París, Francia</SelectItem>
+                    <SelectItem value="Roma, Italia">Roma, Italia</SelectItem>
+                    <SelectItem value="Nueva York, Estados Unidos">Nueva York, Estados Unidos</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Fechas */}
-              <div>
-                <Label className="text-sm font-medium text-white">FECHAS</Label>
-                <div className="mt-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal bg-white text-gray-900 border-0 hover:bg-gray-50"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {fechaInicio ? formatearFecha(fechaInicio) : <span className="text-muted-foreground">Seleccionar fecha inicio</span>}
-                      </Button>
-                    </PopoverTrigger>
-                                         <PopoverContent className="w-auto p-0 bg-white border border-gray-200 shadow-lg rounded-md" align="start" side="bottom" sideOffset={4}>
-                       <CustomCalendar
-                         selected={fechaInicio}
-                         onSelect={setFechaInicio}
-                         disabled={(date: Date) => date < new Date()}
-                         className="rounded-md"
-                       />
-                     </PopoverContent>
-                  </Popover>
-                </div>
+              <div className="flex flex-col space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Fechas</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-48 h-9 justify-start text-left font-normal border border-border bg-background hover:bg-accent/50"
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3 text-muted-foreground" />
+                      {fechaInicio ? formatearFecha(fechaInicio) : <span className="text-muted-foreground">Fecha inicio</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg" align="start">
+                    <CustomCalendar
+                      selected={fechaInicio}
+                      onSelect={setFechaInicio}
+                      disabled={(date: Date) => date < new Date()}
+                      className="rounded-md"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Noches */}
-              <div>
-                <Label className="text-sm font-medium text-white">{noches} NOCHES</Label>
-                <div className="mt-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal bg-white text-gray-900 border-0 hover:bg-gray-50"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {fechaFin ? formatearFecha(fechaFin) : <span className="text-muted-foreground">Seleccionar fecha fin</span>}
-                      </Button>
-                    </PopoverTrigger>
-                                         <PopoverContent className="w-auto p-0 bg-white border border-gray-200 shadow-lg rounded-md" align="start" side="bottom" sideOffset={4}>
-                       <CustomCalendar
-                         selected={fechaFin}
-                         onSelect={setFechaFin}
-                         disabled={(date: Date) => date <= (fechaInicio || new Date())}
-                         className="rounded-md"
-                       />
-                     </PopoverContent>
-                  </Popover>
-                </div>
+              <div className="flex flex-col space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{noches} Noches</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-48 h-9 justify-start text-left font-normal border border-border bg-background hover:bg-accent/50"
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3 text-muted-foreground" />
+                      {fechaFin ? formatearFecha(fechaFin) : <span className="text-muted-foreground">Fecha fin</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg" align="start">
+                    <CustomCalendar
+                      selected={fechaFin}
+                      onSelect={setFechaFin}
+                      disabled={(date: Date) => date <= (fechaInicio || new Date())}
+                      className="rounded-md"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
-            </div>
 
-            {/* Segunda Fila */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               {/* Habitaciones y Personas */}
-              <div>
-                <Label className="text-sm font-medium text-white">HABITACIONES</Label>
-                <div className="relative mt-1">
-                  <Bed className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                  <Select 
-                    value={`${habitaciones}-${personas}`} 
-                    onValueChange={(value) => {
-                      const [h, p] = value.split('-').map(Number)
-                      setHabitaciones(h)
-                      setPersonas(p)
-                    }}
-                  >
-                    <SelectTrigger className="pl-10 bg-white text-gray-900 border-0">
-                      <SelectValue placeholder="Seleccionar habitaciones y personas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-1">1 habitación, 1 persona</SelectItem>
-                      <SelectItem value="1-2">1 habitación, 2 personas</SelectItem>
-                      <SelectItem value="1-3">1 habitación, 3 personas</SelectItem>
-                      <SelectItem value="1-4">1 habitación, 4 personas</SelectItem>
-                      <SelectItem value="2-2">2 habitaciones, 2 personas</SelectItem>
-                      <SelectItem value="2-3">2 habitaciones, 3 personas</SelectItem>
-                      <SelectItem value="2-4">2 habitaciones, 4 personas</SelectItem>
-                      <SelectItem value="2-5">2 habitaciones, 5 personas</SelectItem>
-                      <SelectItem value="3-3">3 habitaciones, 3 personas</SelectItem>
-                      <SelectItem value="3-4">3 habitaciones, 4 personas</SelectItem>
-                      <SelectItem value="3-5">3 habitaciones, 5 personas</SelectItem>
-                      <SelectItem value="3-6">3 habitaciones, 6 personas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Enlaces de Acción */}
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" className="text-white hover:text-primary-foreground p-0 h-auto">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Cambiar ciudad o fechas del alojamiento
-                </Button>
-               
-              </div>
-
-              {/* Botón de Búsqueda */}
-              <div className="flex justify-end">
-                <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-2">
-                  <Search className="w-4 h-4 mr-2" />
-                  Buscar
-                </Button>
+              <div className="flex flex-col space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Habitaciones</Label>
+                <Select 
+                  value={`${habitaciones}-${personas}`} 
+                  onValueChange={(value) => {
+                    const [h, p] = value.split('-').map(Number)
+                    setHabitaciones(h)
+                    setPersonas(p)
+                  }}
+                >
+                  <SelectTrigger className="w-48 h-9 border border-border bg-background hover:bg-accent/50">
+                    <Bed className="w-3 h-3 text-muted-foreground mr-2" />
+                    <SelectValue placeholder="Habitaciones y personas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-1">1 habitación, 1 persona</SelectItem>
+                    <SelectItem value="1-2">1 habitación, 2 personas</SelectItem>
+                    <SelectItem value="1-3">1 habitación, 3 personas</SelectItem>
+                    <SelectItem value="1-4">1 habitación, 4 personas</SelectItem>
+                    <SelectItem value="2-2">2 habitaciones, 2 personas</SelectItem>
+                    <SelectItem value="2-3">2 habitaciones, 3 personas</SelectItem>
+                    <SelectItem value="2-4">2 habitaciones, 4 personas</SelectItem>
+                    <SelectItem value="2-5">2 habitaciones, 5 personas</SelectItem>
+                    <SelectItem value="3-3">3 habitaciones, 3 personas</SelectItem>
+                    <SelectItem value="3-4">3 habitaciones, 4 personas</SelectItem>
+                    <SelectItem value="3-5">3 habitaciones, 5 personas</SelectItem>
+                    <SelectItem value="3-6">3 habitaciones, 6 personas</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Botón de Búsqueda */}
+            <div className="flex items-end pt-6">
+              <Button className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Search className="w-4 h-4 mr-2" />
+                Buscar
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Banner de Promoción */}
         <div className="space-y-4 mb-6">
@@ -1092,7 +1073,9 @@ ${paquete.descuentoTarjeta ? `🎯 *Descuento tarjeta:* US$ ${paquete.descuentoT
 
                                        {/* Botones de Acción */}
                     <div className="space-y-3">
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-white py-3 text-lg">
+                      <Button className="w-full bg-primary hover:bg-primary/90 text-white py-3 text-lg
+                      " onClick={() => handleLlamar(paqueteSeleccionado.vuelo.telefono  )}
+                      >
                         <Phone className="w-5 h-5 mr-2" />
                         Llamar para Reservar
                       </Button>

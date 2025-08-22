@@ -339,7 +339,7 @@ export default function CrearCotizacionPage() {
     
       <div className="mx-auto relative z-10">
         {/* Header con Banner */}
-        <div className="relative mb-8 rounded-xl overflow-hidden">
+        <div className="relative mb-8 overflow-hidden">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: "url('/assets/banner.jpg')" }}
@@ -523,7 +523,7 @@ const AccommodationForm = ({ onSearch }: { onSearch: (params: any) => void }) =>
   };
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 px-12">
       {/* Tipo de Alojamiento */}
       <div className="flex gap-4 mb-6">
         {[
@@ -546,7 +546,7 @@ const AccommodationForm = ({ onSearch }: { onSearch: (params: any) => void }) =>
       </div>
 
       {/* Campos de búsqueda */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 px-12">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Destino</label>
           <div className="relative" ref={destinationRef}>

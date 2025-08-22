@@ -968,307 +968,315 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
     const highestPrice = Math.max(...pricesForDates.map(d => d.price));
     
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl lg:max-w-5xl max-h-[95vh] overflow-hidden">
-          {/* Header del Modal */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col">
+          {/* Header del Modal con Botón de Cerrar */}
+          <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Building className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Comparación de Precios
+                </h3>
+                <p className="text-sm text-slate-600">
+                  {selectedItem.name || selectedItem.title}
+                </p>
+              </div>
+            </div>
+            
+            {/* Botón de Cerrar en Header */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-10 h-10 rounded-full hover:bg-slate-200"
+              onClick={closePriceComparison}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </Button>
+          </div>
           
-          
-          <div className="p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-[calc(95vh-120px)]">
-            {/* Información del Item Seleccionado */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-                <div className="lg:col-span-2">
-                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                    <div className="p-3 sm:p-4 bg-blue-100 rounded-xl self-center sm:self-start">
-                      <Building className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-                    </div>
-                    <div className="flex-1 text-center sm:text-left">
-                      <h4 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
-                        {selectedItem.name || selectedItem.title}
-                      </h4>
-                      <p className="text-base sm:text-lg text-slate-600 mb-6">
-                        {selectedItem.location || `${selectedItem.origin} → ${selectedItem.destination}`}
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
-                          <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Precio Base</span>
-                          <div className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">{formatPrice(selectedItem.price)}</div>
-                        </div>
-                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
-                          <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Rango de Precios</span>
-                          <div className="text-lg sm:text-xl font-semibold text-slate-900 mt-2">
-                            {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
+          {/* Contenido del Modal - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="space-y-6">
+              {/* Información del Item Seleccionado */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      <div className="p-3 bg-blue-100 rounded-xl self-center sm:self-start">
+                        <Building className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <div className="flex-1 text-center sm:text-left">
+                        <h4 className="text-2xl font-bold text-slate-900 mb-3">
+                          {selectedItem.name || selectedItem.title}
+                        </h4>
+                        <p className="text-lg text-slate-600 mb-6">
+                          {selectedItem.location || `${selectedItem.origin} → ${selectedItem.destination}`}
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
+                            <span className="text-sm text-blue-600 uppercase tracking-wide font-medium">Precio Base</span>
+                            <div className="text-2xl font-bold text-slate-900 mt-2">{formatPrice(selectedItem.price)}</div>
                           </div>
-                        </div>
-                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
-                          <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Ahorro Máximo</span>
-                          <div className="text-lg sm:text-xl font-semibold text-green-600 mt-2">
-                            {formatPrice(selectedItem.price - lowestPrice)}
+                          <div className="text-center p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
+                            <span className="text-sm text-blue-600 uppercase tracking-wide font-medium">Rango de Precios</span>
+                            <div className="text-xl font-semibold text-slate-900 mt-2">
+                              {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
+                            </div>
+                          </div>
+                          <div className="text-center p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
+                            <span className="text-sm text-blue-600 uppercase tracking-wide font-medium">Ahorro Máximo</span>
+                            <div className="text-xl font-semibold text-green-600 mt-2">
+                              {formatPrice(selectedItem.price - lowestPrice)}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-col justify-center mt-6 lg:mt-0">
-                  <div className="bg-green-500 text-white p-6 sm:p-8 rounded-2xl text-center shadow-lg">
-                    <div className="flex items-center justify-center mb-3">
-                      <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 mr-3" />
-                      <span className="text-sm sm:text-base font-semibold">Mejor Precio</span>
-                    </div>
-                    <div className="text-3xl sm:text-4xl font-bold mb-2">{formatPrice(lowestPrice)}</div>
-                    <div className="text-green-100 text-sm sm:text-base">
-                      {new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}
+                  <div className="flex flex-col justify-center">
+                    <div className="bg-green-500 text-white p-6 rounded-2xl text-center shadow-lg">
+                      <div className="flex items-center justify-center mb-3">
+                        <TrendingDown className="w-6 h-6 mr-2" />
+                        <span className="font-semibold">Mejor Precio</span>
+                      </div>
+                      <div className="text-3xl font-bold mb-2">{formatPrice(lowestPrice)}</div>
+                      <div className="text-green-100 text-sm">
+                        {new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Filtrador de Fechas */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
-              <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                <Filter className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                Filtrador de Fechas
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Seleccionar Fecha
-                  </label>
-                  <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      min={dateRange.start}
-                      max={dateRange.end}
-                      className="w-full pl-12 pr-4 py-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-base"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Rango de Análisis Personalizado
-                  </label>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-slate-600">Desde:</label>
+              
+              {/* Filtrador de Fechas */}
+              <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <h4 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                  <Filter className="w-5 h-5 text-blue-600" />
+                  Filtrador de Fechas
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Seleccionar Fecha
+                    </label>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input
                         type="date"
-                        value={userDateRange.start}
-                        onChange={(e) => {
-                          setUserDateRange(prev => ({ ...prev, start: e.target.value }));
-                          // Actualizar fecha seleccionada si está fuera del nuevo rango
-                          if (selectedDate && e.target.value > selectedDate) {
-                            setSelectedDate(e.target.value);
-                          }
-                        }}
-                        max={userDateRange.end}
-                        className="px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-slate-600">Hasta:</label>
-                      <input
-                        type="date"
-                        value={userDateRange.end}
-                        onChange={(e) => {
-                          setUserDateRange(prev => ({ ...prev, end: e.target.value }));
-                          // Actualizar fecha seleccionada si está fuera del nuevo rango
-                          if (selectedDate && e.target.value < selectedDate) {
-                            setSelectedDate(e.target.value);
-                          }
-                        }}
-                        min={userDateRange.start}
-                        className="px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        min={dateRange.start}
+                        max={dateRange.end}
+                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                       />
                     </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Acciones Rápidas
-                  </label>
-                  <div className="flex flex-col gap-3">
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       onClick={() => {
-                         const bestPriceDate = pricesForDates.find(d => d.isLowest)?.date;
-                         if (bestPriceDate) {
-                           setSelectedDate(bestPriceDate);
-                           // Scroll suave al gráfico
-                           setTimeout(() => {
-                             const graphElement = document.querySelector('[data-graph-section]');
-                             if (graphElement) {
-                               graphElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                             }
-                           }, 100);
-                         }
-                       }}
-                       className="text-green-600 border-green-300 hover:bg-green-50 flex items-center gap-2 h-10"
-                     >
-                       <TrendingDown className="w-4 h-4" />
-                       Mejor Precio
-                     </Button>
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       onClick={() => {
-                         const today = new Date().toISOString().split('T')[0];
-                         setSelectedDate(today);
-                       }}
-                       className="text-blue-600 border-blue-300 hover:bg-blue-50 flex items-center gap-2 h-10"
-                     >
-                       <Calendar className="w-4 h-4" />
-                       Hoy
-                     </Button>
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       onClick={() => {
-                         // Encontrar el precio más bajo en la mitad del rango seleccionado
-                         const midPoint = Math.floor(pricesForDates.length / 2);
-                         const currentWeekPrices = pricesForDates.slice(midPoint - 3, midPoint + 4);
-                         const bestCurrentWeek = currentWeekPrices.reduce((min, current) => 
-                           current.price < min.price ? current : min
-                         );
-                         if (bestCurrentWeek) {
-                           setSelectedDate(bestCurrentWeek.date);
-                         }
-                       }}
-                       className="text-purple-600 border-purple-300 hover:bg-purple-50 flex items-center gap-2 h-10"
-                     >
-                       <Calendar className="w-4 h-4" />
-                       Mejor en el Rango
-                     </Button>
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       onClick={() => {
-                         setUserDateRange(dateRange);
-                         setSelectedDate(new Date().toISOString().split('T')[0]);
-                       }}
-                       className="text-gray-600 border-gray-300 hover:bg-gray-50 flex items-center gap-2 h-10"
-                     >
-                       <Calendar className="w-4 h-4" />
-                       Resetear Rango
-                     </Button>
-                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Rango de Análisis
+                    </label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-slate-600">Desde:</label>
+                        <input
+                          type="date"
+                          value={userDateRange.start}
+                          onChange={(e) => {
+                            setUserDateRange(prev => ({ ...prev, start: e.target.value }));
+                            if (selectedDate && e.target.value > selectedDate) {
+                              setSelectedDate(e.target.value);
+                            }
+                          }}
+                          max={userDateRange.end}
+                          className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-slate-600">Hasta:</label>
+                        <input
+                          type="date"
+                          value={userDateRange.end}
+                          onChange={(e) => {
+                            setUserDateRange(prev => ({ ...prev, end: e.target.value }));
+                            if (selectedDate && e.target.value < selectedDate) {
+                              setSelectedDate(e.target.value);
+                            }
+                          }}
+                          min={userDateRange.start}
+                          className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Acciones Rápidas
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const bestPriceDate = pricesForDates.find(d => d.isLowest)?.date;
+                          if (bestPriceDate) {
+                            setSelectedDate(bestPriceDate);
+                          }
+                        }}
+                        className="text-green-600 border-green-300 hover:bg-green-50 h-10"
+                      >
+                        <TrendingDown className="w-4 h-4 mr-2" />
+                        Mejor Precio
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date().toISOString().split('T')[0];
+                          setSelectedDate(today);
+                        }}
+                        className="text-blue-600 border-blue-300 hover:bg-blue-50 h-10"
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Hoy
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Gráfico de Precios por Fecha con Gráficos Apilados */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg" data-graph-section>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-                <div>
-                                      <h4 className="text-lg sm:text-xl font-semibold text-slate-900 flex items-center gap-3">
-                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                      Evolución de Precios ({pricesForDates.length} días)
+              
+              {/* Gráfico de Precios por Fecha - Comparación Estructurada */}
+              <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm" data-graph-section>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-slate-900 flex items-center gap-3">
+                      <TrendingUp className="w-5 h-5 text-blue-600" />
+                      Comparación de Precios por Día
                     </h4>
-                  <p className="text-sm sm:text-base text-slate-600 mt-2">
-                    Las barras más altas indican precios más altos
-                  </p>
-                </div>
-                                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 mt-2">
+                      Análisis de precios para los próximos 10 días desde la fecha seleccionada
+                    </p>
+                  </div>
+                  
+                  {/* Resumen de Precios */}
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
-                      <TrendingDown className="w-4 h-4 text-green-600" />
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <span>Mejor precio: {formatPrice(lowestPrice)}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <span>{new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}</span>
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span>Fecha seleccionada</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Info className="w-4 h-4 text-purple-600" />
-                      <span>{pricesForDates.length} días analizados</span>
+                      <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
+                      <span>Precio base: {formatPrice(selectedItem.price)}</span>
                     </div>
                   </div>
-              </div>
-              
-                <div className="bg-gradient-to-b from-slate-50 to-white rounded-2xl p-6 sm:p-8 lg:p-10 border border-slate-200">
-                {/* Gráfico Principal - Barras Apiladas */}
-                <div className="relative mb-8">
-                  <div className="grid gap-1 sm:gap-2 mb-8" style={{ gridTemplateColumns: `repeat(${pricesForDates.length}, minmax(0, 1fr))` }}>
-                    {pricesForDates.map((dateData, index) => {
-                      // Lógica corregida: precios más altos = barras más altas
-                      const priceHeight = ((dateData.price - lowestPrice) / (highestPrice - lowestPrice)) * 120 + 40;
+                </div>
+
+                {/* Grilla de Precios por Día */}
+                <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200">
+                  <div className="grid grid-cols-5 sm:grid-cols-10 gap-3 mb-6">
+                    {pricesForDates.slice(0, 10).map((dateData, index) => {
                       const isBestPrice = dateData.isLowest;
                       const isSelected = dateData.isSelected;
                       const priceDifference = selectedItem.price - dateData.price;
                       const isGoodDeal = priceDifference > 0;
                       
+                      // Calcular altura proporcional al precio
+                      const maxPrice = Math.max(...pricesForDates.slice(0, 10).map(d => d.price));
+                      const minPrice = Math.min(...pricesForDates.slice(0, 10).map(d => d.price));
+                      const priceHeight = ((dateData.price - minPrice) / (maxPrice - minPrice)) * 80 + 20;
+                      
                       return (
                         <div
                           key={index}
-                          className={`relative cursor-pointer group transition-all duration-300 ${
+                          className={`relative group cursor-pointer transition-all duration-200 ${
                             isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''
                           }`}
                           onClick={() => setSelectedDate(dateData.date)}
                         >
-                          {/* Barra Principal */}
-                          <div
-                            className={`w-full rounded-t-lg transition-all duration-300 ${
-                              isBestPrice
-                                ? 'bg-green-500 hover:bg-green-600'
-                                : isSelected
-                                ? 'bg-blue-500 hover:bg-blue-600'
-                                : isGoodDeal
-                                ? 'bg-emerald-500 hover:bg-emerald-600'
-                                : 'bg-slate-400 hover:bg-slate-500'
-                            }`}
-                            style={{ height: `${priceHeight}px` }}
-                          />
+                          {/* Barra de Precio */}
+                          <div className="relative mb-3">
+                            <div
+                              className={`w-full rounded-t-lg transition-all duration-300 ${
+                                isBestPrice
+                                  ? 'bg-green-500 hover:bg-green-600'
+                                  : isSelected
+                                  ? 'bg-blue-500 hover:bg-blue-600'
+                                  : isGoodDeal
+                                  ? 'bg-emerald-500 hover:bg-emerald-600'
+                                  : 'bg-slate-400 hover:bg-slate-500'
+                              }`}
+                              style={{ height: `${priceHeight}px` }}
+                            />
+                            
+                            {/* Indicador de Mejor Precio */}
+                            {isBestPrice && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-10">
+                                <TrendingDown className="w-3 h-3" />
+                              </div>
+                            )}
+                            
+                            {/* Indicador de Fecha Seleccionada */}
+                            {isSelected && !isBestPrice && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-10">
+                                <Calendar className="w-3 h-3" />
+                              </div>
+                            )}
+                          </div>
                           
-                          {/* Indicador de Mejor Precio */}
-                          {isBestPrice && (
-                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
-                              <TrendingDown className="w-3 h-3" />
+                          {/* Precio */}
+                          <div className="text-center mb-2">
+                            <div className={`text-sm font-bold ${
+                              isBestPrice ? 'text-green-600' : 
+                              isSelected ? 'text-blue-600' : 
+                              isGoodDeal ? 'text-emerald-600' : 'text-slate-600'
+                            }`}>
+                              {formatPrice(dateData.price)}
                             </div>
-                          )}
-                          
-                          {/* Indicador de Fecha Seleccionada */}
-                          {isSelected && !isBestPrice && (
-                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
-                              <Calendar className="w-3 h-3" />
-                            </div>
-                          )}
-                          
-                          {/* Indicador de Buen Precio */}
-                          {!isBestPrice && !isSelected && isGoodDeal && (
-                            <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg z-20">
-                              <TrendingDown className="w-3 h-3" />
-                            </div>
-                          )}
+                            
+                            {/* Indicador de Ahorro */}
+                            {isGoodDeal && (
+                              <div className="text-xs text-green-600 font-medium">
+                                -{formatPrice(priceDifference)}
+                              </div>
+                            )}
+                          </div>
                           
                           {/* Fecha */}
-                          <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-slate-600 whitespace-nowrap font-medium">
-                            {new Date(dateData.date).getDate()}
-                          </div>
-                          
-                          {/* Precio en la Barra */}
-                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
-                            {formatPrice(dateData.price)}
-                          </div>
-                          
-                          {/* Indicador de Ahorro */}
-                          {isGoodDeal && (
-                            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
-                              -{formatPrice(priceDifference)}
+                          <div className="text-center">
+                            <div className="text-xs text-slate-600 font-medium">
+                              {new Date(dateData.date).toLocaleDateString('es-ES', { 
+                                day: '2-digit', 
+                                month: '2-digit' 
+                              })}
                             </div>
-                          )}
+                            <div className="text-xs text-slate-500">
+                              {new Date(dateData.date).toLocaleDateString('es-ES', { 
+                                weekday: 'short' 
+                              })}
+                            </div>
+                          </div>
                           
                           {/* Tooltip Detallado */}
-                          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-xl hidden sm:block">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-20 shadow-xl mb-2">
                             <div className="text-center">
-                              <div className="font-medium">{new Date(dateData.date).toLocaleDateString('es-ES')}</div>
+                              <div className="font-medium">{new Date(dateData.date).toLocaleDateString('es-ES', { 
+                                weekday: 'long', 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                              })}</div>
                               <div className="text-green-400 font-bold">{formatPrice(dateData.price)}</div>
-                              {isBestPrice && <div className="text-green-300 text-xs mt-1">Mejor precio</div>}
-                              {isSelected && !isBestPrice && <div className="text-blue-300 text-xs mt-1">Fecha seleccionada</div>}
-                              {isGoodDeal && !isBestPrice && <div className="text-emerald-300 text-xs mt-1">Buen precio</div>}
+                              {isBestPrice && <div className="text-green-300 text-xs mt-1">Mejor precio disponible</div>}
+                              {isSelected && !isBestPrice && <div className="text-green-300 text-xs mt-1">Fecha seleccionada</div>}
+                              {isGoodDeal && !isBestPrice && <div className="text-emerald-300 text-xs mt-1">Ahorro disponible</div>}
                             </div>
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                           </div>
@@ -1278,184 +1286,168 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   </div>
                   
                   {/* Línea de Referencia del Precio Base */}
-                  <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-400 opacity-50" 
-                       style={{ 
-                         top: `${((selectedItem.price - lowestPrice) / (highestPrice - lowestPrice)) * 120 + 40}px` 
-                       }} />
-                  <div className="absolute right-0 top-0 bg-slate-400 text-white text-xs px-2 py-1 rounded transform translate-y-[-50%] hidden sm:block">
-                    Precio Base: {formatPrice(selectedItem.price)}
+                  <div className="relative mb-6">
+                    <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-400 opacity-60" 
+                         style={{ 
+                           top: `${((selectedItem.price - Math.min(...pricesForDates.slice(0, 10).map(d => d.price))) / (Math.max(...pricesForDates.slice(0, 10).map(d => d.price)) - Math.min(...pricesForDates.slice(0, 10).map(d => d.price)))) * 80 + 20}px` 
+                         }} />
+                    <div className="absolute right-0 top-0 bg-slate-400 text-white text-xs px-2 py-1 rounded transform translate-y-[-50%]">
+                      Precio Base: {formatPrice(selectedItem.price)}
+                    </div>
                   </div>
-                </div>
-                
-                {/* Gráfico Secundario - Comparación de Rangos */}
-                <div className="mb-6 sm:mb-8">
-                  <h5 className="text-sm font-medium text-slate-700 mb-3 sm:mb-4 text-center">Rango de Precios por Período</h5>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {/* Semana Anterior */}
-                    <div className="text-center p-4 bg-gradient-to-b from-red-50 to-red-100 rounded-xl border border-red-200">
-                      <div className="text-xs text-red-600 uppercase tracking-wide mb-2">Semana Anterior</div>
-                      <div className="text-lg font-bold text-red-700">
-                        {formatPrice(Math.min(...pricesForDates.slice(0, 7).map(d => d.price)))}
+                  
+                  {/* Estadísticas Rápidas */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="text-2xl font-bold text-green-600">
+                        {formatPrice(lowestPrice)}
                       </div>
-                      <div className="text-xs text-red-600">a</div>
-                      <div className="text-lg font-bold text-red-700">
-                        {formatPrice(Math.max(...pricesForDates.slice(0, 7).map(d => d.price)))}
+                      <div className="text-sm text-green-600 font-medium">Mejor Precio</div>
+                      <div className="text-xs text-slate-600">
+                        {new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}
                       </div>
                     </div>
                     
-                    {/* Semana Actual */}
-                    <div className="text-center p-4 bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                      <div className="text-xs text-blue-600 uppercase tracking-wide mb-2">Semana Actual</div>
-                      <div className="text-lg font-bold text-blue-700">
-                        {formatPrice(Math.min(...pricesForDates.slice(7, 14).map(d => d.price)))}
+                    <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {formatPrice(selectedItem.price)}
                       </div>
-                      <div className="text-xs text-blue-600">a</div>
-                      <div className="text-lg font-bold text-blue-700">
-                        {formatPrice(Math.max(...pricesForDates.slice(7, 14).map(d => d.price)))}
-                      </div>
+                      <div className="text-sm text-blue-600 font-medium">Precio Base</div>
+                      <div className="text-xs text-slate-600">Referencia</div>
                     </div>
                     
-                    {/* Semana Siguiente */}
-                    <div className="text-center p-4 bg-gradient-to-b from-green-50 to-green-100 rounded-xl border border-green-200">
-                      <div className="text-xs text-green-600 uppercase tracking-wide mb-2">Semana Siguiente</div>
-                      <div className="text-lg font-bold text-green-700">
-                        {formatPrice(Math.min(...pricesForDates.slice(14, 21).map(d => d.price)))}
+                    <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div className="text-2xl font-bold text-slate-600">
+                        {formatPrice(Math.max(...pricesForDates.slice(0, 10).map(d => d.price)))}
                       </div>
-                      <div className="text-xs text-green-600">a</div>
-                      <div className="text-lg font-bold text-green-700">
-                        {formatPrice(Math.max(...pricesForDates.slice(14, 21).map(d => d.price)))}
-                      </div>
+                      <div className="text-sm text-slate-600 font-medium">Precio Más Alto</div>
+                      <div className="text-xs text-slate-600">En el rango</div>
+                    </div>
+                  </div>
+                  
+                  {/* Leyenda */}
+                  <div className="flex items-center justify-center gap-6 text-xs text-slate-600 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
+                      <span>Mejor precio</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-emerald-500 rounded-sm"></div>
+                      <span>Buen precio</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-500 rounded-sm"></div>
+                      <span>Fecha seleccionada</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-slate-400 rounded-sm"></div>
+                      <span>Precio regular</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-t-2 border-dashed border-slate-400"></div>
+                      <span>Precio base</span>
                     </div>
                   </div>
                 </div>
-                
-                {/* Leyenda Mejorada */}
-                <div className="flex items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-gradient-to-t from-slate-300 to-slate-400 rounded-sm"></div>
-                    <span className="text-slate-600">Precio normal</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-gradient-to-t from-emerald-400 to-emerald-500 rounded-sm"></div>
-                    <span className="text-slate-600">Buen precio</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-gradient-to-t from-blue-500 to-blue-600 rounded-sm"></div>
-                    <span className="text-slate-600">Fecha seleccionada</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-gradient-to-t from-green-500 to-green-600 rounded-sm"></div>
-                    <span className="text-slate-600">Mejor precio</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-t-2 border-dashed border-slate-400"></div>
-                    <span className="text-slate-600">Precio base</span>
-                  </div>
-                </div>
-                
-                {/* Nota de Interpretación */}
-                <div className="text-center mt-4 text-xs text-slate-500">
-                  <strong>Interpretación:</strong> Las barras más altas representan precios más altos
-                </div>
               </div>
-            </div>
-            
-            {/* Información Detallada de la Fecha Seleccionada */}
-            {selectedDate && (
-              <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
-                <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                  <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                  <span className="hidden sm:inline">
-                    Detalles para {new Date(selectedDate).toLocaleDateString('es-ES', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </span>
-                  <span className="sm:hidden">
-                    Detalles para {new Date(selectedDate).toLocaleDateString('es-ES')}
-                  </span>
-                </h4>
-                
-                {(() => {
-                  const selectedDateData = pricesForDates.find(d => d.date === selectedDate);
-                  if (!selectedDateData) return null;
+              
+              {/* Información Detallada de la Fecha Seleccionada */}
+              {selectedDate && (
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                    <Info className="w-5 h-5 text-blue-600" />
+                    <span className="hidden sm:inline">
+                      Detalles para {new Date(selectedDate).toLocaleDateString('es-ES', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </span>
+                    <span className="sm:hidden">
+                      Detalles para {new Date(selectedDate).toLocaleDateString('es-ES')}
+                    </span>
+                  </h4>
                   
-                  const savings = selectedItem.price - selectedDateData.price;
-                  const isGoodDeal = savings > 0;
-                  const ranking = pricesForDates.filter(d => d.price <= selectedDateData.price).length;
-                  
-                  return (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                      <div className="text-center p-4 sm:p-6 bg-blue-50 rounded-xl border border-blue-200 shadow-sm">
-                        <div className="p-2 sm:p-3 bg-blue-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
-                          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                  {(() => {
+                    const selectedDateData = pricesForDates.find(d => d.date === selectedDate);
+                    if (!selectedDateData) return null;
+                    
+                    const savings = selectedItem.price - selectedDateData.price;
+                    const isGoodDeal = savings > 0;
+                    const ranking = pricesForDates.filter(d => d.price <= selectedDateData.price).length;
+                    
+                    return (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-200 shadow-sm">
+                          <div className="p-2 bg-blue-100 rounded-full w-fit mx-auto mb-3">
+                            <Calendar className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div className="text-sm text-blue-600 mb-2 uppercase tracking-wide font-medium">Precio para esta fecha</div>
+                          <div className={`text-2xl font-bold ${isGoodDeal ? 'text-green-600' : 'text-blue-900'}`}>
+                            {formatPrice(selectedDateData.price)}
+                          </div>
                         </div>
-                        <div className="text-xs sm:text-sm text-blue-600 mb-2 uppercase tracking-wide font-medium">Precio para esta fecha</div>
-                        <div className={`text-2xl sm:text-3xl font-bold ${isGoodDeal ? 'text-green-600' : 'text-blue-900'}`}>
-                          {formatPrice(selectedDateData.price)}
+                        
+                        <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200 shadow-sm">
+                          <div className="p-2 bg-green-100 rounded-full w-fit mx-auto mb-3">
+                            <TrendingDown className="w-5 h-5 text-green-600" />
+                          </div>
+                          <div className="text-sm text-green-600 mb-2 uppercase tracking-wide font-medium">Comparado con precio base</div>
+                          <div className={`text-xl font-semibold ${isGoodDeal ? 'text-green-600' : 'text-red-600'}`}>
+                            {isGoodDeal ? `-${formatPrice(savings)}` : `+${formatPrice(Math.abs(savings))}`}
+                          </div>
+                          <div className="text-xs text-slate-600 font-medium">
+                            {isGoodDeal ? 'Ahorro' : 'Incremento'}
+                          </div>
+                        </div>
+                        
+                        <div className="text-center p-4 bg-indigo-50 rounded-xl border border-indigo-200 shadow-sm sm:col-span-2 lg:col-span-1">
+                          <div className="p-2 bg-indigo-100 rounded-full w-fit mx-auto mb-3">
+                            <Star className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div className="text-sm text-indigo-600 mb-2 uppercase tracking-wide font-medium">Posición en el ranking</div>
+                          <div className="text-xl font-semibold text-indigo-900">
+                            {ranking} de {pricesForDates.length}
+                          </div>
+                          <div className="text-xs text-slate-600 font-medium">
+                            {selectedDateData.isLowest ? 'Mejor precio disponible' : ranking <= 5 ? 'Precio excelente' : ranking <= 10 ? 'Precio competitivo' : 'Precio regular'}
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="text-center p-4 sm:p-6 bg-green-50 rounded-xl border border-green-200 shadow-sm">
-                        <div className="p-2 sm:p-3 bg-green-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
-                          <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                        </div>
-                        <div className="text-xs sm:text-sm text-green-600 mb-2 uppercase tracking-wide font-medium">Comparado con precio base</div>
-                        <div className={`text-xl sm:text-2xl font-semibold ${isGoodDeal ? 'text-green-600' : 'text-red-600'}`}>
-                          {isGoodDeal ? `-${formatPrice(savings)}` : `+${formatPrice(Math.abs(savings))}`}
-                        </div>
-                        <div className="text-xs sm:text-sm text-slate-600 font-medium">
-                          {isGoodDeal ? 'Ahorro' : 'Incremento'}
-                        </div>
-                      </div>
-                      
-                      <div className="text-center p-4 sm:p-6 bg-indigo-50 rounded-xl border border-indigo-200 shadow-sm sm:col-span-2 lg:col-span-1">
-                        <div className="p-2 sm:p-3 bg-indigo-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
-                          <Star className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
-                        </div>
-                        <div className="text-xs sm:text-sm text-indigo-600 mb-2 uppercase tracking-wide font-medium">Posición en el ranking</div>
-                        <div className="text-xl sm:text-2xl font-semibold text-indigo-900">
-                          {ranking} de {pricesForDates.length}
-                        </div>
-                        <div className="text-xs sm:text-sm text-slate-600 font-medium">
-                          {selectedDateData.isLowest ? 'Mejor precio disponible' : ranking <= 5 ? 'Precio excelente' : ranking <= 10 ? 'Precio competitivo' : 'Precio regular'}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
-            
-            {/* Botones de Acción */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="flex-1 h-14 sm:h-16 text-slate-700 border-slate-300 hover:bg-slate-50 text-base sm:text-lg"
-                onClick={closePriceComparison}
-              >
-                                  <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                Cerrar
-              </Button>
-              <Button 
-                size="lg"
-                className="flex-1 h-14 sm:h-16 bg-green-600 hover:bg-green-700 shadow-lg text-base sm:text-lg"
-                onClick={() => handleReservar(selectedDate)}
-              >
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                <span className="hidden sm:inline">
-                  Reservar para {selectedDate ? new Date(selectedDate).toLocaleDateString('es-ES') : 'Fecha Seleccionada'}
-                </span>
-                <span className="sm:hidden">
-                  Reservar
-                </span>
-              </Button>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
+          </div>
+          
+          {/* Footer del Modal con Botones de Acción - SIEMPRE VISIBLE */}
+          <div className="flex flex-col sm:flex-row gap-4 p-6 border-t border-slate-200 bg-slate-50 flex-shrink-0">
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="flex-1 h-12 text-slate-700 border-slate-300 hover:bg-slate-50"
+              onClick={closePriceComparison}
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cerrar
+            </Button>
+            <Button 
+              size="lg"
+              className="flex-1 h-12 bg-green-600 hover:bg-green-700 shadow-lg"
+              onClick={() => handleReservar(selectedDate)}
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">
+                Reservar para {selectedDate ? new Date(selectedDate).toLocaleDateString('es-ES') : 'Fecha Seleccionada'}
+              </span>
+              <span className="sm:hidden">
+                Reservar
+              </span>
+            </Button>
           </div>
         </div>
       </div>
@@ -1466,8 +1458,8 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
     switch (result.type) {
       case "hotel":
         return (
-          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-            <div className="relative">
+          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+            <div className="relative flex-shrink-0">
               <Image
                 src={result.image}
                 alt={result.name}
@@ -1498,23 +1490,23 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 </TooltipProvider>
               </div>
             </div>
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex-1 flex flex-col">
               <div className="flex items-start justify-between mb-3">
-                <div>
+                <div className="flex-1">
                   <CardTitle className="text-xl font-bold text-foreground mb-2">
                     {result.name}
                   </CardTitle>
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm">{result.location}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                   {renderStars(result.rating)}
                   <span className="text-sm text-muted-foreground ml-1">({result.reviews})</span>
                 </div>
               </div>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-1">
                 {result.description}
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -1524,32 +1516,32 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   </Badge>
                 ))}
               </div>
-                             <div className="flex items-center justify-between">
-                 <div className="text-2xl font-bold text-primary">
-                   {formatPrice(result.price)}
-                   <span className="text-sm text-muted-foreground font-normal">/noche</span>
-                 </div>
-                                <div className="flex items-center gap-2">
-                 <Button 
-                   variant="outline" 
-                   className="border-green-600 text-green-600 hover:bg-green-50"
-                   onClick={() => handleSelectItem(result)}
-                 >
-                   Seleccionar
-                 </Button>
-                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                   Ver Detalles
-                 </Button>
-               </div>
-               </div>
+              <div className="flex items-center justify-between mt-auto">
+                <div className="text-2xl font-bold text-primary">
+                  {formatPrice(result.price)}
+                  <span className="text-sm text-muted-foreground font-normal">/noche</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                    onClick={() => handleSelectItem(result)}
+                  >
+                    Seleccionar
+                  </Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Ver Detalles
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         );
 
       case "flight":
         return (
-          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-            <div className="relative">
+          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+            <div className="relative flex-shrink-0">
               <Image
                 src={result.image}
                 alt={`${result.origin} - ${result.destination}`}
@@ -1577,7 +1569,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 </TooltipProvider>
               </div>
             </div>
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex-1 flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-foreground">{result.origin}</div>
@@ -1615,31 +1607,31 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   <div className="font-semibold">{result.stops}</div>
                 </div>
               </div>
-                             <div className="flex items-center justify-between">
-                 <div className="text-2xl font-bold text-primary">
-                   {formatPrice(result.price)}
-                 </div>
-                                <div className="flex items-center gap-2">
-                 <Button 
-                   variant="outline" 
-                   className="border-green-600 text-green-600 hover:bg-green-50"
-                   onClick={() => handleSelectItem(result)}
-                 >
-                   Seleccionar
-                 </Button>
-                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                   Reservar
-                 </Button>
-               </div>
-               </div>
+              <div className="flex items-center justify-between mt-auto">
+                <div className="text-2xl font-bold text-primary">
+                  {formatPrice(result.price)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                    onClick={() => handleSelectItem(result)}
+                  >
+                    Seleccionar
+                  </Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Reservar
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         );
 
       case "package":
         return (
-          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-            <div className="relative">
+          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+            <div className="relative flex-shrink-0">
               <Image
                 src={result.image}
                 alt={result.title}
@@ -1670,12 +1662,12 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 </TooltipProvider>
               </div>
             </div>
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex-1 flex flex-col">
               <CardTitle className="text-xl font-bold text-foreground mb-3">
                 {result.title}
               </CardTitle>
               <div className="flex items-center gap-2 text-muted-foreground mb-3">
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-4 h-4 flex-shrink-0" />
                 <span className="text-sm">
                   {Array.isArray(result.destinations) 
                     ? result.destinations.join(" → ") 
@@ -1691,7 +1683,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   {renderStars(result.rating)}
                 </div>
               </div>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-1">
                 {result.description}
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -1701,32 +1693,32 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   </Badge>
                 ))}
               </div>
-                             <div className="flex items-center justify-between">
-                 <div className="text-2xl font-bold text-primary">
-                   {formatPrice(result.price)}
-                   <span className="text-sm text-muted-foreground font-normal">/persona</span>
-                 </div>
-                                <div className="flex items-center gap-2">
-                 <Button 
-                   variant="outline" 
-                   className="border-green-600 text-green-600 hover:bg-green-50"
-                   onClick={() => handleSelectItem(result)}
-                 >
-                   Seleccionar
-                 </Button>
-                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                   Ver Detalles
-                 </Button>
-               </div>
-               </div>
+              <div className="flex items-center justify-between mt-auto">
+                <div className="text-2xl font-bold text-primary">
+                  {formatPrice(result.price)}
+                  <span className="text-sm text-muted-foreground font-normal">/persona</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                    onClick={() => handleSelectItem(result)}
+                  >
+                    Seleccionar
+                  </Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Ver Detalles
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         );
 
       default:
         return (
-          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-            <div className="relative">
+          <Card key={result.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+            <div className="relative flex-shrink-0">
               <Image
                 src={result.image}
                 alt={result.name || result.title}
@@ -1754,30 +1746,30 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 </TooltipProvider>
               </div>
             </div>
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex-1 flex flex-col">
               <CardTitle className="text-xl font-bold text-foreground mb-3">
                 {result.name || result.title}
               </CardTitle>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-1">
                 {result.description}
               </p>
-                             <div className="flex items-center justify-between">
-                 <div className="text-2xl font-bold text-primary">
-                   {formatPrice(result.price)}
-                 </div>
-                                <div className="flex items-center gap-2">
-                 <Button 
-                   variant="outline" 
-                   className="border-green-600 text-green-600 hover:bg-green-50"
-                   onClick={() => handleSelectItem(result)}
-                 >
-                   Seleccionar
-                 </Button>
-                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                   Ver Detalles
-                 </Button>
-               </div>
-               </div>
+              <div className="flex items-center justify-between mt-auto">
+                <div className="text-2xl font-bold text-primary">
+                  {formatPrice(result.price)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                    onClick={() => handleSelectItem(result)}
+                  >
+                    Seleccionar
+                  </Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Ver Detalles
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         );
@@ -1800,36 +1792,9 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
         </p>
       </div>
 
-                           {/* Resumen de Ahorros */}
-        <Card className="bg-gradient-to-r from-slate-50 to-blue-50 border-slate-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-xl">
-                  <TrendingDown className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-800">Oportunidades de Ahorro</h3>
-                  <p className="text-slate-600">
-                    {filteredResults.length > 0 ? 
-                      `${filteredResults.filter((_, index) => index % 3 === 0).length} opciones con precios más bajos que la semana anterior` : 
-                      'Compara precios para encontrar las mejores ofertas'
-                    }
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-2">
-                  <Info className="w-4 h-4" />
-                  Hover en "Seleccionar" para comparar
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
        {/* Filtros y Ordenamiento */}
-       <Card className="bg-card/50 backdrop-blur-sm">
+       <Card className="bg-card/50 backdrop-blur-sm px-19">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
@@ -1886,7 +1851,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
       </Card>
 
       {/* Resultados */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
         {filteredResults.map((result) => renderResultCard(result))}
       </div>
 

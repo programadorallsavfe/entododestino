@@ -1,7 +1,5 @@
 "use client"
 
-import { Heart } from 'lucide-react'
-
 export const BannerMarca = () => {
   return (
     <div className="sticky bottom-0 bg-white border-t-2 border-primary shadow-lg">

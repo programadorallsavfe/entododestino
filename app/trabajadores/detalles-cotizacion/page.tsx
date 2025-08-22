@@ -24,9 +24,28 @@ import {
   MessageCircle,
   Download,
   Phone,
-  Mail
+  Mail,
+  Navigation,
+  Route,
+  Compass,
+  Car,
+  Train,
+  Ship,
+  Wifi,
+  Utensils,
+  Camera,
+  Shield,
+  Gift,
+  Award,
+  Clock3,
+  Map,
+  TrendingUp,
+  Zap,
+  Heart,
+  Home
 } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { SimpleMap } from '@/app/clientes/components/SimpleMap';
 
 interface Destination {
   id: string;
@@ -41,6 +60,10 @@ interface Destination {
   description?: string;
   startDate?: string;
   endDate?: string;
+  transportType?: 'plane' | 'car' | 'train' | 'ship';
+  accommodationType?: 'hotel' | 'resort' | 'hostel' | 'apartment';
+  activities?: string[];
+  highlights?: string[];
 }
 
 interface ItinerarioData {
@@ -52,32 +75,39 @@ interface ItinerarioData {
   serviciosIncluidos: string[];
   precioTotal: number;
   precioDescuento: number;
+  transportDetails?: {
+    type: string;
+    provider: string;
+    duration: string;
+    class: string;
+  }[];
+  accommodationDetails?: {
+    name: string;
+    rating: number;
+    amenities: string[];
+    roomType: string;
+  }[];
+  insurance?: {
+    included: boolean;
+    type: string;
+    coverage: string;
+  };
+  cancellationPolicy?: string;
+  specialOffers?: string[];
 }
 
-interface FlightPrice {
-  date: string;
-  price: number;
-  airline: string;
-  departureTime: string;
-  arrivalTime: string;
-  duration: string;
-  stops: number;
-  isOptimal: boolean;
-}
-
-interface FlightSegment {
-  from: string;
-  to: string;
-  segmentDate: string;
-  prices: FlightPrice[];
-}
-
-// Componente de carga
+// Componente de carga mejorado
 const LoadingComponent = () => (
-  <div className="min-h-screen bg-muted flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-      <p className="text-muted-foreground">Cargando detalles del itinerario...</p>
+  <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center">
+    <div className="text-center space-y-6">
+      <div className="relative">
+        <div className="w-16 h-16 border-4 border-primary/20 rounded-full animate-spin"></div>
+        <div className="absolute inset-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      <div className="space-y-2">
+        <p className="text-lg font-semibold text-foreground">Preparando tu viaje</p>
+        <p className="text-sm text-muted-foreground">Cargando todos los detalles del itinerario...</p>
+      </div>
     </div>
   </div>
 );
@@ -88,18 +118,41 @@ const DetallesCotizacionContent = () => {
   const [itinerarioData, setItinerarioData] = useState<ItinerarioData | null>(null);
   const [currentStep, setCurrentStep] = useState<'resumen' | 'datos-cliente' | 'confirmacion' | 'exportacion'>('resumen');
   const [isCallDrawerOpen, setIsCallDrawerOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('+51 ');
+
+  // Función para agregar un número al marcador
+  const handleAddNumber = (digit: string) => {
+    setPhoneNumber(prev => prev + digit);
+  };
+
+  // Función para eliminar el último número
+  const handleDeleteNumber = () => {
+    setPhoneNumber(prev => {
+      if (prev.length <= 4) return '+51 ';
+      return prev.slice(0, -1);
+    });
+  };
+
+  // Función para limpiar todo el número
+  const handleClearNumber = () => {
+    setPhoneNumber('+51 ');
+  };
+
+  // Resetear número cuando se abre el drawer
+  useEffect(() => {
+    if (isCallDrawerOpen) {
+      setPhoneNumber('+51 ');
+    }
+  }, [isCallDrawerOpen]);
 
   // Función para iniciar llamada telefónica
-  const handleCall = (phoneNumber: string) => {
+  const handleCall = (phoneNumberToCall: string) => {
     try {
-      // En dispositivos móviles, esto abrirá la app de teléfono
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        window.location.href = `tel:${phoneNumber}`;
+        window.location.href = `tel:${phoneNumberToCall}`;
       } else {
-        // Para desktop, copiar al portapapeles sin mostrar alertas
-        navigator.clipboard.writeText(phoneNumber);
-        // Opcional: mostrar un toast o notificación sutil
-        console.log(`Número ${phoneNumber} copiado al portapapeles`);
+        navigator.clipboard.writeText(phoneNumberToCall);
+        console.log(`Número ${phoneNumberToCall} copiado al portapapeles`);
       }
     } catch (error) {
       console.log('Error al procesar la llamada:', error);
@@ -129,7 +182,11 @@ const DetallesCotizacionContent = () => {
           image: "/assets/banner.jpg",
           description: data.description,
           startDate: data.selectedDate || '08 sept 2025',
-          endDate: data.selectedDate || '13 sept 2025'
+          endDate: data.selectedDate || '13 sept 2025',
+          transportType: 'plane',
+          accommodationType: 'hotel',
+          activities: ['City Tour', 'Visita a museos', 'Gastronomía local'],
+          highlights: ['Vistas panorámicas', 'Cultura local', 'Experiencia auténtica']
         }],
         fechaInicio: data.selectedDate || '08 Septiembre 2025',
         fechaFin: data.selectedDate || '13 Septiembre 2025',
@@ -137,7 +194,26 @@ const DetallesCotizacionContent = () => {
         personas: data.guests?.adults || data.passengers?.adults || 2,
         serviciosIncluidos: data.amenities || ['Servicios básicos'],
         precioTotal: data.price || 299.99,
-        precioDescuento: data.discountPrice || 249.99
+        precioDescuento: data.discountPrice || 249.99,
+        transportDetails: [{
+          type: 'Avión',
+          provider: 'LATAM Airlines',
+          duration: '1h 30m',
+          class: 'Económica'
+        }],
+        accommodationDetails: [{
+          name: 'Hotel Plaza Mayor',
+          rating: 4.5,
+          amenities: ['WiFi', 'Restaurante', 'Gimnasio', 'Piscina'],
+          roomType: 'Habitación Superior'
+        }],
+        insurance: {
+          included: true,
+          type: 'Viaje Completo',
+          coverage: 'Médico, equipaje, cancelación'
+        },
+        cancellationPolicy: 'Cancelación gratuita hasta 24h antes del viaje',
+        specialOffers: ['Descuento por reserva anticipada', 'Traslado gratuito desde aeropuerto']
       };
       setItinerarioData(mockData);
     } else {
@@ -161,7 +237,26 @@ const DetallesCotizacionContent = () => {
             personas: parseInt(personas || '2'),
             serviciosIncluidos: ['Hoteles', 'Tours', 'Visitas guiadas', 'Traslados', 'Alimentación'],
             precioTotal: parseFloat(precioTotal || '2899.99'),
-            precioDescuento: parseFloat(precioDescuento || '2599.99')
+            precioDescuento: parseFloat(precioDescuento || '2599.99'),
+            transportDetails: [{
+              type: 'Avión',
+              provider: 'LATAM Airlines',
+              duration: '1h 30m',
+              class: 'Económica'
+            }],
+            accommodationDetails: [{
+              name: 'Hotel Plaza Mayor',
+              rating: 4.5,
+              amenities: ['WiFi', 'Restaurante', 'Gimnasio', 'Piscina'],
+              roomType: 'Habitación Superior'
+            }],
+            insurance: {
+              included: true,
+              type: 'Viaje Completo',
+              coverage: 'Médico, equipaje, cancelación'
+            },
+            cancellationPolicy: 'Cancelación gratuita hasta 24h antes del viaje',
+            specialOffers: ['Descuento por reserva anticipada', 'Traslado gratuito desde aeropuerto']
           };
           setItinerarioData(mockData);
         }
@@ -183,7 +278,11 @@ const DetallesCotizacionContent = () => {
               image: "/assets/banner.jpg",
               description: serviceData.description,
               startDate: serviceData.selectedDate || '08 sept 2025',
-              endDate: serviceData.selectedDate || '13 sept 2025'
+              endDate: serviceData.selectedDate || '13 sept 2025',
+              transportType: 'plane',
+              accommodationType: 'hotel',
+              activities: ['City Tour', 'Visita a museos', 'Gastronomía local'],
+              highlights: ['Vistas panorámicas', 'Cultura local', 'Experiencia auténtica']
             }],
             fechaInicio: serviceData.selectedDate || '08 Septiembre 2025',
             fechaFin: serviceData.selectedDate || '13 Septiembre 2025',
@@ -191,7 +290,26 @@ const DetallesCotizacionContent = () => {
             personas: serviceData.guests?.adults || serviceData.passengers?.adults || 2,
             serviciosIncluidos: serviceData.amenities || ['Servicios básicos'],
             precioTotal: serviceData.price || 299.99,
-            precioDescuento: serviceData.discountPrice || 249.99
+            precioDescuento: serviceData.discountPrice || 249.99,
+            transportDetails: [{
+              type: 'Avión',
+              provider: 'LATAM Airlines',
+              duration: '1h 30m',
+              class: 'Económica'
+            }],
+            accommodationDetails: [{
+              name: 'Hotel Plaza Mayor',
+              rating: 4.5,
+              amenities: ['WiFi', 'Restaurante', 'Gimnasio', 'Piscina'],
+              roomType: 'Habitación Superior'
+            }],
+            insurance: {
+              included: true,
+              type: 'Viaje Completo',
+              coverage: 'Médico, equipaje, cancelación'
+            },
+            cancellationPolicy: 'Cancelación gratuita hasta 24h antes del viaje',
+            specialOffers: ['Descuento por reserva anticipada', 'Traslado gratuito desde aeropuerto']
           };
           setItinerarioData(mockData);
         }
@@ -215,92 +333,24 @@ const DetallesCotizacionContent = () => {
     });
   };
 
-  const getDestinationIcon = (type: 'start' | 'destination' | 'end') => {
+  const getTransportIcon = (type?: string) => {
     switch (type) {
-      case 'start': return <Star className="w-4 h-4 text-green-600" />;
-      case 'end': return <MapPin className="w-4 h-4 text-red-600" />;
-      default: return <MapPin className="w-4 h-4 text-blue-600" />;
+      case 'plane': return <Plane className="w-5 h-5" />;
+      case 'car': return <Car className="w-5 h-5" />;
+      case 'train': return <Train className="w-5 h-5" />;
+      case 'ship': return <Ship className="w-5 h-5" />;
+      default: return <Navigation className="w-5 h-5" />;
     }
   };
 
-  const getDestinationColor = (type: 'start' | 'destination' | 'end') => {
+  const getAccommodationIcon = (type?: string) => {
     switch (type) {
-      case 'start': return 'bg-green-100 text-green-800 border-green-200';
-      case 'end': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'hotel': return <Building className="w-5 h-5" />;
+      case 'resort': return <Star className="w-5 h-5" />;
+      case 'hostel': return <Users className="w-5 h-5" />;
+      case 'apartment': return <Home className="w-5 h-5" />;
+      default: return <Building className="w-5 h-5" />;
     }
-  };
-
-  // Función para generar precios de vuelos simulados
-  const generateFlightPrices = (): FlightSegment[] => {
-    if (!itinerarioData || itinerarioData.destinations.length <= 1) return [];
-
-    const segments: FlightSegment[] = [];
-    
-    for (let i = 0; i < itinerarioData.destinations.length - 1; i++) {
-      const from = itinerarioData.destinations[i];
-      const to = itinerarioData.destinations[i + 1];
-      
-      // Generar fecha del segmento (simulada)
-      const segmentDate = new Date();
-      segmentDate.setDate(segmentDate.getDate() + (i + 1) * 7); // Cada segmento una semana después
-      
-      const prices: FlightPrice[] = [];
-      const airlines = ['LATAM', 'Avianca', 'Copa Airlines', 'American Airlines', 'Delta'];
-      
-      // Generar precios para 10 días antes y después
-      for (let dayOffset = -10; dayOffset <= 10; dayOffset++) {
-        const priceDate = new Date(segmentDate);
-        priceDate.setDate(priceDate.getDate() + dayOffset);
-        
-        // Precio base variará según la distancia y demanda
-        const basePrice = 150 + (i * 50) + Math.abs(dayOffset) * 5;
-        const randomVariation = Math.random() * 100 - 50;
-        const finalPrice = Math.max(80, basePrice + randomVariation);
-        
-        // Determinar si es el precio más óptimo (menor precio en ventana de ±3 días)
-        const isOptimal = Math.abs(dayOffset) <= 3 && finalPrice <= basePrice + 20;
-        
-        prices.push({
-          date: priceDate.toLocaleDateString('es-ES', { 
-            weekday: 'short', 
-            month: 'short', 
-            day: 'numeric' 
-          }),
-          price: Math.round(finalPrice),
-          airline: airlines[Math.floor(Math.random() * airlines.length)],
-          departureTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 6) * 10}`,
-          arrivalTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 6) * 10}`,
-          duration: `${Math.floor(Math.random() * 3) + 1}h ${Math.floor(Math.random() * 60)}m`,
-          stops: Math.floor(Math.random() * 2),
-          isOptimal: isOptimal
-        });
-      }
-      
-      // Ordenar por precio y marcar el más óptimo
-      prices.sort((a, b) => a.price - b.price);
-      const optimalIndex = prices.findIndex(p => p.isOptimal);
-      if (optimalIndex !== -1) {
-        prices[optimalIndex].isOptimal = true;
-        // Desmarcar otros como óptimos
-        prices.forEach((p, idx) => {
-          if (idx !== optimalIndex) p.isOptimal = false;
-        });
-      }
-      
-      segments.push({
-        from: from.name,
-        to: to.name,
-        segmentDate: segmentDate.toLocaleDateString('es-ES', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric' 
-        }),
-        prices: prices
-      });
-    }
-    
-    return segments;
   };
 
   if (!itinerarioData) {
@@ -308,366 +358,616 @@ const DetallesCotizacionContent = () => {
   }
 
   const renderResumen = () => (
-    <div className="space-y-0">
-      {/* Header Azul Completo */}
-      <div className="w-full  text-dark py-8 px-6 lg:px-8 xl:px-12 -mx-6 lg:-mx-8 xl:-mx-12 mb-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="text-center lg:text-left mb-4 lg:mb-0">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                Resumen del Itinerario
-              </h1>
-              <p className="text-lg text-dark">
-                Revisa todos los detalles antes de confirmar tu viaje
-              </p>
-            </div>
-            <div className="flex flex-col items-center lg:items-end space-y-2">
-              <Badge className="bg-primary-foreground text-primary px-4 py-2 text-sm font-semibold">
-                PENDIENTE
-              </Badge>
-              <p className="text-sm text-dark">
-                ID: IT-{Math.floor(Math.random() * 900000) + 100000}
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      {/* Header Hero con Gradiente */}
+      <div className="relative overflow-hidden">
+        {/* Fondo con patrón geométrico */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-secondary/10"></div>
+        <div className="absolute inset-0 opacity-30">
+          <div className="w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
+        
+        <div className="relative z-10 px-6 lg:px-8 xl:px-12 py-12 lg:py-16">
+          <div className="max-w-7xl mx-auto">
+            {/* Información Principal */}
+            <div className="text-center lg:text-left space-y-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-3 px-4 py-2 bg-primary/10 text-primary rounded-full border border-primary/20">
+                    <Compass className="w-5 h-5" />
+                    <span className="text-sm font-medium">Paquete de Viaje</span>
+                  </div>
+                  
+                  <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight">
+                    Resumen del
+                    <span className="block text-primary">Itinerario</span>
+                  </h1>
+                  
+                  <p className="text-xl text-muted-foreground max-w-2xl lg:max-w-none">
+                    Revisa todos los detalles antes de confirmar tu experiencia de viaje única
+                  </p>
+                </div>
+                
+                {/* Estado y ID */}
+                <div className="flex flex-col items-center lg:items-end space-y-4">
+                  <div className="relative">
+                    <Badge className="bg-primary text-primary-foreground px-6 py-3 text-lg font-semibold rounded-full shadow-lg">
+                      PENDIENTE
+                    </Badge>
+                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-secondary rounded-full animate-pulse"></div>
+                  </div>
+                  
+                  <div className="text-center lg:text-right">
+                    <p className="text-sm text-muted-foreground font-medium">ID de Reserva</p>
+                    <p className="text-2xl font-bold text-foreground font-mono">
+                      IT-{Math.floor(Math.random() * 900000) + 100000}
+                    </p>
+                  </div>
+                  
+                  {/* Información Rápida */}
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="p-3 bg-background/80 backdrop-blur-sm rounded-xl border border-border/50">
+                      <Clock className="w-6 h-6 text-primary mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Duración</p>
+                      <p className="text-lg font-bold text-foreground">{itinerarioData.duracion} días</p>
+                    </div>
+                    <div className="p-3 bg-background/80 backdrop-blur-sm rounded-xl border border-border/50">
+                      <Users className="w-6 h-6 text-primary mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Viajeros</p>
+                      <p className="text-lg font-bold text-foreground">{itinerarioData.personas}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Contenido Principal - Layout de Dos Columnas */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Columna Izquierda - Información del Viaje */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Información del Viaje */}
-            <Card className="border border-border">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Globe className="w-5 h-5 text-primary" />
-                  Información del Viaje
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-muted/30 rounded-lg border border-border">
-                    <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
-                    <div className="text-sm text-muted-foreground font-medium">Fecha Inicio</div>
-                    <div className="text-base font-bold text-foreground">
-                      {itinerarioData.fechaInicio}
-                    </div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-muted/30 rounded-lg border border-border">
-                    <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
-                    <div className="text-sm text-muted-foreground font-medium">Fecha Fin</div>
-                    <div className="text-base font-bold text-foreground">
-                      {itinerarioData.fechaFin}
-                    </div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-muted/30 rounded-lg border border-border">
-                    <Clock className="w-6 h-6 text-primary mx-auto mb-2" />
-                    <div className="text-sm text-muted-foreground font-medium">Duración</div>
-                    <div className="text-base font-bold text-foreground">
-                      {itinerarioData.duracion} días
-                    </div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-muted/30 rounded-lg border border-border">
-                    <Users className="w-6 h-6 text-primary mx-auto mb-2" />
-                    <div className="text-sm text-muted-foreground font-medium">Personas</div>
-                    <div className="text-base font-bold text-foreground">
-                      {itinerarioData.personas}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Contenido Principal */}
+      <div className="px-6 lg:px-8 xl:px-12 py-8 lg:py-12">
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          {/* Línea de Tiempo del Viaje */}
+          <section className="relative">
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-primary/50"></div>
+            
+            <div className="space-y-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
+                  <Route className="w-8 h-8 text-primary" />
+                  Cronograma del Viaje
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Descubre cada parada de tu aventura con detalles completos de transporte, alojamiento y actividades
+                </p>
+              </div>
 
-            {/* Ruta del Viaje */}
-            <Card className="border border-border">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  Ruta del Viaje
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {itinerarioData.destinations.map((destination: Destination, index: number) => (
-                  <div key={destination.id} className="relative">
-                    {/* Línea conectora */}
-                    {index > 0 && (
-                      <div className="absolute left-6 top-0 w-0.5 h-8 bg-muted border-l-2 border-dashed border-border">
-                        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                          <div className="flex items-center space-x-2 bg-card px-2 py-1 rounded-full shadow-sm">
-                            <Plane className="w-3 h-3 text-primary" />
+              {itinerarioData.destinations.map((destination, index) => (
+                <div key={destination.id} className="relative">
+                  {/* Marcador de tiempo */}
+                  <div className="absolute left-6 top-0 w-4 h-4 bg-primary rounded-full border-4 border-background shadow-lg z-10"></div>
+                  
+                  {/* Contenido del destino */}
+                  <div className="ml-16 space-y-6">
+                    {/* Header del destino */}
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <Badge className={`px-3 py-1 text-sm font-bold ${
+                            destination.type === 'start' 
+                              ? 'bg-primary text-primary-foreground' 
+                              : destination.type === 'end'
+                              ? 'bg-destructive text-destructive-foreground'
+                              : 'bg-secondary text-secondary-foreground'
+                          }`}>
+                            {destination.type === 'start' ? 'Inicio' : destination.type === 'end' ? 'Final' : `Destino ${index + 1}`}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground font-medium">
+                            {destination.nights || 2} noches
+                          </span>
+                        </div>
+                        
+                        <h3 className="text-2xl font-bold text-foreground">{destination.name}</h3>
+                        
+                        {destination.description && (
+                          <p className="text-muted-foreground max-w-2xl">{destination.description}</p>
+                        )}
+                      </div>
+                      
+                      {/* Fechas */}
+                      <div className="text-right space-y-1">
+                        <p className="text-sm text-muted-foreground">Llegada</p>
+                        <p className="font-semibold text-foreground">{destination.startDate}</p>
+                        <p className="text-sm text-muted-foreground">Salida</p>
+                        <p className="font-semibold text-foreground">{destination.endDate}</p>
+                      </div>
+                    </div>
+
+                    {/* Detalles del transporte */}
+                    {itinerarioData.transportDetails && index > 0 && (
+                      <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="p-3 bg-primary/10 rounded-xl">
+                            {getTransportIcon(destination.transportType)}
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-semibold text-foreground">Transporte desde {itinerarioData.destinations[index - 1].name}</h4>
+                            <p className="text-muted-foreground">Detalles del viaje</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="flex items-center gap-3">
+                            <Building className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="text-sm text-muted-foreground">Aerolínea</p>
+                              <p className="font-semibold text-foreground">{itinerarioData.transportDetails[0]?.provider}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <Clock className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="text-sm text-muted-foreground">Duración</p>
+                              <p className="font-semibold text-foreground">{itinerarioData.transportDetails[0]?.duration}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <Star className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="text-sm text-muted-foreground">Clase</p>
+                              <p className="font-semibold text-foreground">{itinerarioData.transportDetails[0]?.class}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    {/* Tarjeta del destino */}
-                    <div className="flex items-start space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
-                      <div className="relative">
-                        <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            {getDestinationIcon(destination.type)}
+                    {/* Detalles del alojamiento */}
+                    {itinerarioData.accommodationDetails && destination.accommodationIncluded && (
+                      <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="p-3 bg-secondary/10 rounded-xl">
+                            {getAccommodationIcon(destination.accommodationType)}
                           </div>
-                        </div>
-                        <Badge className={`absolute -top-1 -right-1 w-6 h-6 p-0 text-xs font-bold ${
-                          destination.type === 'start' ? 'bg-green-500' : 'bg-blue-500'
-                        }`}>
-                          {destination.type === 'start' ? '1' : index + 1}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold text-foreground text-lg">{destination.name}</h3>
-                          <Badge variant="outline" className={getDestinationColor(destination.type)}>
-                            {destination.type === 'start' ? 'Inicio' : destination.type === 'end' ? 'Final' : `Destino`}
-                          </Badge>
+                          <div>
+                            <h4 className="text-lg font-semibold text-foreground">{itinerarioData.accommodationDetails[0]?.name}</h4>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star 
+                                    key={i} 
+                                    className={`w-4 h-4 ${
+                                      i < (itinerarioData.accommodationDetails?.[0]?.rating || 0) 
+                                        ? 'text-yellow-500 fill-current' 
+                                        : 'text-muted-foreground'
+                                    }`} 
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-muted-foreground">
+                                {itinerarioData.accommodationDetails[0]?.rating}/5
+                              </span>
+                            </div>
+                          </div>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Hotel className="w-4 h-4" />
-                            {destination.nights || 2} noches
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h5 className="font-semibold text-foreground mb-3">Tipo de Habitación</h5>
+                            <p className="text-muted-foreground">{itinerarioData.accommodationDetails[0]?.roomType}</p>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Check className="w-4 h-4 text-green-600" />
-                            Incluido
+                          
+                          <div>
+                            <h5 className="font-semibold text-foreground mb-3">Servicios Incluidos</h5>
+                            <div className="flex flex-wrap gap-2">
+                              {itinerarioData.accommodationDetails[0]?.amenities.map((amenity, idx) => (
+                                <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-background rounded-md text-xs text-muted-foreground">
+                                  {amenity === 'WiFi' && <Wifi className="w-3 h-3" />}
+                                  {amenity === 'Restaurante' && <Utensils className="w-3 h-3" />}
+                                  {amenity === 'Gimnasio' && <Zap className="w-3 h-3" />}
+                                  {amenity === 'Piscina' && <Heart className="w-3 h-3" />}
+                                  {amenity}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
+                    )}
+
+                    {/* Actividades y highlights */}
+                    {destination.activities && destination.activities.length > 0 && (
+                      <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+                        <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                          <Camera className="w-5 h-5 text-primary" />
+                          Actividades y Experiencias
+                        </h4>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h5 className="font-semibold text-foreground mb-3">Actividades Incluidas</h5>
+                            <div className="space-y-2">
+                              {destination.activities.map((activity, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                  <Check className="w-4 h-4 text-green-600" />
+                                  <span className="text-muted-foreground">{activity}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {destination.highlights && (
+                            <div>
+                              <h5 className="font-semibold text-foreground mb-3">Puntos Destacados</h5>
+                              <div className="space-y-2">
+                                {destination.highlights.map((highlight, idx) => (
+                                  <div key={idx} className="flex items-center gap-2">
+                                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                    <span className="text-muted-foreground">{highlight}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+                     </section>
+
+           {/* Mapa del Itinerario */}
+           <section className="space-y-8">
+             <div className="text-center">
+               <h2 className="text-3xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
+                 <Map className="w-8 h-8 text-primary" />
+                 Mapa del Itinerario
+               </h2>
+               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                 Visualiza la ruta completa de tu viaje con todos los destinos marcados
+               </p>
+             </div>
+             
+             <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+               <SimpleMap 
+                 destinations={itinerarioData.destinations}
+                 className="w-full h-[500px]"
+               />
+             </div>
+           </section>
+
+           {/* Servicios y Beneficios */}
+          <section className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
+                <Award className="w-8 h-8 text-primary" />
+                Servicios Incluidos
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Todo lo que necesitas para una experiencia de viaje completa y sin preocupaciones
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {itinerarioData.serviciosIncluidos.map((servicio, index) => (
+                <div key={index} className="group relative overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl p-6 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <div className="relative z-10 space-y-4">
+                    <div className="p-3 bg-primary/10 rounded-xl w-fit">
+                      {servicio === 'Hoteles' && <Building className="w-6 h-6 text-primary" />}
+                      {servicio === 'Tours' && <Compass className="w-6 h-6 text-primary" />}
+                      {servicio === 'Visitas guiadas' && <Map className="w-6 h-6 text-primary" />}
+                      {servicio === 'Traslados' && <Car className="w-6 h-6 text-primary" />}
+                      {servicio === 'Alimentación' && <Utensils className="w-6 h-6 text-primary" />}
+                      {!['Hoteles', 'Tours', 'Visitas guiadas', 'Traslados', 'Alimentación'].includes(servicio) && <Check className="w-6 h-6 text-primary" />}
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">{servicio}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Incluido en tu paquete de viaje para máxima comodidad
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Información Adicional */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Seguro y Políticas */}
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-foreground flex items-center gap-3">
+                <Shield className="w-6 h-6 text-primary" />
+                Seguro y Políticas
+              </h3>
+              
+              <div className="space-y-4">
+                {itinerarioData.insurance && (
+                  <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Check className="w-4 h-4 text-green-600" />
+                      </div>
+                      <span className="font-semibold text-foreground">Seguro Incluido</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{itinerarioData.insurance.type}</p>
+                    <p className="text-xs text-muted-foreground">{itinerarioData.insurance.coverage}</p>
+                  </div>
+                )}
+                
+                {itinerarioData.cancellationPolicy && (
+                  <div className="bg-muted/30 rounded-2xl p-6 border border-border/50">
+                    <h4 className="font-semibold text-foreground mb-2">Política de Cancelación</h4>
+                    <p className="text-sm text-muted-foreground">{itinerarioData.cancellationPolicy}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Ofertas Especiales */}
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-foreground flex items-center gap-3">
+                <Gift className="w-6 h-6 text-primary" />
+                Ofertas Especiales
+              </h3>
+              
+              <div className="space-y-4">
+                {itinerarioData.specialOffers?.map((offer, index) => (
+                  <div key={index} className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary rounded-lg">
+                        <TrendingUp className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                      <span className="font-semibold text-foreground">{offer}</span>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
 
-            {/* Servicios Incluidos */}
-            <Card className="border border-border">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Check className="w-5 h-5 text-primary" />
-                  Servicios Incluidos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                  {itinerarioData.serviciosIncluidos.map((servicio: string, index: number) => (
-                    <div key={index} className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-foreground">{servicio}</span>
+      {/* Sección de Precios y Acciones - Sticky */}
+      <div className="sticky  shadow-lg">
+        <div className="px-6 lg:px-8 xl:px-12 py-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+              {/* Información de Precios */}
+              <div className="lg:col-span-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <DollarSign className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm bg-primary/10 rounded-lg p-2">Precio por persona</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          {formatPrice(itinerarioData.precioTotal / itinerarioData.personas)}
+                        </p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Columna Derecha - Resumen de Precios */}
-          <div className="lg:col-span-1">
-            <Card className="border border-border sticky top-8">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <DollarSign className="w-5 h-5 text-primary" />
-                  Resumen de Precios
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Precio por persona:</span>
-                    <span className="font-semibold text-foreground">
-                      {formatPrice(itinerarioData.precioTotal / itinerarioData.personas)}
-                    </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Total ({itinerarioData.personas} personas):</span>
-                    <span className="font-semibold text-foreground">
-                      {formatPrice(itinerarioData.precioTotal)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Descuento aplicado:</span>
-                    <span className="font-semibold text-green-600">
-                      -{formatPrice(itinerarioData.precioTotal - itinerarioData.precioDescuento)}
-                    </span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-foreground">Precio Final:</span>
-                    <span className="text-xl font-bold text-primary">
-                      {formatPrice(itinerarioData.precioDescuento)}
-                    </span>
+                  
+                  <div className="text-right space-y-2">
+                    <div className="flex items-center gap-2 justify-end">
+                      <span className="text-sm text-muted-foreground">Total ({itinerarioData.personas} personas):</span>
+                      <span className="text-lg font-semibold text-foreground">
+                        {formatPrice(itinerarioData.precioTotal)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 justify-end">
+                      <span className="text-sm text-muted-foreground">Descuento:</span>
+                      <span className="text-lg font-semibold text-green-600">
+                        -{formatPrice(itinerarioData.precioTotal - itinerarioData.precioDescuento)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 justify-end">
+                      <span className="text-sm text-muted-foreground">Precio Final:</span>
+                      <span className="text-3xl font-bold text-primary">
+                        {formatPrice(itinerarioData.precioDescuento)}
+                      </span>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Botones de Acción */}
-                <div className="space-y-3 pt-4">
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Proceder al Pago
-                  </Button>
-                                     <Button variant="outline" className="w-full border-green-500 text-green-600 hover:bg-green-50">
-                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                     </svg>
-                     Enviar por WhatsApp
-                   </Button>
-                  <Button variant="outline" className="w-full">
-                    <Download className="w-4 h-4 mr-2" />
-                    Descargar PDF
-                  </Button>
+              {/* Botones de Acción */}
+              <div className="lg:col-span-1 space-y-3">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-lg font-semibold shadow-lg">
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Proceder al Pago
+                </Button>
+                
+                <Button variant="outline" className="w-full border-green-500 text-green-600 hover:bg-green-50 h-12">
+                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                  </svg>
+                  Enviar por WhatsApp
+                </Button>
+                
+                <Button variant="outline" className="w-full h-12">
+                  <Download className="w-5 h-5 mr-2" />
+                  Descargar PDF
+                </Button>
+              </div>
+            </div>
+
+            {/* Sección de Contacto */}
+            <div className="mt-6 pt-6 border-t border-border/50">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-sm text-muted-foreground mb-2">¿Tienes preguntas sobre tu viaje?</p>
+                  <p className="text-xs text-muted-foreground">Nuestro equipo está disponible 24/7 para ayudarte</p>
                 </div>
-
-                                 {/* Sección de Contacto */}
-                 <div className="pt-6 border-t border-border">
-                   <p className="text-sm text-muted-foreground mb-3">¿Tienes preguntas?</p>
-                   <div className="flex gap-3">
-                     <Drawer open={isCallDrawerOpen} onOpenChange={setIsCallDrawerOpen}>
-                       <DrawerTrigger asChild>
-                         <Button variant="outline" size="sm" className="flex-1">
-                           <Phone className="w-4 h-4 mr-2" />
-                           Llamar
-                         </Button>
-                       </DrawerTrigger>
-                                               <DrawerContent className="bg-slate-900 border-slate-700">
-                          <div className="mx-auto w-full max-w-sm">
-                            <DrawerHeader className="border-b border-slate-700">
-                              <DrawerTitle className="text-center text-xl font-semibold text-white">
-                                📞 Marcador Telefónico
-                              </DrawerTitle>
-                              <p className="text-center text-sm text-slate-300">
-                                Marca el número que deseas llamar
-                              </p>
-                            </DrawerHeader>
+                
+                <div className="flex gap-3">
+                  <Drawer open={isCallDrawerOpen} onOpenChange={setIsCallDrawerOpen}>
+                    <DrawerTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex items-center gap-2">
+                        <Phone className="w-4 h-4" />
+                        Llamar
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent className="bg-slate-900 border-slate-700">
+                      <div className="mx-auto w-full max-w-sm">
+                        <DrawerHeader className="border-b border-slate-700">
+                          <DrawerTitle className="text-center text-xl font-semibold text-white">
+                            Marcador Telefónico
+                          </DrawerTitle>
+                          <p className="text-center text-sm text-slate-300">
+                            Marca el número que deseas llamar
+                          </p>
+                        </DrawerHeader>
+                        
+                        {/* Número mostrado */}
+                        <div className="px-6 py-6 text-center bg-slate-800/50">
+                          <div className="text-4xl font-bold text-white mb-2">
+                            {phoneNumber === '+51 ' ? 'Ingresa número' : phoneNumber}
+                          </div>
+                          <div className="text-sm text-slate-400 font-medium">
+                            {phoneNumber === '+51 ' ? 'LISTO PARA MARCAR' : 'LLAMANDO'}
+                          </div>
+                        </div>
+                        
+                        {/* Teclado numérico */}
+                        <div className="px-6 py-6">
+                          <div className="grid grid-cols-3 gap-5 mb-8">
+                            {/* Primera fila: 1, 2, 3 */}
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('1')}
+                            >
+                              1
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('2')}
+                            >
+                              2
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('3')}
+                            >
+                              3
+                            </button>
                             
-                            {/* Número mostrado */}
-                            <div className="px-6 py-6 text-center bg-slate-800/50">
-                              <div className="text-4xl font-bold text-white mb-2">+51 1 234 5678</div>
-                              <div className="text-sm text-slate-400 font-medium">LLAMANDO</div>
+                            {/* Segunda fila: 4, 5, 6 */}
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('4')}
+                            >
+                              4
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('5')}
+                            >
+                              5
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('6')}
+                            >
+                              6
+                            </button>
+                            
+                            {/* Tercera fila: 7, 8, 9 */}
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('7')}
+                            >
+                              7
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('8')}
+                            >
+                              8
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('9')}
+                            >
+                              9
+                            </button>
+                            
+                            {/* Cuarta fila: *, 0, # */}
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('*')}
+                            >
+                              *
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('0')}
+                            >
+                              0
+                            </button>
+                            <button 
+                              className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                              onClick={() => handleAddNumber('#')}
+                            >
+                              #
+                            </button>
+                          </div>
+                          
+                          {/* Botones de acción */}
+                          <div className="flex flex-col gap-4 mb-6">
+                            {/* Botón de borrar */}
+                            <div className="flex justify-center">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="w-20 h-20 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg border-4 border-red-400/30"
+                                onClick={handleDeleteNumber}
+                                title="Borrar último número"
+                              >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-6-2h2v-2h-2v2zm0-4h2v-2h-2v2zm-2-2v2h2v-2h-2zm-2 2h2v-2h-2v2zm0 4h2v-2h-2v2zm-2-2v2h2v-2h-2z"/>
+                                </svg>
+                              </Button>
                             </div>
                             
-                            {/* Teclado numérico */}
-                            <div className="px-6 py-6">
-                              <div className="grid grid-cols-3 gap-5 mb-8">
-                                                                 {/* Primera fila: 1, 2, 3 */}
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   1
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   2
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   3
-                                 </button>
-                                 
-                                 {/* Segunda fila: 4, 5, 6 */}
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   4
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   5
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   6
-                                 </button>
-                                 
-                                 {/* Tercera fila: 7, 8, 9 */}
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   7
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   8
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   9
-                                 </button>
-                                 
-                                 {/* Cuarta fila: *, 0, # */}
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   *
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   0
-                                 </button>
-                                 <button 
-                                   className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                   onClick={() => handleCall('+5112345678')}
-                                 >
-                                   #
-                                 </button>
-                              </div>
-                              
-                              {/* Botón de llamada grande */}
-                              <div className="flex justify-center mb-6">
-                                <button 
-                                  className="w-24 h-24 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border-4 border-green-400/30"
-                                  onClick={() => handleCall('+5112345678')}
-                                >
-                                  <Phone className="w-10 h-10" />
-                                </button>
-                              </div>
-                              
-                              {/* Botón de cerrar */}
-                              <div className="text-center">
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-                                  onClick={() => setIsCallDrawerOpen(false)}
-                                >
-                                  Cerrar
-                                </Button>
-                              </div>
+                            {/* Botón de llamar */}
+                            <div className="flex justify-center">
+                              <Button 
+                                className="w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border-4 border-green-400/30"
+                                onClick={() => handleCall(phoneNumber)}
+                                title="Llamar"
+                              >
+                                <Phone className="w-10 h-10" />
+                              </Button>
                             </div>
                           </div>
-                        </DrawerContent>
-                     </Drawer>
-                     
-                     <Button variant="outline" size="sm" className="flex-1">
-                       <Mail className="w-4 h-4 mr-2" />
-                       Email
-                     </Button>
-                   </div>
-                 </div>
-              </CardContent>
-            </Card>
+                        </div>
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                  
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
