@@ -4,274 +4,273 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Users, 
-  Package, 
-  Calendar, 
-  DollarSign, 
-  TrendingUp, 
-  MapPin, 
-  Target,
-  CheckCircle,
-  XCircle,
-  Star,
-  Clock,
-  BarChart3,
-  Activity,
-  Award,
-  TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  PieChart,
-  LineChart,
-  BarChart,
-  AreaChart,
-  Shield,
-  Database,
-  Key,
-  Settings,
-  UserCheck,
-  Building,
-  Hotel,
-  Plane,
-  FileText,
-  CreditCard,
-  Globe,
-  Lock,
-  Server,
-  Zap,
-  Mail
+import {
+    Users,
+    Package,
+    Calendar,
+    DollarSign,
+    TrendingUp,
+    MapPin,
+    Target,
+    CheckCircle,
+    XCircle,
+    Star,
+    Clock,
+    BarChart3,
+    Activity,
+    Award,
+    TrendingDown,
+    ArrowUpRight,
+    ArrowDownRight,
+    PieChart,
+    LineChart,
+    BarChart,
+    AreaChart,
+    Shield,
+    Database,
+    Key,
+    Settings,
+    UserCheck,
+    Building,
+    Hotel,
+    Plane,
+    FileText,
+    CreditCard,
+    Globe,
+    Lock,
+    Server,
+    Zap,
+    Mail
 } from "lucide-react"
 
 // Componente de gráfico de barras apiladas para administradores
 const AdminStackedBarChart = () => (
-  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-    <div className="text-center mb-4 px-2">
-      <h4 className="font-semibold text-foreground">Gestión de Usuarios por Mes</h4>
+    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
+        <div className="text-center mb-4 px-2">
+        </div>
+        <div className="flex items-end justify-between h-40 space-x-1">
+            {/* Enero */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '70px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '45px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '25px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">Ene</span>
+            </div>
+            {/* Febrero */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '85px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '55px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '30px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">Feb</span>
+            </div>
+            {/* Marzo */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '75px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '65px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '35px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">Mar</span>
+            </div>
+            {/* Abril */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '95px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '75px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">Abr</span>
+            </div>
+            {/* Mayo */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '110px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '85px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '50px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">May</span>
+            </div>
+            {/* Junio */}
+            <div className="flex flex-col items-center space-y-1">
+                <div className="w-8 bg-primary rounded-t" style={{ height: '90px' }}></div>
+                <div className="w-8 bg-secondary" style={{ height: '70px' }}></div>
+                <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
+                <span className="text-xs text-muted-foreground font-medium">Jun</span>
+            </div>
+        </div>
+        <div className="flex justify-center space-x-4 mt-4 text-xs">
+            <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-primary rounded"></div>
+                <span className="text-muted-foreground font-medium">Administradores</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-secondary rounded"></div>
+                <span className="text-muted-foreground font-medium">Trabajadores</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-accent rounded"></div>
+                <span className="text-muted-foreground font-medium">Clientes</span>
+            </div>
+        </div>
     </div>
-    <div className="flex items-end justify-between h-40 space-x-1">
-      {/* Enero */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '70px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '45px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '25px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">Ene</span>
-      </div>
-      {/* Febrero */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '85px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '55px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '30px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">Feb</span>
-      </div>
-      {/* Marzo */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '75px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '65px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '35px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">Mar</span>
-      </div>
-      {/* Abril */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '95px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '75px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">Abr</span>
-      </div>
-      {/* Mayo */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '110px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '85px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '50px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">May</span>
-      </div>
-      {/* Junio */}
-      <div className="flex flex-col items-center space-y-1">
-        <div className="w-8 bg-primary rounded-t" style={{ height: '90px' }}></div>
-        <div className="w-8 bg-secondary" style={{ height: '70px' }}></div>
-        <div className="w-8 bg-accent rounded-b" style={{ height: '40px' }}></div>
-        <span className="text-xs text-muted-foreground font-medium">Jun</span>
-      </div>
-    </div>
-    <div className="flex justify-center space-x-4 mt-4 text-xs">
-      <div className="flex items-center space-x-2">
-        <div className="w-3 h-3 bg-primary rounded"></div>
-        <span className="text-muted-foreground font-medium">Administradores</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="w-3 h-3 bg-secondary rounded"></div>
-        <span className="text-muted-foreground font-medium">Trabajadores</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="w-3 h-3 bg-accent rounded"></div>
-        <span className="text-muted-foreground font-medium">Clientes</span>
-      </div>
-    </div>
-  </div>
 )
 
 // Componente de gráfico de dona para métricas del sistema
 const SystemDonutChart = () => (
-  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-    <div className="text-center mb-4">
-      <h4 className="font-semibold text-foreground">Estado del Sistema</h4>
+    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
+        <div className="text-center mb-4">
+            <h4 className="font-semibold text-foreground">Estado del Sistema</h4>
+        </div>
+        <div className="relative w-32 h-32 mx-auto">
+            <svg className="w-full h-full" viewBox="0 0 100 100">
+                {/* Segmento 1 - Activo (75%) */}
+                <circle
+                    cx="50"
+                    cy="50"
+                    r="35"
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="15"
+                    strokeDasharray="165 220"
+                    strokeDashoffset="0"
+                    transform="rotate(-90 50 50)"
+                />
+                {/* Segmento 2 - Mantenimiento (20%) */}
+                <circle
+                    cx="50"
+                    cy="50"
+                    r="35"
+                    fill="none"
+                    stroke="hsl(var(--secondary))"
+                    strokeWidth="15"
+                    strokeDasharray="44 220"
+                    strokeDashoffset="-165"
+                    transform="rotate(-90 50 50)"
+                />
+                {/* Segmento 3 - Crítico (5%) */}
+                <circle
+                    cx="50"
+                    cy="50"
+                    r="35"
+                    fill="none"
+                    stroke="hsl(var(--destructive))"
+                    strokeWidth="15"
+                    strokeDasharray="11 220"
+                    strokeDashoffset="-209"
+                    transform="rotate(-90 50 50)"
+                />
+                {/* Centro */}
+                <circle cx="50" cy="50" r="20" fill="hsl(var(--card))" className="shadow-lg" />
+                <text x="50" y="55" textAnchor="middle" className="text-xs font-bold" fill="hsl(var(--card-foreground))">75%</text>
+            </svg>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-xs mt-4">
+            <div className="text-center">
+                <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-1"></div>
+                <div className="text-muted-foreground font-medium">Activo 75%</div>
+            </div>
+            <div className="text-center">
+                <div className="w-3 h-3 bg-secondary rounded-full mx-auto mb-1"></div>
+                <div className="text-muted-foreground font-medium">Mant. 20%</div>
+            </div>
+            <div className="text-center">
+                <div className="w-3 h-3 bg-destructive rounded-full mx-auto mb-1"></div>
+                <div className="text-muted-foreground font-medium">Crítico 5%</div>
+            </div>
+        </div>
     </div>
-    <div className="relative w-32 h-32 mx-auto">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        {/* Segmento 1 - Activo (75%) */}
-        <circle
-          cx="50"
-          cy="50"
-          r="35"
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth="15"
-          strokeDasharray="165 220"
-          strokeDashoffset="0"
-          transform="rotate(-90 50 50)"
-        />
-        {/* Segmento 2 - Mantenimiento (20%) */}
-        <circle
-          cx="50"
-          cy="50"
-          r="35"
-          fill="none"
-          stroke="hsl(var(--secondary))"
-          strokeWidth="15"
-          strokeDasharray="44 220"
-          strokeDashoffset="-165"
-          transform="rotate(-90 50 50)"
-        />
-        {/* Segmento 3 - Crítico (5%) */}
-        <circle
-          cx="50"
-          cy="50"
-          r="35"
-          fill="none"
-          stroke="hsl(var(--destructive))"
-          strokeWidth="15"
-          strokeDasharray="11 220"
-          strokeDashoffset="-209"
-          transform="rotate(-90 50 50)"
-        />
-        {/* Centro */}
-        <circle cx="50" cy="50" r="20" fill="hsl(var(--card))" className="shadow-lg" />
-        <text x="50" y="55" textAnchor="middle" className="text-xs font-bold" fill="hsl(var(--card-foreground))">75%</text>
-      </svg>
-    </div>
-    <div className="grid grid-cols-3 gap-2 text-xs mt-4">
-      <div className="text-center">
-        <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-1"></div>
-        <div className="text-muted-foreground font-medium">Activo 75%</div>
-      </div>
-      <div className="text-center">
-        <div className="w-3 h-3 bg-secondary rounded-full mx-auto mb-1"></div>
-        <div className="text-muted-foreground font-medium">Mant. 20%</div>
-      </div>
-      <div className="text-center">
-        <div className="w-3 h-3 bg-destructive rounded-full mx-auto mb-1"></div>
-        <div className="text-muted-foreground font-medium">Crítico 5%</div>
-      </div>
-    </div>
-  </div>
 )
 
 // Componente de gráfico de área para rendimiento
 const PerformanceAreaChart = () => (
-  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-    <div className="text-center mb-4">
-      <h4 className="font-semibold text-foreground">Rendimiento del Sistema</h4>
+    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
+        <div className="text-center mb-4">
+            <h4 className="font-semibold text-foreground">Rendimiento del Sistema</h4>
+        </div>
+        <div className="relative h-32">
+            <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+                    </linearGradient>
+                </defs>
+                {/* Área sombreada */}
+                <path
+                    d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15 L100,40 Z"
+                    fill="url(#performanceGradient)"
+                />
+                {/* Línea del gráfico */}
+                <path
+                    d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+                {/* Puntos de datos */}
+                <circle cx="20" cy="35" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+                <circle cx="40" cy="30" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+                <circle cx="60" cy="25" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+                <circle cx="80" cy="20" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+                <circle cx="100" cy="15" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+            </svg>
+        </div>
+        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mt-4 font-medium">
+            <div className="text-center">Ene</div>
+            <div className="text-center">Feb</div>
+            <div className="text-center">Mar</div>
+            <div className="text-center">Abr</div>
+            <div className="text-center">May</div>
+        </div>
     </div>
-    <div className="relative h-32">
-      <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-          </linearGradient>
-        </defs>
-        {/* Área sombreada */}
-        <path
-          d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15 L100,40 Z"
-          fill="url(#performanceGradient)"
-        />
-        {/* Línea del gráfico */}
-        <path
-          d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Puntos de datos */}
-        <circle cx="20" cy="35" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-        <circle cx="40" cy="30" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-        <circle cx="60" cy="25" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-        <circle cx="80" cy="20" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-        <circle cx="100" cy="15" r="3" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
-      </svg>
-    </div>
-    <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mt-4 font-medium">
-      <div className="text-center">Ene</div>
-      <div className="text-center">Feb</div>
-      <div className="text-center">Mar</div>
-      <div className="text-center">Abr</div>
-      <div className="text-center">May</div>
-    </div>
-  </div>
 )
 
 // Componente de gráfico de radar para métricas de seguridad
 const SecurityRadarChart = () => (
-  <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
-    <div className="text-center mb-4">
-      <h4 className="font-semibold text-foreground">Métricas de Seguridad</h4>
+    <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg p-4">
+        <div className="text-center mb-4">
+            <h4 className="font-semibold text-foreground">Métricas de Seguridad</h4>
+        </div>
+        <div className="relative w-32 h-32 mx-auto">
+            <svg className="w-full h-full" viewBox="0 0 100 100">
+                {/* Círculos concéntricos */}
+                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <circle cx="50" cy="50" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <circle cx="50" cy="50" r="20" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <circle cx="50" cy="50" r="10" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
+
+                {/* Líneas del radar */}
+                <line x1="50" y1="10" x2="50" y2="90" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <line x1="10" y1="50" x2="90" y2="50" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <line x1="20" y1="20" x2="80" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
+                <line x1="80" y1="20" x2="20" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
+
+                {/* Datos del radar */}
+                <polygon
+                    points="50,15 70,35 65,50 45,50 40,35"
+                    fill="hsl(var(--primary))"
+                    fillOpacity="0.3"
+                />
+                <polygon
+                    points="50,15 70,35 65,50 45,50 40,35"
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+
+                {/* Puntos de datos */}
+                <circle cx="50" cy="15" r="2" fill="hsl(var(--primary))" />
+                <circle cx="70" cy="35" r="2" fill="hsl(var(--primary))" />
+                <circle cx="65" cy="50" r="2" fill="hsl(var(--primary))" />
+                <circle cx="45" cy="50" r="2" fill="hsl(var(--primary))" />
+                <circle cx="40" cy="35" r="2" fill="hsl(var(--primary))" />
+            </svg>
+        </div>
+        <div className="grid grid-cols-4 gap-1 text-xs mt-4 text-muted-foreground font-medium">
+            <div className="text-center">Firewall</div>
+            <div className="text-center">SSL</div>
+            <div className="text-center">Backup</div>
+            <div className="text-center">Auth</div>
+        </div>
     </div>
-    <div className="relative w-32 h-32 mx-auto">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        {/* Círculos concéntricos */}
-        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <circle cx="50" cy="50" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <circle cx="50" cy="50" r="20" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <circle cx="50" cy="50" r="10" fill="none" stroke="hsl(var(--muted))" strokeWidth="1" />
-        
-        {/* Líneas del radar */}
-        <line x1="50" y1="10" x2="50" y2="90" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <line x1="10" y1="50" x2="90" y2="50" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <line x1="20" y1="20" x2="80" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
-        <line x1="80" y1="20" x2="20" y2="80" stroke="hsl(var(--muted))" strokeWidth="1" />
-        
-        {/* Datos del radar */}
-        <polygon
-          points="50,15 70,35 65,50 45,50 40,35"
-          fill="hsl(var(--primary))"
-          fillOpacity="0.3"
-        />
-        <polygon
-          points="50,15 70,35 65,50 45,50 40,35"
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        
-        {/* Puntos de datos */}
-        <circle cx="50" cy="15" r="2" fill="hsl(var(--primary))" />
-        <circle cx="70" cy="35" r="2" fill="hsl(var(--primary))" />
-        <circle cx="65" cy="50" r="2" fill="hsl(var(--primary))" />
-        <circle cx="45" cy="50" r="2" fill="hsl(var(--primary))" />
-        <circle cx="40" cy="35" r="2" fill="hsl(var(--primary))" />
-      </svg>
-    </div>
-    <div className="grid grid-cols-4 gap-1 text-xs mt-4 text-muted-foreground font-medium">
-      <div className="text-center">Firewall</div>
-      <div className="text-center">SSL</div>
-      <div className="text-center">Backup</div>
-      <div className="text-center">Auth</div>
-    </div>
-  </div>
 )
 
 export default function AdministradoresPage() {
@@ -279,7 +278,7 @@ export default function AdministradoresPage() {
         <div className="min-h-screen bg-background">
             {/* Contenido principal */}
             <div className="pt-16">
-                <div className="p-6 lg:p-8 space-y-6">
+                <div className="p-6 lg:p-8 space-y-8">
                     {/* Header del Dashboard */}
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                         <div>
@@ -353,75 +352,86 @@ export default function AdministradoresPage() {
                             <CardContent>
                                 <div className="text-2xl font-bold text-destructive">3</div>
                                 <div className="flex items-center space-x-2 mt-1">
-                                    <ArrowDownRight className="w-4 h-4 text-green-500" />
-                                    <span className="text-xs text-green-600 font-medium">-2</span>
+                                    <ArrowDownRight className="w-4 h-4 text-red-500" />
+                                    <span className="text-xs text-red-600 font-medium">-2</span>
                                     <span className="text-xs text-muted-foreground">desde ayer</span>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Gráficos Estadísticos */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Gráficos Estadísticos - Primera Fila */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <Card className="border-primary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <BarChart className="h-5 w-5 text-primary" />
                                     <span>Gestión de Usuarios por Mes</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <AdminStackedBarChart />
+                            <CardContent className="pt-0">
+                                <div className="h-80">
+                                    <AdminStackedBarChart />
+                                </div>
                             </CardContent>
                         </Card>
 
                         <Card className="border-secondary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <PieChart className="h-5 w-5 text-secondary" />
                                     <span>Estado del Sistema</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <SystemDonutChart />
+                            <CardContent className="pt-0">
+                                <div className="h-80">
+                                    <SystemDonutChart />
+                                </div>
                             </CardContent>
                         </Card>
+                    </div>
 
+                    {/* Gráficos Estadísticos - Segunda Fila */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <Card className="border-accent/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <AreaChart className="h-5 w-5 text-accent" />
                                     <span>Rendimiento del Sistema</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <PerformanceAreaChart />
+                            <CardContent className="pt-0">
+                                <div className="h-80">
+                                    <PerformanceAreaChart />
+                                </div>
                             </CardContent>
                         </Card>
 
                         <Card className="border-primary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <BarChart3 className="h-5 w-5 text-primary" />
                                     <span>Métricas de Seguridad</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <SecurityRadarChart />
+                            <CardContent className="pt-0">
+                                <div className="h-80">
+                                    <SecurityRadarChart />
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {/* Métricas del Sistema y Top Administradores */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <Card className="lg:col-span-2 border-primary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <Target className="h-5 w-5 text-primary" />
                                     <span>Rendimiento del Sistema</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-0">
                                 <div className="space-y-6">
                                     {/* Uso de CPU */}
                                     <div>
@@ -470,13 +480,13 @@ export default function AdministradoresPage() {
 
                         {/* Top Administradores */}
                         <Card className="border-secondary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <Award className="h-5 w-5 text-secondary" />
                                     <span>Top Administradores</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-0">
                                 <div className="space-y-4">
                                     {[
                                         { name: "Carlos Rodríguez", tasks: 89, rating: 4.9, change: "+15%" },
@@ -514,16 +524,16 @@ export default function AdministradoresPage() {
                     </div>
 
                     {/* Servicios del Sistema y Actividad Reciente */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Servicios del Sistema */}
                         <Card className="border-accent/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <Server className="h-5 w-5 text-accent" />
                                     <span>Servicios del Sistema</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-0">
                                 <div className="space-y-4">
                                     {[
                                         { name: "Base de Datos", status: "online", uptime: "99.9%", icon: Database },
@@ -537,13 +547,13 @@ export default function AdministradoresPage() {
                                         const statusColor = service.status === 'online' ? 'text-green-600' : 'text-yellow-600';
                                         const statusBg = service.status === 'online' ? 'bg-green-50 dark:bg-green-950/20' : 'bg-yellow-50 dark:bg-yellow-950/20';
                                         
-    return (
+                                        return (
                                             <div key={index} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                                                 <div className="flex items-center space-x-3">
                                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusBg}`}>
                                                         <IconComponent className={`w-4 h-4 ${statusColor}`} />
                                                     </div>
-        <div>
+                                                    <div>
                                                         <div className="text-sm font-medium">{service.name}</div>
                                                         <div className="text-xs text-muted-foreground">Uptime: {service.uptime}</div>
                                                     </div>
@@ -560,13 +570,13 @@ export default function AdministradoresPage() {
 
                         {/* Actividad Reciente */}
                         <Card className="border-primary/20">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="flex items-center space-x-2 text-lg">
                                     <Activity className="h-5 w-5 text-primary" />
                                     <span>Actividad del Sistema</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-0">
                                 <div className="space-y-4">
                                     {[
                                         { action: "Nuevo usuario administrador registrado", time: "Hace 5 min", type: "success" as const, icon: Shield },
