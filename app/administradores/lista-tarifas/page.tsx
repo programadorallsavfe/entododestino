@@ -1,4 +1,4 @@
-import { TarifasTable } from "../components/tarifas-table"
+import TarifasTable from "@/app/trabajadores/components/tarifas-table";
 
 export default function ListaTarifasPage() {
     return (
