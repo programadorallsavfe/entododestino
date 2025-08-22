@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { ChevronDown, User, Flag, HelpCircle, Menu, Users, Package, Calendar, Settings, Bell, X, ChevronLeft, ChevronRight, MapPin } from "lucide-react"
+import { ChevronDown, User, Flag, HelpCircle, Menu, Users, Package, Calendar, Settings, Bell, X, ChevronLeft, ChevronRight, MapPin, Building, Hotel, Plane } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ModeToggle } from "@/components/mode-toggle"
@@ -116,6 +116,24 @@ export const TrabajadoresNavbar = ({ className }: TrabajadoresNavbarProps) => {
       route: '/trabajadores/lista-tarifas',
       icon: Settings,
       description: 'Gestión de tarifas'
+    },
+    {
+      name: 'Proveedores',
+      route: '/trabajadores/lista-proveedores',
+      icon: Building,
+      description: 'Lista de proveedores'
+    },
+    {
+      name: 'Hoteles',
+      route: '/trabajadores/lista-hoteles',
+      icon: Hotel,
+      description: 'Gestión de hoteles'
+    },
+    {
+      name: 'Vuelos',
+      route: '/trabajadores/lista-vuelos',
+      icon: Plane,
+      description: 'Gestión de vuelos'
     }
   ]
 

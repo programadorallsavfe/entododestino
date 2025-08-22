@@ -11,7 +11,10 @@ import {
   FileText, 
   CreditCard,
   ChevronRight,
-  Home
+  Home,
+  Building,
+  Hotel,
+  Plane
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -87,6 +90,27 @@ export const TrabajadoresSidebar = () => {
       label: 'Configuración',
       icon: <Settings className="w-4 h-4" />,
       href: '/trabajadores/configuracion'
+    },
+    {
+      id: 'proveedores',
+      label: 'Lista de Proveedores',
+      icon: <Building className="w-4 h-4" />,
+      href: '/trabajadores/lista-proveedores',
+      badge: '15'
+    },
+    {
+      id: 'hoteles',
+      label: 'Hoteles',
+      icon: <Hotel className="w-4 h-4" />,
+      href: '/trabajadores/lista-hoteles',
+      badge: '8'
+    },
+    {
+      id: 'vuelos',
+      label: 'Vuelos',
+      icon: <Plane className="w-4 h-4" />,
+      href: '/trabajadores/lista-vuelos',
+      badge: '12'
     },
     {
       id: 'ayuda',

@@ -1,1122 +1,897 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { 
   Search, 
-  Filter,
-  Clock,
-  User,
-  MapPin,
-  Calendar,
-  Users,
-  DollarSign,
+  Filter, 
+  Package, 
+  Users, 
+  Calendar, 
+  DollarSign, 
+  TrendingUp, 
   CheckCircle,
   XCircle,
+  Clock,
   Eye,
-  MessageSquare,
-  Phone,
-  Mail,
+  Edit,
+  Trash2,
+  Download,
+  Plus,
+  AlertCircle,
   Star,
+  MapPin,
   Plane,
   Hotel,
   Car,
-  Utensils,
-  Camera,
-  Mountain,
-  Waves,
-  Building,
-  Heart,
-  AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  Route,
-  Package
-} from 'lucide-react'
-import dynamic from 'next/dynamic'
+  X
+} from "lucide-react"
 
-// Importación dinámica del mapa para evitar errores de SSR
-const SimpleMap = dynamic(
-  () => import('../../clientes/components/SimpleMap').then(mod => ({ default: mod.SimpleMap })),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full min-h-[300px] rounded-lg border bg-muted/20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-muted-foreground text-sm">Cargando mapa...</p>
-        </div>
-      </div>
-    )
+// Función para obtener icono de servicio
+const getServicioIcono = (servicio: string) => {
+  switch (servicio) {
+    case "hotel": return <Hotel className="w-4 h-4" />
+    case "vuelos": return <Plane className="w-4 h-4" />
+    case "transporte": return <Car className="w-4 h-4" />
+    default: return <Star className="w-4 h-4" />
   }
-)
-
-interface Destination {
-  id: string
-  name: string
-  lat: number
-  lng: number
-  type: 'start' | 'destination' | 'end'
-  image?: string
-  description?: string
-  nights?: number
-  transportIncluded?: boolean
-  accommodationIncluded?: boolean
 }
 
+
+
+// Tipos de datos
 interface SolicitudPaquete {
   id: string
-  cliente: {
-    nombre: string
-    email: string
-    telefono: string
-    avatar: string
-    pais: string
-    calificacion: number
-  }
-  paquete: {
-    nombre: string
-    destino: string
-    duracion: number
-    personas: number
-    precio: number
-    tipo: 'aventura' | 'cultural' | 'relax' | 'gastronomico' | 'ecoturismo'
-    servicios: string[]
-    imagen: string
-    categoria: 'paquete_viaje' | 'paquete_itinerario'
-    destinos: Destination[] // Nueva propiedad para los destinos del paquete
-  }
+  cliente: string
+  email: string
+  telefono: string
+  destino: string
+  fechaInicio: string
+  fechaFin: string
+  personas: number
+  presupuesto: number
+  estado: "pendiente" | "en_revision" | "aprobada" | "rechazada" | "completada"
+  prioridad: "baja" | "media" | "alta" | "urgente"
+  servicios: string[]
   fechaSolicitud: string
-  fechaViaje: string
-  estado: 'pendiente' | 'aprobada' | 'rechazada' | 'en_revision'
-  prioridad: 'baja' | 'media' | 'alta' | 'urgente'
-  comentarios: string
-  presupuesto: {
-    min: number
-    max: number
-    moneda: string
-  }
-  preferencias: string[]
+  notas: string
 }
 
-export default function SolicitudesPaquetesPage() {
-  const [solicitudes, setSolicitudes] = useState<SolicitudPaquete[]>([])
-  const [filtros, setFiltros] = useState({
-    estado: 'todos',
-    prioridad: 'todos',
-    destino: 'todos',
-    categoriaPaquete: 'todos', // Nuevo filtro
-    fechaDesde: '',
-    fechaHasta: ''
-  })
-  const [solicitudSeleccionada, setSolicitudSeleccionada] = useState<SolicitudPaquete | null>(null)
-  const [modalDetalle, setModalDetalle] = useState(false)
-  const [modalDecision, setModalDecision] = useState(false)
-  const [decision, setDecision] = useState<'aprobada' | 'rechazada'>('aprobada')
-  const [comentarioDecision, setComentarioDecision] = useState('')
+// Datos mock para las solicitudes
+const solicitudesMock: SolicitudPaquete[] = [
+  {
+    id: "SOL-001",
+    cliente: "María González",
+    email: "maria.gonzalez@email.com",
+    telefono: "+51 999 123 456",
+    destino: "Cusco, Perú",
+    fechaInicio: "2024-03-15",
+    fechaFin: "2024-03-22",
+    personas: 4,
+    presupuesto: 2500,
+    estado: "pendiente",
+    prioridad: "alta",
+    servicios: ["hotel", "vuelos", "guía", "transporte"],
+    fechaSolicitud: "2024-01-15",
+    notas: "Familia con niños pequeños, preferencia por hoteles familiares"
+  },
+  {
+    id: "SOL-002",
+    cliente: "Carlos Rodríguez",
+    email: "carlos.rodriguez@email.com",
+    telefono: "+51 998 234 567",
+    destino: "Arequipa, Perú",
+    fechaInicio: "2024-04-10",
+    fechaFin: "2024-04-15",
+    personas: 2,
+    presupuesto: 1800,
+    estado: "en_revision",
+    prioridad: "media",
+    servicios: ["hotel", "vuelos", "tours"],
+    fechaSolicitud: "2024-01-20",
+    notas: "Pareja en luna de miel, buscan experiencias románticas"
+  },
+  {
+    id: "SOL-003",
+    cliente: "Ana Martínez",
+    email: "ana.martinez@email.com",
+    telefono: "+51 997 345 678",
+    destino: "Lima, Perú",
+    fechaInicio: "2024-05-01",
+    fechaFin: "2024-05-08",
+    personas: 6,
+    presupuesto: 3200,
+    estado: "aprobada",
+    prioridad: "urgente",
+    servicios: ["hotel", "vuelos", "transporte", "guía", "actividades"],
+    fechaSolicitud: "2024-01-18",
+    notas: "Grupo de amigos, intereses en gastronomía y cultura"
+  },
+  {
+    id: "SOL-004",
+    cliente: "Luis Fernández",
+    email: "luis.fernandez@email.com",
+    telefono: "+51 996 456 789",
+    destino: "Machu Picchu, Perú",
+    fechaInicio: "2024-06-20",
+    fechaFin: "2024-06-25",
+    personas: 3,
+    presupuesto: 2100,
+    estado: "pendiente",
+    prioridad: "baja",
+    servicios: ["hotel", "vuelos", "guía"],
+    fechaSolicitud: "2024-01-22",
+    notas: "Viaje de aventura, preferencia por alojamientos rústicos"
+  },
+  {
+    id: "SOL-005",
+    cliente: "Sofia Torres",
+    email: "sofia.torres@email.com",
+    telefono: "+51 995 567 890",
+    destino: "Trujillo, Perú",
+    fechaInicio: "2024-07-10",
+    fechaFin: "2024-07-17",
+    personas: 5,
+    presupuesto: 2800,
+    estado: "en_revision",
+    prioridad: "media",
+    servicios: ["hotel", "vuelos", "transporte", "tours"],
+    fechaSolicitud: "2024-01-25",
+    notas: "Familia numerosa, interés en arqueología y playas"
+  }
+]
 
-  useEffect(() => {
-    // Simular carga de datos
-    const solicitudesData: SolicitudPaquete[] = [
-      {
-        id: '1',
-        cliente: {
-          nombre: 'María González',
-          email: 'maria.gonzalez@email.com',
-          telefono: '+51 999 123 456',
-          avatar: '/assets/banner.jpg',
-          pais: 'Perú',
-          calificacion: 4.8
-        },
-        paquete: {
-          nombre: 'Aventura en Machu Picchu',
-          destino: 'Cusco, Perú',
-          duracion: 7,
-          personas: 4,
-          precio: 2800,
-          tipo: 'aventura',
-          servicios: ['Guía local', 'Transporte', 'Alojamiento', 'Alimentación'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_viaje',
-          destinos: [
-            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'start' },
-            { id: 'machu', name: 'Machu Picchu', lat: -13.1631, lng: -72.5450, type: 'destination' },
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-15',
-        fechaViaje: '2024-03-20',
-        estado: 'pendiente',
-        prioridad: 'alta',
-        comentarios: 'Cliente VIP, solicita experiencia premium con guía privado',
-        presupuesto: {
-          min: 2500,
-          max: 3500,
-          moneda: 'USD'
-        },
-        preferencias: ['Guía privado', 'Alojamiento 4 estrellas', 'Comida local']
-      },
-      {
-        id: '2',
-        cliente: {
-          nombre: 'Carlos Rodríguez',
-          email: 'carlos.rodriguez@email.com',
-          telefono: '+51 998 654 321',
-          avatar: '/assets/banner.jpg',
-          pais: 'Argentina',
-          calificacion: 4.5
-        },
-        paquete: {
-          nombre: 'Tour Gastronómico Lima',
-          destino: 'Lima, Perú',
-          duracion: 5,
-          personas: 2,
-          precio: 1200,
-          tipo: 'gastronomico',
-          servicios: ['Chef privado', 'Degustaciones', 'Alojamiento boutique'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_itinerario',
-          destinos: [
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
-            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'destination' },
-            { id: 'arequipa', name: 'Arequipa', lat: -16.4090, lng: -71.5375, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-14',
-        fechaViaje: '2024-02-15',
-        estado: 'en_revision',
-        prioridad: 'media',
-        comentarios: 'Interesado en experiencias culinarias únicas',
-        presupuesto: {
-          min: 1000,
-          max: 1500,
-          moneda: 'USD'
-        },
-        preferencias: ['Restaurantes exclusivos', 'Clases de cocina', 'Mercados locales']
-      },
-      {
-        id: '3',
-        cliente: {
-          nombre: 'Ana Silva',
-          email: 'ana.silva@email.com',
-          telefono: '+51 997 789 123',
-          avatar: '/assets/banner.jpg',
-          pais: 'Brasil',
-          calificacion: 4.9
-        },
-        paquete: {
-          nombre: 'Ecoturismo en Amazonas',
-          destino: 'Iquitos, Perú',
-          duracion: 6,
-          personas: 3,
-          precio: 1800,
-          tipo: 'ecoturismo',
-          servicios: ['Guía especializado', 'Lodge ecológico', 'Actividades sostenibles'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_viaje',
-          destinos: [
-            { id: 'iquitos', name: 'Iquitos', lat: -3.7450, lng: -73.2422, type: 'start' },
-            { id: 'amazonas', name: 'Amazonas', lat: -3.2500, lng: -65.0000, type: 'destination' },
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-13',
-        fechaViaje: '2024-04-10',
-        estado: 'pendiente',
-        prioridad: 'urgente',
-        comentarios: 'Cliente ambientalista, requiere certificaciones de sostenibilidad',
-        presupuesto: {
-          min: 1500,
-          max: 2200,
-          moneda: 'USD'
-        },
-        preferencias: ['Alojamiento eco-friendly', 'Actividades de conservación', 'Comida orgánica']
-      },
-      {
-        id: '4',
-        cliente: {
-          nombre: 'Luis Torres',
-          email: 'luis.torres@email.com',
-          telefono: '+51 996 456 789',
-          avatar: '/assets/banner.jpg',
-          pais: 'Chile',
-          calificacion: 4.2
-        },
-        paquete: {
-          nombre: 'Relax en Paracas',
-          destino: 'Paracas, Perú',
-          duracion: 4,
-          personas: 2,
-          precio: 800,
-          tipo: 'relax',
-          servicios: ['Spa', 'Yoga', 'Alojamiento frente al mar'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_itinerario',
-          destinos: [
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
-            { id: 'paracas', name: 'Paracas', lat: -13.7500, lng: -76.1667, type: 'destination' },
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-12',
-        fechaViaje: '2024-02-28',
-        estado: 'aprobada',
-        prioridad: 'baja',
-        comentarios: 'Cliente regular, siempre satisfecho',
-        presupuesto: {
-          min: 700,
-          max: 1000,
-          moneda: 'USD'
-        },
-        preferencias: ['Habitación con vista al mar', 'Masajes relajantes', 'Silencio']
-      },
-      {
-        id: '5',
-        cliente: {
-          nombre: 'Elena Morales',
-          email: 'elena.morales@email.com',
-          telefono: '+51 995 321 654',
-          avatar: '/assets/banner.jpg',
-          pais: 'México',
-          calificacion: 4.7
-        },
-        paquete: {
-          nombre: 'Ruta Cultural Cusco',
-          destino: 'Cusco, Perú',
-          duracion: 8,
-          personas: 6,
-          precio: 3200,
-          tipo: 'cultural',
-          servicios: ['Guía arqueólogo', 'Museos', 'Sitios históricos', 'Alojamiento colonial'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_itinerario',
-          destinos: [
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
-            { id: 'cusco', name: 'Cusco', lat: -13.5225, lng: -71.9682, type: 'destination' },
-            { id: 'arequipa', name: 'Arequipa', lat: -16.4090, lng: -71.5375, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-16',
-        fechaViaje: '2024-05-15',
-        estado: 'pendiente',
-        prioridad: 'alta',
-        comentarios: 'Grupo familiar interesado en historia inca',
-        presupuesto: {
-          min: 3000,
-          max: 4000,
-          moneda: 'USD'
-        },
-        preferencias: ['Guía especializado en historia', 'Hoteles con encanto', 'Experiencias auténticas']
-      },
-      {
-        id: '6',
-        cliente: {
-          nombre: 'Roberto Jiménez',
-          email: 'roberto.jimenez@email.com',
-          telefono: '+51 994 789 123',
-          avatar: '/assets/banner.jpg',
-          pais: 'Colombia',
-          calificacion: 4.6
-        },
-        paquete: {
-          nombre: 'Aventura en Huaraz',
-          destino: 'Huaraz, Perú',
-          duracion: 10,
-          personas: 2,
-          precio: 2200,
-          tipo: 'aventura',
-          servicios: ['Guía de montaña', 'Equipamiento', 'Refugios', 'Alimentación'],
-          imagen: '/assets/banner.jpg',
-          categoria: 'paquete_viaje',
-          destinos: [
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'start' },
-            { id: 'huaraz', name: 'Huaraz', lat: -9.0350, lng: -77.6200, type: 'destination' },
-            { id: 'lima', name: 'Lima', lat: -12.0464, lng: -77.0428, type: 'end' }
-          ]
-        },
-        fechaSolicitud: '2024-01-17',
-        fechaViaje: '2024-06-20',
-        estado: 'en_revision',
-        prioridad: 'media',
-        comentarios: 'Montañista experimentado, busca desafíos técnicos',
-        presupuesto: {
-          min: 2000,
-          max: 2500,
-          moneda: 'USD'
-        },
-        preferencias: ['Rutas difíciles', 'Equipamiento profesional', 'Guía certificado']
-      }
-    ]
-    setSolicitudes(solicitudesData)
-  }, [])
-
-  const solicitudesFiltradas = solicitudes.filter(solicitud => {
-    if (filtros.estado !== 'todos' && solicitud.estado !== filtros.estado) return false
-    if (filtros.prioridad !== 'todos' && solicitud.prioridad !== filtros.prioridad) return false
-    if (filtros.destino !== 'todos' && !solicitud.paquete.destino.includes(filtros.destino)) return false
-    if (filtros.categoriaPaquete !== 'todos' && solicitud.paquete.categoria !== filtros.categoriaPaquete) return false
-    return true
+// Componente para editar solicitud
+const EditarSolicitudForm = ({ 
+  solicitud, 
+  onSave, 
+  onCancel 
+}: { 
+  solicitud: SolicitudPaquete
+  onSave: (datos: Partial<SolicitudPaquete>) => void
+  onCancel: () => void
+}) => {
+  const [datos, setDatos] = useState({
+    cliente: solicitud.cliente,
+    email: solicitud.email,
+    telefono: solicitud.telefono,
+    destino: solicitud.destino,
+    fechaInicio: solicitud.fechaInicio,
+    fechaFin: solicitud.fechaFin,
+    personas: solicitud.personas,
+    presupuesto: solicitud.presupuesto,
+    estado: solicitud.estado,
+    prioridad: solicitud.prioridad,
+    servicios: [...solicitud.servicios],
+    notas: solicitud.notas
   })
 
-  const handleVerDetalle = (solicitud: SolicitudPaquete) => {
-    setSolicitudSeleccionada(solicitud)
-    setModalDetalle(true)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSave(datos)
   }
 
-  const handleDecision = (solicitud: SolicitudPaquete, decision: 'aprobada' | 'rechazada') => {
-    setSolicitudSeleccionada(solicitud)
-    setDecision(decision)
-    setModalDecision(true)
-  }
-
-  const confirmarDecision = () => {
-    if (solicitudSeleccionada) {
-      setSolicitudes(prev => prev.map(s => 
-        s.id === solicitudSeleccionada.id 
-          ? { ...s, estado: decision, comentarios: comentarioDecision }
-          : s
-      ))
-      setModalDecision(false)
-      setComentarioDecision('')
-    }
-  }
-
-  const renderEstado = (estado: string) => {
-    const estados = {
-      pendiente: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-      en_revision: { color: 'bg-blue-100 text-blue-800', icon: Eye },
-      aprobada: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
-      rechazada: { color: 'bg-red-100 text-red-800', icon: XCircle }
-    }
-    const { color, icon: Icon } = estados[estado as keyof typeof estados]
-    
-    return (
-      <Badge className={color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {estado.replace('_', ' ')}
-      </Badge>
-    )
-  }
-
-  const renderPrioridad = (prioridad: string) => {
-    const prioridades = {
-      baja: { color: 'bg-gray-100 text-gray-800', icon: TrendingDown },
-      media: { color: 'bg-blue-100 text-blue-800', icon: TrendingUp },
-      alta: { color: 'bg-orange-100 text-orange-800', icon: AlertCircle },
-      urgente: { color: 'bg-red-100 text-red-800', icon: Heart }
-    }
-    const { color, icon: Icon } = prioridades[prioridad as keyof typeof prioridades]
-    
-    return (
-      <Badge className={color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {prioridad}
-      </Badge>
-    )
-  }
-
-  const renderTipoPaquete = (tipo: string) => {
-    const tipos = {
-      aventura: { color: 'bg-purple-100 text-purple-800', icon: Mountain },
-      cultural: { color: 'bg-indigo-100 text-indigo-800', icon: Building },
-      relax: { color: 'bg-teal-100 text-teal-800', icon: Waves },
-      gastronomico: { color: 'bg-orange-100 text-orange-800', icon: Utensils },
-      ecoturismo: { color: 'bg-green-100 text-green-800', icon: Mountain }
-    }
-    const { color, icon: Icon } = tipos[tipo as keyof typeof tipos]
-    
-    return (
-      <Badge className={color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {tipo}
-      </Badge>
-    )
-  }
-
-  const renderCategoriaPaquete = (categoria: string) => {
-    const categorias = {
-      paquete_viaje: { color: 'bg-blue-100 text-blue-800', icon: Plane, label: 'Paquete de Viaje' },
-      paquete_itinerario: { color: 'bg-purple-100 text-purple-800', icon: Route, label: 'Paquete de Itinerario' }
-    }
-    const { color, icon: Icon, label } = categorias[categoria as keyof typeof categorias]
-    
-    return (
-      <Badge className={color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {label}
-      </Badge>
-    )
-  }
-
-  const estadisticas = {
-    total: solicitudes.length,
-    pendientes: solicitudes.filter(s => s.estado === 'pendiente').length,
-    enRevision: solicitudes.filter(s => s.estado === 'en_revision').length,
-    aprobadas: solicitudes.filter(s => s.estado === 'aprobada').length,
-    rechazadas: solicitudes.filter(s => s.estado === 'rechazada').length,
-    paquetesViaje: solicitudes.filter(s => s.paquete.categoria === 'paquete_viaje').length,
-    paquetesItinerario: solicitudes.filter(s => s.paquete.categoria === 'paquete_itinerario').length
+  const toggleServicio = (servicio: string) => {
+    setDatos(prev => ({
+      ...prev,
+      servicios: prev.servicios.includes(servicio)
+        ? prev.servicios.filter(s => s !== servicio)
+        : [...prev.servicios, servicio]
+    }))
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="cliente">Nombre del Cliente</Label>
+          <Input
+            id="cliente"
+            value={datos.cliente}
+            onChange={(e) => setDatos(prev => ({ ...prev, cliente: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={datos.email}
+            onChange={(e) => setDatos(prev => ({ ...prev, email: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="telefono">Teléfono</Label>
+          <Input
+            id="telefono"
+            value={datos.telefono}
+            onChange={(e) => setDatos(prev => ({ ...prev, telefono: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="destino">Destino</Label>
+          <Input
+            id="destino"
+            value={datos.destino}
+            onChange={(e) => setDatos(prev => ({ ...prev, destino: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="fechaInicio">Fecha de Inicio</Label>
+          <Input
+            id="fechaInicio"
+            type="date"
+            value={datos.fechaInicio}
+            onChange={(e) => setDatos(prev => ({ ...prev, fechaInicio: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="fechaFin">Fecha de Fin</Label>
+          <Input
+            id="fechaFin"
+            type="date"
+            value={datos.fechaFin}
+            onChange={(e) => setDatos(prev => ({ ...prev, fechaFin: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="personas">Número de Personas</Label>
+          <Input
+            id="personas"
+            type="number"
+            min="1"
+            value={datos.personas}
+            onChange={(e) => setDatos(prev => ({ ...prev, personas: parseInt(e.target.value) }))}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="presupuesto">Presupuesto (USD)</Label>
+          <Input
+            id="presupuesto"
+            type="number"
+            min="0"
+            value={datos.presupuesto}
+            onChange={(e) => setDatos(prev => ({ ...prev, presupuesto: parseInt(e.target.value) }))}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="estado">Estado</Label>
+          <Select value={datos.estado} onValueChange={(value) => setDatos(prev => ({ ...prev, estado: value as SolicitudPaquete["estado"] }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pendiente">Pendiente</SelectItem>
+              <SelectItem value="en_revision">En Revisión</SelectItem>
+              <SelectItem value="aprobada">Aprobada</SelectItem>
+              <SelectItem value="rechazada">Rechazada</SelectItem>
+              <SelectItem value="completada">Completada</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="prioridad">Prioridad</Label>
+          <Select value={datos.prioridad} onValueChange={(value) => setDatos(prev => ({ ...prev, prioridad: value as SolicitudPaquete["prioridad"] }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="baja">Baja</SelectItem>
+              <SelectItem value="media">Media</SelectItem>
+              <SelectItem value="alta">Alta</SelectItem>
+              <SelectItem value="urgente">Urgente</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div>
+        <Label>Servicios Incluidos</Label>
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          {['hotel', 'vuelos', 'transporte', 'guía', 'tours', 'actividades'].map((servicio) => (
+            <Button
+              key={servicio}
+              type="button"
+              variant={datos.servicios.includes(servicio) ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleServicio(servicio)}
+              className="justify-start"
+            >
+              {getServicioIcono(servicio)}
+              <span className="ml-2 capitalize">{servicio}</span>
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="notas">Notas Adicionales</Label>
+        <Textarea
+          id="notas"
+          value={datos.notas}
+          onChange={(e) => setDatos(prev => ({ ...prev, notas: e.target.value }))}
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" className="bg-[#1605ac] hover:bg-[#1605ac]/90">
+          Guardar Cambios
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+// Componente para mostrar detalles de la solicitud
+const DetalleSolicitud = ({ solicitud }: { solicitud: SolicitudPaquete }) => {
+  return (
+    <div className="space-y-6">
+      {/* Información del Cliente */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Información del Cliente
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Solicitudes de Cotizaciones</h1>
+            <Label className="text-sm font-medium text-muted-foreground">Nombre</Label>
+            <p className="text-lg font-medium">{solicitud.cliente}</p>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filtros
-            </Button>
-            <Button>
-              <Search className="w-4 h-4 mr-2" />
-              Buscar
-            </Button>
-            <Button className="bg-primary hover:bg-primary/90">
-              <Package className="w-4 h-4 mr-2" />
-              Crear Cotización
-            </Button>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Email</Label>
+            <p className="text-lg">{solicitud.email}</p>
           </div>
-        </div>
-
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold text-foreground">{estadisticas.total}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Clock className="w-5 h-5 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Pendientes</p>
-                  <p className="text-2xl font-bold text-yellow-600">{estadisticas.pendientes}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Eye className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">En Revisión</p>
-                  <p className="text-2xl font-bold text-blue-600">{estadisticas.enRevision}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Aprobadas</p>
-                  <p className="text-2xl font-bold text-green-600">{estadisticas.aprobadas}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Rechazadas</p>
-                  <p className="text-2xl font-bold text-red-600">{estadisticas.rechazadas}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Plane className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Paquetes de Viaje</p>
-                  <p className="text-2xl font-bold text-blue-600">{estadisticas.paquetesViaje}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Route className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Paquetes de Itinerario</p>
-                  <p className="text-2xl font-bold text-purple-600">{estadisticas.paquetesItinerario}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Contenido Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar de Filtros */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Filter className="w-5 h-5 text-primary" />
-                <span>Filtros</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Categoría de Paquete - NUEVO FILTRO */}
-              <div>
-                <h3 className="font-medium mb-2">Tipo de Paquete</h3>
-                <div className="space-y-2">
-                  {['todos', 'paquete_viaje', 'paquete_itinerario'].map((categoria) => (
-                    <label key={categoria} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="categoriaPaquete"
-                        value={categoria}
-                        checked={filtros.categoriaPaquete === categoria}
-                        onChange={(e) => setFiltros({...filtros, categoriaPaquete: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm">
-                        {categoria === 'todos' ? 'Todos los tipos' : 
-                         categoria === 'paquete_viaje' ? 'Paquetes de Viaje' : 
-                         'Paquetes de Itinerario'}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Estado */}
-              <div>
-                <h3 className="font-medium mb-2">Estado</h3>
-                <div className="space-y-2">
-                  {['todos', 'pendiente', 'en_revision', 'aprobada', 'rechazada'].map((estado) => (
-                    <label key={estado} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="estado"
-                        value={estado}
-                        checked={filtros.estado === estado}
-                        onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm capitalize">{estado.replace('_', ' ')}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Prioridad */}
-              <div>
-                <h3 className="font-medium mb-2">Prioridad</h3>
-                <div className="space-y-2">
-                  {['todos', 'baja', 'media', 'alta', 'urgente'].map((prioridad) => (
-                    <label key={prioridad} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="prioridad"
-                        value={prioridad}
-                        checked={filtros.prioridad === prioridad}
-                        onChange={(e) => setFiltros({...filtros, prioridad: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm capitalize">{prioridad}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Destino */}
-              <div>
-                <h3 className="font-medium mb-2">Destino</h3>
-                <div className="space-y-2">
-                  {['todos', 'Cusco', 'Lima', 'Iquitos', 'Paracas', 'Huaraz'].map((destino) => (
-                    <label key={destino} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="destino"
-                        value={destino}
-                        checked={filtros.destino === destino}
-                        onChange={(e) => setFiltros({...filtros, destino: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm">{destino}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Lista de Solicitudes */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Solicitudes ({solicitudesFiltradas.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {solicitudesFiltradas.map((solicitud) => (
-                  <div key={solicitud.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-4">
-                      {/* Avatar del Cliente */}
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage src={solicitud.cliente.avatar} />
-                        <AvatarFallback>{solicitud.cliente.nombre.charAt(0)}</AvatarFallback>
-                      </Avatar>
-
-                      {/* Información Principal */}
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-foreground">{solicitud.cliente.nombre}</h3>
-                            <p className="text-sm text-muted-foreground">{solicitud.cliente.email}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {renderEstado(solicitud.estado)}
-                            {renderPrioridad(solicitud.prioridad)}
-                          </div>
-                        </div>
-
-                        {/* Detalles del Paquete */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-foreground">{solicitud.paquete.nombre}</h4>
-                              {renderCategoriaPaquete(solicitud.paquete.categoria)}
-                            </div>
-                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                              <MapPin className="w-4 h-4" />
-                              <span>{solicitud.paquete.destino}</span>
-                            </div>
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center space-x-1">
-                                <Calendar className="w-4 h-4" />
-                                <span>{solicitud.paquete.duracion} días</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <Users className="w-4 h-4" />
-                                <span>{solicitud.paquete.personas} personas</span>
-                              </div>
-                            </div>
-                            {renderTipoPaquete(solicitud.paquete.tipo)}
-                          </div>
-
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-muted-foreground">Presupuesto:</span>
-                              <span className="font-medium text-foreground">
-                                {solicitud.presupuesto.moneda} {solicitud.presupuesto.min} - {solicitud.presupuesto.max}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-muted-foreground">Fecha Viaje:</span>
-                              <span className="font-medium text-foreground">{solicitud.fechaViaje}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                              <span className="text-sm text-muted-foreground">{solicitud.cliente.calificacion}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Comentarios */}
-                        {solicitud.comentarios && (
-                          <div className="bg-muted/30 rounded-lg p-3">
-                            <p className="text-sm text-muted-foreground">{solicitud.comentarios}</p>
-                          </div>
-                        )}
-
-                        {/* Acciones */}
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleVerDetalle(solicitud)}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              Ver Detalle
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <MessageSquare className="w-4 h-4 mr-2" />
-                              Contactar
-                            </Button>
-                          </div>
-
-                          {solicitud.estado === 'pendiente' && (
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={() => handleDecision(solicitud, 'aprobada')}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                Aprobar
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDecision(solicitud, 'rechazada')}
-                              >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Rechazar
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Modal de Detalle */}
-      {modalDetalle && solicitudSeleccionada && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
-            <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground">Detalle de Solicitud</h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setModalDetalle(false)}
-              >
-                <XCircle className="w-6 h-6" />
-              </Button>
-            </div>
-            
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Columna 1: Información del Cliente */}
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Información del Cliente</h3>
-                    <div className="flex items-center space-x-4 mb-4">
-                      <Avatar className="w-16 h-16">
-                        <AvatarImage src={solicitudSeleccionada.cliente.avatar} />
-                        <AvatarFallback className="text-lg">{solicitudSeleccionada.cliente.nombre.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h4 className="text-lg font-semibold">{solicitudSeleccionada.cliente.nombre}</h4>
-                        <p className="text-muted-foreground">{solicitudSeleccionada.cliente.pais}</p>
-                        <div className="flex items-center space-x-1 mt-1">
-                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                          <span className="text-sm">{solicitudSeleccionada.cliente.calificacion}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{solicitudSeleccionada.cliente.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{solicitudSeleccionada.cliente.telefono}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Preferencias */}
-                  <div>
-                    <h4 className="font-medium mb-3">Preferencias del Cliente</h4>
-                    <div className="space-y-2">
-                      {solicitudSeleccionada.preferencias.map((preferencia, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-primary rounded-full"></div>
-                          <span className="text-sm text-muted-foreground">{preferencia}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Presupuesto */}
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <h4 className="font-medium mb-3">Presupuesto</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Rango:</span>
-                        <span className="font-semibold">
-                          {solicitudSeleccionada.presupuesto.moneda} {solicitudSeleccionada.presupuesto.min} - {solicitudSeleccionada.presupuesto.max}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Fecha Solicitud:</span>
-                        <span className="font-medium">{solicitudSeleccionada.fechaSolicitud}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Fecha Viaje:</span>
-                        <span className="font-medium">{solicitudSeleccionada.fechaViaje}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Columna 2: Información del Paquete */}
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Detalles del Paquete</h3>
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <img
-                          src={solicitudSeleccionada.paquete.imagen}
-                          alt={solicitudSeleccionada.paquete.nombre}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                        <div className="absolute top-3 right-3 flex gap-2">
-                          {renderCategoriaPaquete(solicitudSeleccionada.paquete.categoria)}
-                          {renderTipoPaquete(solicitudSeleccionada.paquete.tipo)}
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <h4 className="text-lg font-semibold">{solicitudSeleccionada.paquete.nombre}</h4>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="w-4 h-4 text-muted-foreground" />
-                            <span>{solicitudSeleccionada.paquete.destino}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span>{solicitudSeleccionada.paquete.duracion} días</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Users className="w-4 h-4 text-muted-foreground" />
-                            <span>{solicitudSeleccionada.paquete.personas} personas</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
-                            <span>US$ {solicitudSeleccionada.paquete.precio}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Servicios */}
-                      <div>
-                        <h4 className="font-medium mb-3">Servicios Incluidos</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          {solicitudSeleccionada.paquete.servicios.map((servicio, index) => (
-                            <div key={index} className="flex items-center space-x-2 text-sm">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-muted-foreground">{servicio}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Columna 3: Mapa de la Ruta */}
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Ruta del Viaje</h3>
-                    
-                    {/* Lista de Destinos */}
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-3">Destinos del Paquete</h4>
-                      <div className="space-y-2">
-                        {solicitudSeleccionada.paquete.destinos.map((destino, index) => (
-                          <div key={destino.id} className="flex items-center space-x-3 p-2 bg-muted/30 rounded-lg">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                              destino.type === 'start' ? 'bg-green-500' : 
-                              destino.type === 'end' ? 'bg-red-500' : 'bg-blue-500'
-                            }`}>
-                              {destino.type === 'start' ? 'I' : destino.type === 'end' ? 'F' : index}
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{destino.name}</p>
-                              {destino.description && (
-                                <p className="text-xs text-muted-foreground">{destino.description}</p>
-                              )}
-                            </div>
-                            {destino.nights && (
-                              <Badge variant="outline" className="text-xs">
-                                {destino.nights} noche{destino.nights > 1 ? 's' : ''}
-                              </Badge>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Mapa */}
-                    <div className="h-80 w-full">
-                      <SimpleMap destinations={solicitudSeleccionada.paquete.destinos} />
-                    </div>
-
-                    {/* Información de la Ruta */}
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                      <h4 className="font-medium text-blue-800 mb-2">Información de la Ruta</h4>
-                      <div className="text-sm text-blue-700 space-y-1">
-                        <p>• <strong>Inicio:</strong> {solicitudSeleccionada.paquete.destinos.find(d => d.type === 'start')?.name}</p>
-                        <p>• <strong>Destinos intermedios:</strong> {solicitudSeleccionada.paquete.destinos.filter(d => d.type === 'destination').length} paradas</p>
-                        <p>• <strong>Final:</strong> {solicitudSeleccionada.paquete.destinos.find(d => d.type === 'end')?.name}</p>
-                        <p>• <strong>Duración total:</strong> {solicitudSeleccionada.paquete.duracion} días</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Teléfono</Label>
+            <p className="text-lg">{solicitud.telefono}</p>
           </div>
-        </div>
-      )}
-
-      {/* Modal de Decisión */}
-      {modalDecision && solicitudSeleccionada && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
-                  decision === 'aprobada' ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  {decision === 'aprobada' ? (
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  ) : (
-                    <XCircle className="w-8 h-8 text-red-600" />
-                  )}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  {decision === 'aprobada' ? 'Aprobar Solicitud' : 'Rechazar Solicitud'}
-                </h3>
-                <p className="text-muted-foreground">
-                  {decision === 'aprobada' 
-                    ? '¿Estás seguro de que quieres aprobar esta solicitud?'
-                    : '¿Estás seguro de que quieres rechazar esta solicitud?'
-                  }
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Comentario (opcional)</label>
-                  <textarea
-                    value={comentarioDecision}
-                    onChange={(e) => setComentarioDecision(e.target.value)}
-                    placeholder="Agrega un comentario sobre tu decisión..."
-                    className="w-full p-3 border rounded-lg resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex space-x-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setModalDecision(false)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    className={`flex-1 ${
-                      decision === 'aprobada' 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-red-600 hover:bg-red-700'
-                    }`}
-                    onClick={confirmarDecision}
-                  >
-                    {decision === 'aprobada' ? 'Aprobar' : 'Rechazar'}
-                  </Button>
-                </div>
-              </div>
-            </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Fecha de Solicitud</Label>
+            <p className="text-lg">{new Date(solicitud.fechaSolicitud).toLocaleDateString('es-ES')}</p>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+
+      {/* Detalles del Viaje */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Detalles del Viaje
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Destino</Label>
+            <p className="text-lg font-medium">{solicitud.destino}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Número de Personas</Label>
+            <p className="text-lg">{solicitud.personas}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Fecha de Inicio</Label>
+            <p className="text-lg">{new Date(solicitud.fechaInicio).toLocaleDateString('es-ES')}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Fecha de Fin</Label>
+            <p className="text-lg">{new Date(solicitud.fechaFin).toLocaleDateString('es-ES')}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Presupuesto</Label>
+            <p className="text-lg font-medium text-green-600">${solicitud.presupuesto.toLocaleString('en-US')}</p>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Duración</Label>
+            <p className="text-lg">
+              {Math.ceil((new Date(solicitud.fechaFin).getTime() - new Date(solicitud.fechaInicio).getTime()) / (1000 * 60 * 60 * 24))} días
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Estado y Prioridad */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5" />
+            Estado y Prioridad
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Estado</Label>
+            <Badge className={`mt-2 ${getEstadoColor(solicitud.estado)}`}>
+              {solicitud.estado.replace("_", " ")}
+            </Badge>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Prioridad</Label>
+            <Badge className={`mt-2 ${getPrioridadColor(solicitud.prioridad)}`}>
+              {solicitud.prioridad}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Servicios */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="w-5 h-5" />
+            Servicios Incluidos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-2">
+            {solicitud.servicios.map((servicio, index) => (
+              <div key={index} className="flex items-center gap-2 p-2 border rounded-lg">
+                {getServicioIcono(servicio)}
+                <span className="capitalize">{servicio}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notas */}
+      {solicitud.notas && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5" />
+              Notas Adicionales
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg">{solicitud.notas}</p>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
 }
 
-// Estilos CSS personalizados para el mapa
-const mapStyles = `
-  .custom-image-marker {
-    background: transparent !important;
-    border: none !important;
+// Función para obtener color del estado
+const getEstadoColor = (estado: string) => {
+  switch (estado) {
+    case "pendiente": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+    case "en_revision": return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+    case "aprobada": return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+    case "rechazada": return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+    case "completada": return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300"
+    default: return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
   }
-  
-  .custom-div-icon {
-    background: transparent !important;
-    border: none !important;
-  }
-  
-  .custom-popup .leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-  
-  .custom-popup .leaflet-popup-content {
-    margin: 0;
-    padding: 0;
-  }
-  
-  .arrow-marker {
-    background: transparent !important;
-    border: none !important;
-  }
-  
-  .return-arrow-marker {
-    background: transparent !important;
-    border: none !important;
-  }
-`
+}
 
-// Agregar estilos al head del documento
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style')
-  styleElement.textContent = mapStyles
-  document.head.appendChild(styleElement)
-} 
+// Función para obtener color de prioridad
+const getPrioridadColor = (prioridad: string) => {
+  switch (prioridad) {
+    case "baja": return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+    case "media": return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+    case "alta": return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300"
+    case "urgente": return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+    default: return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+  }
+}
+
+// Componente principal
+export default function SolicitudesPaquetesPage() {
+  const router = useRouter()
+  const [solicitudes, setSolicitudes] = useState<SolicitudPaquete[]>(solicitudesMock)
+  const [filtroEstado, setFiltroEstado] = useState<string>("todos")
+  const [filtroPrioridad, setFiltroPrioridad] = useState<string>("todos")
+  const [busqueda, setBusqueda] = useState<string>("")
+  const [tabActivo, setTabActivo] = useState<string>("todas")
+  const [editarSolicitud, setEditarSolicitud] = useState<SolicitudPaquete | null>(null)
+  const [verDetalle, setVerDetalle] = useState<SolicitudPaquete | null>(null)
+  const [confirmarEliminar, setConfirmarEliminar] = useState<string | null>(null)
+
+  // Filtrar solicitudes
+  const solicitudesFiltradas = solicitudes.filter(solicitud => {
+    const cumpleEstado = filtroEstado === "todos" || solicitud.estado === filtroEstado
+    const cumplePrioridad = filtroPrioridad === "todos" || solicitud.prioridad === filtroPrioridad
+    const cumpleBusqueda = solicitud.cliente.toLowerCase().includes(busqueda.toLowerCase()) ||
+                           solicitud.destino.toLowerCase().includes(busqueda.toLowerCase()) ||
+                           solicitud.id.toLowerCase().includes(busqueda.toLowerCase())
+    
+    return cumpleEstado && cumplePrioridad && cumpleBusqueda
+  })
+
+  // Obtener estadísticas
+  const estadisticas = {
+    total: solicitudes.length,
+    pendientes: solicitudes.filter(s => s.estado === "pendiente").length,
+    enRevision: solicitudes.filter(s => s.estado === "en_revision").length,
+    aprobadas: solicitudes.filter(s => s.estado === "aprobada").length,
+    rechazadas: solicitudes.filter(s => s.estado === "rechazada").length,
+    completadas: solicitudes.filter(s => s.estado === "completada").length,
+    ingresosPotenciales: solicitudes
+      .filter(s => ["pendiente", "en_revision", "aprobada"].includes(s.estado))
+      .reduce((sum, s) => sum + s.presupuesto, 0)
+  }
+
+  // Función para cambiar estado
+  const handleCambiarEstado = (id: string, nuevoEstado: SolicitudPaquete["estado"]) => {
+    setSolicitudes(prev => 
+      prev.map(s => s.id === id ? { ...s, estado: nuevoEstado } : s)
+    )
+  }
+
+  // Función para editar solicitud
+  const handleEditar = (solicitud: SolicitudPaquete) => {
+    setEditarSolicitud(solicitud)
+  }
+
+  // Función para guardar edición
+  const handleGuardarEdicion = (datosEditados: Partial<SolicitudPaquete>) => {
+    if (editarSolicitud) {
+      setSolicitudes(prev => 
+        prev.map(s => s.id === editarSolicitud.id ? { ...s, ...datosEditados } : s)
+      )
+      setEditarSolicitud(null)
+    }
+  }
+
+  // Función para ver detalle
+  const handleVerDetalle = (solicitud: SolicitudPaquete) => {
+    setVerDetalle(solicitud)
+  }
+
+  // Función para eliminar solicitud
+  const handleEliminar = (id: string) => {
+    setSolicitudes(prev => prev.filter(s => s.id !== id))
+    setConfirmarEliminar(null)
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Solicitudes de Paquetes</h1>
+          <p className="text-muted-foreground">
+            Gestiona las solicitudes de paquetes turísticos de los clientes
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Exportar
+          </Button>
+          <Button 
+            size="sm" 
+            className="bg-[#1605ac] hover:bg-[#1605ac]/90"
+            onClick={() => router.push('/trabajadores/crear-cotizacion')}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Agregar Cotizaciones
+          </Button>
+        </div>
+      </div>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Solicitudes</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{estadisticas.total}</div>
+            <p className="text-xs text-muted-foreground">
+              Solicitudes en el sistema
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{estadisticas.pendientes}</div>
+            <p className="text-xs text-muted-foreground">
+              Requieren atención
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">En Revisión</CardTitle>
+            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{estadisticas.enRevision}</div>
+            <p className="text-xs text-muted-foreground">
+              En proceso de evaluación
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Ingresos Potenciales</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+                         <div className="text-2xl font-bold text-green-600">
+               ${estadisticas.ingresosPotenciales.toLocaleString('en-US')}
+             </div>
+            <p className="text-xs text-muted-foreground">
+              Valor total de solicitudes activas
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabs y Filtros */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <Tabs value={tabActivo} onValueChange={setTabActivo} className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="todas">Todas ({estadisticas.total})</TabsTrigger>
+                <TabsTrigger value="pendientes">Pendientes ({estadisticas.pendientes})</TabsTrigger>
+                <TabsTrigger value="en_revision">En Revisión ({estadisticas.enRevision})</TabsTrigger>
+                <TabsTrigger value="aprobadas">Aprobadas ({estadisticas.aprobadas})</TabsTrigger>
+                <TabsTrigger value="completadas">Completadas ({estadisticas.completadas})</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardHeader>
+        
+        <CardContent>
+          {/* Filtros */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar por cliente, destino o ID..."
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            
+            <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar por estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos los estados</SelectItem>
+                <SelectItem value="pendiente">Pendiente</SelectItem>
+                <SelectItem value="en_revision">En Revisión</SelectItem>
+                <SelectItem value="aprobada">Aprobada</SelectItem>
+                <SelectItem value="rechazada">Rechazada</SelectItem>
+                <SelectItem value="completada">Completada</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={filtroPrioridad} onValueChange={setFiltroPrioridad}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar por prioridad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas las prioridades</SelectItem>
+                <SelectItem value="baja">Baja</SelectItem>
+                <SelectItem value="media">Media</SelectItem>
+                <SelectItem value="alta">Alta</SelectItem>
+                <SelectItem value="urgente">Urgente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tabla de Solicitudes */}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Destino</TableHead>
+                  <TableHead>Fechas</TableHead>
+                  <TableHead>Personas</TableHead>
+                  <TableHead>Presupuesto</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Prioridad</TableHead>
+                  <TableHead>Servicios</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {solicitudesFiltradas.map((solicitud) => (
+                  <TableRow key={solicitud.id}>
+                    <TableCell className="font-mono text-sm">{solicitud.id}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{solicitud.cliente}</div>
+                        <div className="text-sm text-muted-foreground">{solicitud.email}</div>
+                        <div className="text-sm text-muted-foreground">{solicitud.telefono}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        {solicitud.destino}
+                      </div>
+                    </TableCell>
+                                         <TableCell>
+                       <div className="text-sm">
+                         <div>Inicio: {new Date(solicitud.fechaInicio).toLocaleDateString('en-US')}</div>
+                         <div>Fin: {new Date(solicitud.fechaFin).toLocaleDateString('en-US')}</div>
+                       </div>
+                     </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="secondary">{solicitud.personas}</Badge>
+                    </TableCell>
+                                         <TableCell>
+                       <div className="font-medium">${solicitud.presupuesto.toLocaleString('en-US')}</div>
+                     </TableCell>
+                    <TableCell>
+                      <Badge className={getEstadoColor(solicitud.estado)}>
+                        {solicitud.estado.replace("_", " ")}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPrioridadColor(solicitud.prioridad)}>
+                        {solicitud.prioridad}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {solicitud.servicios.map((servicio, index) => (
+                          <div key={index} className="flex items-center gap-1 text-xs">
+                            {getServicioIcono(servicio)}
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleVerDetalle(solicitud)}
+                          title="Ver detalles"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditar(solicitud)}
+                          title="Editar"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setConfirmarEliminar(solicitud.id)}
+                          title="Eliminar"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Paginación */}
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-sm text-muted-foreground">
+              Mostrando {solicitudesFiltradas.length} de {solicitudes.length} solicitudes
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled>
+                Anterior
+              </Button>
+              <Button variant="outline" size="sm" disabled>
+                Siguiente
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+
+
+      {/* Modal de Edición */}
+      <Dialog open={!!editarSolicitud} onOpenChange={() => setEditarSolicitud(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Solicitud - {editarSolicitud?.id}</DialogTitle>
+          </DialogHeader>
+          
+          {editarSolicitud && (
+            <EditarSolicitudForm 
+              solicitud={editarSolicitud}
+              onSave={handleGuardarEdicion}
+              onCancel={() => setEditarSolicitud(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Detalle */}
+      <Dialog open={!!verDetalle} onOpenChange={() => setVerDetalle(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalle de Solicitud - {verDetalle?.id}</DialogTitle>
+          </DialogHeader>
+          
+          {verDetalle && (
+            <DetalleSolicitud solicitud={verDetalle} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Confirmación de Eliminación */}
+      <Dialog open={!!confirmarEliminar} onOpenChange={() => setConfirmarEliminar(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              ¿Estás seguro de que quieres eliminar la solicitud <strong>{confirmarEliminar}</strong>? 
+              Esta acción no se puede deshacer.
+            </p>
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setConfirmarEliminar(null)}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => handleEliminar(confirmarEliminar!)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

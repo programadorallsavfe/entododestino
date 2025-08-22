@@ -31,7 +31,7 @@ interface Cliente {
   pais: string
   ciudad: string
   fechaRegistro: string
-  estado: 'activo' | 'inactivo' | 'premium'
+  estado: 'lead' | 'cliente'
   calificacion: number
   totalReservas: number
   valorTotal: number
@@ -52,7 +52,7 @@ export const ClientesTable = () => {
       pais: 'Perú',
       ciudad: 'Lima',
       fechaRegistro: '2024-01-15',
-      estado: 'premium',
+      estado: 'cliente',
       calificacion: 4.8,
       totalReservas: 12,
       valorTotal: 8500
@@ -65,7 +65,7 @@ export const ClientesTable = () => {
       pais: 'Perú',
       ciudad: 'Cusco',
       fechaRegistro: '2024-02-01',
-      estado: 'activo',
+      estado: 'cliente',
       calificacion: 4.5,
       totalReservas: 8,
       valorTotal: 5200
@@ -78,7 +78,7 @@ export const ClientesTable = () => {
       pais: 'Colombia',
       ciudad: 'Bogotá',
       fechaRegistro: '2024-01-20',
-      estado: 'activo',
+      estado: 'cliente',
       calificacion: 4.9,
       totalReservas: 15,
       valorTotal: 12000
@@ -91,10 +91,218 @@ export const ClientesTable = () => {
       pais: 'Chile',
       ciudad: 'Santiago',
       fechaRegistro: '2024-02-10',
-      estado: 'inactivo',
+      estado: 'lead',
       calificacion: 4.2,
-      totalReservas: 3,
-      valorTotal: 1800
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '5',
+      nombre: 'Sofia Herrera',
+      email: 'sofia.herrera@email.com',
+      telefono: '+57 300 123 456',
+      pais: 'Colombia',
+      ciudad: 'Medellín',
+      fechaRegistro: '2024-01-25',
+      estado: 'cliente',
+      calificacion: 4.7,
+      totalReservas: 9,
+      valorTotal: 6800
+    },
+    {
+      id: '6',
+      nombre: 'Diego Morales',
+      email: 'diego.morales@email.com',
+      telefono: '+56 9 8765 4321',
+      pais: 'Chile',
+      ciudad: 'Valparaíso',
+      fechaRegistro: '2024-02-15',
+      estado: 'lead',
+      calificacion: 4.0,
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '7',
+      nombre: 'Carmen Vargas',
+      email: 'carmen.vargas@email.com',
+      telefono: '+51 995 567 890',
+      pais: 'Perú',
+      ciudad: 'Arequipa',
+      fechaRegistro: '2024-01-10',
+      estado: 'cliente',
+      calificacion: 4.6,
+      totalReservas: 6,
+      valorTotal: 4200
+    },
+    {
+      id: '8',
+      nombre: 'Roberto Jiménez',
+      email: 'roberto.jimenez@email.com',
+      telefono: '+54 9 11 2345 6789',
+      pais: 'Argentina',
+      ciudad: 'Buenos Aires',
+      fechaRegistro: '2024-02-20',
+      estado: 'cliente',
+      calificacion: 4.8,
+      totalReservas: 11,
+      valorTotal: 9500
+    },
+    {
+      id: '9',
+      nombre: 'Patricia López',
+      email: 'patricia.lopez@email.com',
+      telefono: '+57 310 987 654',
+      pais: 'Colombia',
+      ciudad: 'Cali',
+      fechaRegistro: '2024-01-30',
+      estado: 'lead',
+      calificacion: 4.3,
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '10',
+      nombre: 'Fernando Castro',
+      email: 'fernando.castro@email.com',
+      telefono: '+51 994 678 901',
+      pais: 'Perú',
+      ciudad: 'Trujillo',
+      fechaRegistro: '2024-02-05',
+      estado: 'cliente',
+      calificacion: 4.4,
+      totalReservas: 7,
+      valorTotal: 5800
+    },
+    {
+      id: '11',
+      nombre: 'Lucía Mendoza',
+      email: 'lucia.mendoza@email.com',
+      telefono: '+56 9 7654 3210',
+      pais: 'Chile',
+      ciudad: 'Concepción',
+      fechaRegistro: '2024-01-18',
+      estado: 'cliente',
+      calificacion: 4.9,
+      totalReservas: 14,
+      valorTotal: 11000
+    },
+    {
+      id: '12',
+      nombre: 'Miguel Torres',
+      email: 'miguel.torres@email.com',
+      telefono: '+54 9 11 3456 7890',
+      pais: 'Argentina',
+      ciudad: 'Córdoba',
+      fechaRegistro: '2024-02-12',
+      estado: 'lead',
+      calificacion: 4.1,
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '13',
+      nombre: 'Elena Ruiz',
+      email: 'elena.ruiz@email.com',
+      telefono: '+57 320 456 789',
+      pais: 'Colombia',
+      ciudad: 'Cartagena',
+      fechaRegistro: '2024-01-22',
+      estado: 'cliente',
+      calificacion: 4.7,
+      totalReservas: 10,
+      valorTotal: 7800
+    },
+    {
+      id: '14',
+      nombre: 'Javier Moreno',
+      email: 'javier.moreno@email.com',
+      telefono: '+51 993 789 012',
+      pais: 'Perú',
+      ciudad: 'Piura',
+      fechaRegistro: '2024-02-08',
+      estado: 'cliente',
+      calificacion: 4.5,
+      totalReservas: 5,
+      valorTotal: 3600
+    },
+    {
+      id: '15',
+      nombre: 'Isabella Santos',
+      email: 'isabella.santos@email.com',
+      telefono: '+55 11 98765 4321',
+      pais: 'Brasil',
+      ciudad: 'São Paulo',
+      fechaRegistro: '2024-01-28',
+      estado: 'lead',
+      calificacion: 4.0,
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '16',
+      nombre: 'Ricardo Flores',
+      email: 'ricardo.flores@email.com',
+      telefono: '+56 9 6543 2109',
+      pais: 'Chile',
+      ciudad: 'La Serena',
+      fechaRegistro: '2024-02-18',
+      estado: 'cliente',
+      calificacion: 4.6,
+      totalReservas: 8,
+      valorTotal: 6200
+    },
+    {
+      id: '17',
+      nombre: 'Valentina Rojas',
+      email: 'valentina.rojas@email.com',
+      telefono: '+57 315 321 654',
+      pais: 'Colombia',
+      ciudad: 'Barranquilla',
+      fechaRegistro: '2024-01-12',
+      estado: 'cliente',
+      calificacion: 4.8,
+      totalReservas: 13,
+      valorTotal: 9200
+    },
+    {
+      id: '18',
+      nombre: 'Andrés Vega',
+      email: 'andres.vega@email.com',
+      telefono: '+51 992 890 123',
+      pais: 'Perú',
+      ciudad: 'Chiclayo',
+      fechaRegistro: '2024-02-25',
+      estado: 'lead',
+      calificacion: 4.2,
+      totalReservas: 0,
+      valorTotal: 0
+    },
+    {
+      id: '19',
+      nombre: 'Camila Ortiz',
+      email: 'camila.ortiz@email.com',
+      telefono: '+54 9 11 4567 8901',
+      pais: 'Argentina',
+      ciudad: 'Rosario',
+      fechaRegistro: '2024-01-05',
+      estado: 'cliente',
+      calificacion: 4.9,
+      totalReservas: 16,
+      valorTotal: 13500
+    },
+    {
+      id: '20',
+      nombre: 'Gabriel Paredes',
+      email: 'gabriel.paredes@email.com',
+      telefono: '+56 9 5432 1098',
+      pais: 'Chile',
+      ciudad: 'Antofagasta',
+      fechaRegistro: '2024-02-22',
+      estado: 'cliente',
+      calificacion: 4.4,
+      totalReservas: 6,
+      valorTotal: 4800
     }
   ]
 
@@ -102,14 +310,13 @@ export const ClientesTable = () => {
 
   const getEstadoBadge = (estado: string) => {
     const variants = {
-      activo: 'bg-green-100 text-green-800 border-green-200',
-      inactivo: 'bg-gray-100 text-gray-800 border-gray-200',
-      premium: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      cliente: 'bg-green-100 text-green-800 border-green-200',
+      lead: 'bg-blue-100 text-blue-800 border-blue-200'
     }
     
     return (
       <Badge className={`${variants[estado as keyof typeof variants]} border`}>
-        {estado === 'activo' ? 'Activo' : estado === 'inactivo' ? 'Inactivo' : 'Premium'}
+        {estado === 'cliente' ? 'Cliente' : 'Lead'}
       </Badge>
     )
   }
@@ -160,9 +367,8 @@ export const ClientesTable = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos los estados</SelectItem>
-                <SelectItem value="activo">Activo</SelectItem>
-                <SelectItem value="inactivo">Inactivo</SelectItem>
-                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="cliente">Clientes</SelectItem>
+                <SelectItem value="lead">Leads</SelectItem>
               </SelectContent>
             </Select>
 
@@ -205,15 +411,15 @@ export const ClientesTable = () => {
             </div>
             <div>
               <div className="text-2xl font-bold text-green-600">
-                {clientes.filter(c => c.estado === 'activo').length}
+                {clientes.filter(c => c.estado === 'cliente').length}
               </div>
-              <div className="text-sm text-muted-foreground">Activos</div>
+              <div className="text-sm text-muted-foreground">Clientes</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {clientes.filter(c => c.estado === 'premium').length}
+              <div className="text-2xl font-bold text-blue-600">
+                {clientes.filter(c => c.estado === 'lead').length}
               </div>
-              <div className="text-sm text-muted-foreground">Premium</div>
+              <div className="text-sm text-muted-foreground">Leads</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-purple-600">
