@@ -880,6 +880,12 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                     };
                   });
 
+                  // Estado para el rango de fechas seleccionado por el usuario
+                  const [userDateRange, setUserDateRange] = useState<{ start: string; end: string }>({
+                    start: dateRange.start,
+                    end: dateRange.end
+                  });
+
                   const handleReservar = (selectedDate: string) => {
                     if (!selectedDate || !selectedItem) return;
                     
@@ -927,9 +933,11 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
       const variation = selectedItem.type === 'hotel' ? 0.25 : selectedItem.type === 'flight' ? 0.35 : 0.30;
       
       const dates = [];
-      const startDate = new Date(dateRange.start);
+      const startDate = new Date(userDateRange.start);
+      const endDate = new Date(userDateRange.end);
+      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       
-      for (let i = 0; i < 21; i++) {
+      for (let i = 0; i < totalDays; i++) {
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + i);
         
@@ -967,7 +975,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
           
           <div className="p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-[calc(95vh-120px)]">
             {/* Información del Item Seleccionado */}
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div className="lg:col-span-2">
                   <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
@@ -982,17 +990,17 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                         {selectedItem.location || `${selectedItem.origin} → ${selectedItem.destination}`}
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                        <div className="text-center p-4 sm:p-5  rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
                           <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Precio Base</span>
                           <div className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">{formatPrice(selectedItem.price)}</div>
                         </div>
-                        <div className="text-center p-4 sm:p-5  rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
                           <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Rango de Precios</span>
                           <div className="text-lg sm:text-xl font-semibold text-slate-900 mt-2">
                             {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
                           </div>
                         </div>
-                        <div className="text-center p-4 sm:p-5  rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-center p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 shadow-sm">
                           <span className="text-sm text-slate-500 uppercase tracking-wide font-medium">Ahorro Máximo</span>
                           <div className="text-lg sm:text-xl font-semibold text-green-600 mt-2">
                             {formatPrice(selectedItem.price - lowestPrice)}
@@ -1003,7 +1011,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   </div>
                 </div>
                 <div className="flex flex-col justify-center mt-6 lg:mt-0">
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 sm:p-8 rounded-2xl text-center shadow-xl hover:shadow-2xl transition-shadow">
+                  <div className="bg-green-500 text-white p-6 sm:p-8 rounded-2xl text-center shadow-lg">
                     <div className="flex items-center justify-center mb-3">
                       <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 mr-3" />
                       <span className="text-sm sm:text-base font-semibold">Mejor Precio</span>
@@ -1042,14 +1050,40 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Rango de Análisis
+                    Rango de Análisis Personalizado
                   </label>
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                    <div className="flex items-center gap-3 text-slate-600">
-                      <Calendar className="w-5 h-5" />
-                      <span className="text-base font-medium">
-                        {new Date(dateRange.start).toLocaleDateString('es-ES')} - {new Date(dateRange.end).toLocaleDateString('es-ES')}
-                      </span>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-slate-600">Desde:</label>
+                      <input
+                        type="date"
+                        value={userDateRange.start}
+                        onChange={(e) => {
+                          setUserDateRange(prev => ({ ...prev, start: e.target.value }));
+                          // Actualizar fecha seleccionada si está fuera del nuevo rango
+                          if (selectedDate && e.target.value > selectedDate) {
+                            setSelectedDate(e.target.value);
+                          }
+                        }}
+                        max={userDateRange.end}
+                        className="px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-slate-600">Hasta:</label>
+                      <input
+                        type="date"
+                        value={userDateRange.end}
+                        onChange={(e) => {
+                          setUserDateRange(prev => ({ ...prev, end: e.target.value }));
+                          // Actualizar fecha seleccionada si está fuera del nuevo rango
+                          if (selectedDate && e.target.value < selectedDate) {
+                            setSelectedDate(e.target.value);
+                          }
+                        }}
+                        min={userDateRange.start}
+                        className="px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1095,8 +1129,9 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                        variant="outline"
                        size="sm"
                        onClick={() => {
-                         // Encontrar el precio más bajo en la semana actual (días 7-14)
-                         const currentWeekPrices = pricesForDates.slice(7, 14);
+                         // Encontrar el precio más bajo en la mitad del rango seleccionado
+                         const midPoint = Math.floor(pricesForDates.length / 2);
+                         const currentWeekPrices = pricesForDates.slice(midPoint - 3, midPoint + 4);
                          const bestCurrentWeek = currentWeekPrices.reduce((min, current) => 
                            current.price < min.price ? current : min
                          );
@@ -1107,7 +1142,19 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                        className="text-purple-600 border-purple-300 hover:bg-purple-50 flex items-center gap-2 h-10"
                      >
                        <Calendar className="w-4 h-4" />
-                       Mejor Esta Semana
+                       Mejor en el Rango
+                     </Button>
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       onClick={() => {
+                         setUserDateRange(dateRange);
+                         setSelectedDate(new Date().toISOString().split('T')[0]);
+                       }}
+                       className="text-gray-600 border-gray-300 hover:bg-gray-50 flex items-center gap-2 h-10"
+                     >
+                       <Calendar className="w-4 h-4" />
+                       Resetear Rango
                      </Button>
                    </div>
                 </div>
@@ -1118,30 +1165,34 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
             <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg" data-graph-section>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
                 <div>
-                  <h4 className="text-lg sm:text-xl font-semibold text-slate-900 flex items-center gap-3">
-                    <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                    Evolución de Precios (20 días)
-                  </h4>
+                                      <h4 className="text-lg sm:text-xl font-semibold text-slate-900 flex items-center gap-3">
+                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      Evolución de Precios ({pricesForDates.length} días)
+                    </h4>
                   <p className="text-sm sm:text-base text-slate-600 mt-2">
-                    Las barras más altas indican precios más bajos
+                    Las barras más altas indican precios más altos
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <TrendingDown className="w-4 h-4 text-green-600" />
-                    <span>Mejor precio: {formatPrice(lowestPrice)}</span>
+                                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <TrendingDown className="w-4 h-4 text-green-600" />
+                      <span>Mejor precio: {formatPrice(lowestPrice)}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <span>{new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Info className="w-4 h-4 text-purple-600" />
+                      <span>{pricesForDates.length} días analizados</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-blue-600" />
-                    <span>{new Date(pricesForDates.find(d => d.isLowest)?.date || '').toLocaleDateString('es-ES')}</span>
-                  </div>
-                </div>
               </div>
               
                 <div className="bg-gradient-to-b from-slate-50 to-white rounded-2xl p-6 sm:p-8 lg:p-10 border border-slate-200">
                 {/* Gráfico Principal - Barras Apiladas */}
                 <div className="relative mb-8">
-                  <div className="grid gap-1 sm:gap-2 mb-8" style={{ gridTemplateColumns: 'repeat(21, minmax(0, 1fr))' }}>
+                  <div className="grid gap-1 sm:gap-2 mb-8" style={{ gridTemplateColumns: `repeat(${pricesForDates.length}, minmax(0, 1fr))` }}>
                     {pricesForDates.map((dateData, index) => {
                       // Lógica corregida: precios más altos = barras más altas
                       const priceHeight = ((dateData.price - lowestPrice) / (highestPrice - lowestPrice)) * 120 + 40;
@@ -1304,16 +1355,16 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                 
                 {/* Nota de Interpretación */}
                 <div className="text-center mt-4 text-xs text-slate-500">
-                  💡 <strong>Interpretación:</strong> Las barras más altas representan precios más bajos
+                  <strong>Interpretación:</strong> Las barras más altas representan precios más altos
                 </div>
               </div>
             </div>
             
             {/* Información Detallada de la Fecha Seleccionada */}
             {selectedDate && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 mb-8 border border-blue-200 shadow-lg">
-                <h4 className="text-lg sm:text-xl font-semibold text-blue-900 mb-6 flex items-center gap-3">
-                  <Info className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="bg-white rounded-2xl p-6 sm:p-8 mb-8 border border-slate-200 shadow-lg">
+                <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                  <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                   <span className="hidden sm:inline">
                     Detalles para {new Date(selectedDate).toLocaleDateString('es-ES', { 
                       weekday: 'long', 
@@ -1337,7 +1388,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                   
                   return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                      <div className="text-center p-4 sm:p-6  rounded-xl border border-blue-200 shadow-sm">
+                      <div className="text-center p-4 sm:p-6 bg-blue-50 rounded-xl border border-blue-200 shadow-sm">
                         <div className="p-2 sm:p-3 bg-blue-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
                           <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                         </div>
@@ -1347,11 +1398,11 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                         </div>
                       </div>
                       
-                      <div className="text-center p-4 sm:p-6 bg-white rounded-xl border border-blue-200 shadow-sm">
+                      <div className="text-center p-4 sm:p-6 bg-green-50 rounded-xl border border-green-200 shadow-sm">
                         <div className="p-2 sm:p-3 bg-green-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
                           <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                         </div>
-                        <div className="text-xs sm:text-sm text-blue-600 mb-2 uppercase tracking-wide font-medium">Comparado con precio base</div>
+                        <div className="text-xs sm:text-sm text-green-600 mb-2 uppercase tracking-wide font-medium">Comparado con precio base</div>
                         <div className={`text-xl sm:text-2xl font-semibold ${isGoodDeal ? 'text-green-600' : 'text-red-600'}`}>
                           {isGoodDeal ? `-${formatPrice(savings)}` : `+${formatPrice(Math.abs(savings))}`}
                         </div>
@@ -1360,12 +1411,12 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
                         </div>
                       </div>
                       
-                      <div className="text-center p-4 sm:p-6 bg-white rounded-xl border border-blue-200 shadow-sm sm:col-span-2 lg:col-span-1">
+                      <div className="text-center p-4 sm:p-6 bg-indigo-50 rounded-xl border border-indigo-200 shadow-sm sm:col-span-2 lg:col-span-1">
                         <div className="p-2 sm:p-3 bg-indigo-100 rounded-full w-fit mx-auto mb-2 sm:mb-3">
                           <Star className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
                         </div>
-                        <div className="text-xs sm:text-sm text-blue-600 mb-2 uppercase tracking-wide font-medium">Posición en el ranking</div>
-                        <div className="text-xl sm:text-2xl font-semibold text-blue-900">
+                        <div className="text-xs sm:text-sm text-indigo-600 mb-2 uppercase tracking-wide font-medium">Posición en el ranking</div>
+                        <div className="text-xl sm:text-2xl font-semibold text-indigo-900">
                           {ranking} de {pricesForDates.length}
                         </div>
                         <div className="text-xs sm:text-sm text-slate-600 font-medium">
@@ -1393,7 +1444,7 @@ export const ResultsCardComponents = ({ searchParams, isVisible, onSelectOption 
               </Button>
               <Button 
                 size="lg"
-                className="flex-1 h-14 sm:h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg text-base sm:text-lg"
+                className="flex-1 h-14 sm:h-16 bg-green-600 hover:bg-green-700 shadow-lg text-base sm:text-lg"
                 onClick={() => handleReservar(selectedDate)}
               >
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
