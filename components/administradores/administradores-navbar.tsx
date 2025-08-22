@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useIsMobile } from "@/hooks/use-mobile"
 import Image from "next/image"
+import { NotificationsPanel } from "../trabajadores/notifications-panel"
 
 interface AdministradoresNavbarProps {
   className?: string
@@ -187,6 +188,13 @@ export const AdministradoresNavbar = ({ className }: AdministradoresNavbarProps)
                     5
                   </span>
                 </Button>
+                
+                {/* Panel de Notificaciones */}
+                <NotificationsPanel 
+                  isOpen={notificationsOpen} 
+                  onClose={() => setNotificationsOpen(false)}
+                  triggerRef={notificationsButtonRef}
+                />
               </div>
 
               {/* Selector de moneda */}
