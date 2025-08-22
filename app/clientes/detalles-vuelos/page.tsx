@@ -66,7 +66,10 @@ interface VueloDetalles {
   }
 }
 
-export default function DetallesVuelosPage({ vueloId }: { vueloId: string }) {
+export default function DetallesVuelosPage() {
+  const searchParams = useSearchParams()
+  const vueloId = searchParams.get('id')
+  
   const [vuelo, setVuelo] = useState<VueloDetalles | null>(null)
   const [pasajeros, setPasajeros] = useState(1)
   const [clase, setClase] = useState('economica')
