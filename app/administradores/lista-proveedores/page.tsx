@@ -317,38 +317,7 @@ const useProveedoresFiltrados = (proveedores: Proveedor[], filtros: FiltrosState
 // COMPONENTS
 // ============================================================================
 
-const PageHeader = () => (
-  <div className="">
-    <div className="">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary/10 rounded-xl border border-primary/20">
-              <Database className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-foreground">Gestión de Proveedores</h1>
-              <p className="text-lg text-muted-foreground">
-                Administra y monitorea las APIs de servicios turísticos
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button variant="outline" size="lg" className="border-border hover:bg-muted">
-            <RefreshCw className="w-5 h-5 mr-2" />
-            Actualizar Datos
-          </Button>
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg">
-            <Plus className="w-5 h-5 mr-2" />
-            Nuevo Proveedor
-          </Button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+
 
 const FiltrosAvanzados = ({ filtros, actualizarFiltro, limpiarFiltros }: {
   filtros: FiltrosState;
@@ -772,10 +741,69 @@ export default function ListaProveedoresPage() {
   const proveedoresFiltrados = useProveedoresFiltrados(proveedores, filtros);
 
   return (
-    <div className="">
-      <PageHeader />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-white/20 rounded-xl border border-white/30 backdrop-blur-sm">
+                  <Database className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-white">Gestión de Proveedores</h1>
+                  <p className="text-xl text-white/90">
+                    Administra y monitorea las APIs de servicios turísticos
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-white hover:bg-gray-100 text-primary border-0 px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <RefreshCw className="w-5 h-5 mr-2" />
+                Actualizar Datos
+              </Button>
+              <Button 
+                size="lg" 
+                className="bg-white hover:bg-gray-100 text-primary border-0 px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Nuevo Proveedor
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <div className=" px-6 py-8 space-y-8">
+      <div className="mx-auto px-4 py-8 space-y-8">
+        {/* Header del contenido */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Panel de Control de Proveedores</h2>
+              <p className="text-muted-foreground">
+                Gestiona APIs, monitorea rendimiento y configura servicios turísticos
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="border-border hover:bg-muted">
+                <Database className="w-4 h-4 mr-2" />
+                APIs
+              </Button>
+              <Button variant="outline" size="sm" className="border-border hover:bg-muted">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Métricas
+              </Button>
+            </div>
+          </div>
+        </div>
+
         <FiltrosAvanzados 
           filtros={filtros} 
           actualizarFiltro={actualizarFiltro} 
@@ -785,26 +813,36 @@ export default function ListaProveedoresPage() {
         <DashboardEstadisticas estadisticas={estadisticas} />
         
         {proveedoresFiltrados.length > 0 ? (
-          <Tabs defaultValue="tabla" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="tabla" className="flex items-center gap-2">
-                <Table className="w-4 h-4" />
-                Vista de Tabla
-              </TabsTrigger>
-              <TabsTrigger value="detallada" className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4" />
-                Vista Detallada
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="tabla" className="space-y-4">
-              <TablaProveedores proveedores={proveedoresFiltrados} />
-            </TabsContent>
-            
-            <TabsContent value="detallada" className="space-y-4">
-              <VistaDetallada proveedores={proveedoresFiltrados} />
-            </TabsContent>
-          </Tabs>
+          <div className="bg-card border border-border rounded-lg">
+            <div className="p-6 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">Gestión de Proveedores</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Administra y monitorea todos los proveedores del sistema
+              </p>
+            </div>
+            <div className="p-6">
+              <Tabs defaultValue="tabla" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="tabla" className="flex items-center gap-2">
+                    <Table className="w-4 h-4" />
+                    Vista de Tabla
+                  </TabsTrigger>
+                  <TabsTrigger value="detallada" className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4" />
+                    Vista Detallada
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="tabla" className="space-y-4">
+                  <TablaProveedores proveedores={proveedoresFiltrados} />
+                </TabsContent>
+                
+                <TabsContent value="detallada" className="space-y-4">
+                  <VistaDetallada proveedores={proveedoresFiltrados} />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
         ) : (
           <EmptyState />
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { 
   Bed, 
@@ -66,6 +67,7 @@ const categories: Category[] = [
 ];
 
 export default function CrearCotizacionPage() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>("alojamiento");
   const [tripType, setTripType] = useState<"one-way" | "round-trip" | "multiple">("round-trip");
   const [accommodationType, setAccommodationType] = useState<"single" | "multiple" | "hourly">("single");
@@ -85,6 +87,14 @@ export default function CrearCotizacionPage() {
     if (selectedCategory === 'multidestino') {
       console.log('Multidestino seleccionado - mostrando constructor de itinerario');
       return; // No hacer nada más - el MultiDestinationForm maneja su propia lógica
+    }
+    
+    // Para paquetes, mostrar directamente los resultados de paquetes
+    if (selectedCategory === 'paquetes') {
+      console.log('Paquetes seleccionado - mostrando resultados de paquetes');
+      setSearchParams(params);
+      setShowResults(true);
+      return;
     }
     
     // Crear datos simulados para detalles-cotizacion según el tipo de servicio
@@ -171,25 +181,15 @@ export default function CrearCotizacionPage() {
         selectedDate: '2025-09-08',
         guests: 2
       };
-    } else if (selectedCategory === 'paquetes') {
-      cotizacionData = {
-        type: 'package',
-        name: 'Paquete Turístico Premium',
-        location: params.selectedCountries?.join(', ') || 'Sudamérica',
-        description: 'Paquete completo con múltiples destinos',
-        amenities: ['Hoteles premium', 'Vuelos incluidos', 'Guías expertos'],
-        includes: ['Todo incluido', 'Seguro de viaje', 'Asistencia VIP'],
-        price: 1299.99,
-        discountPrice: 1099.99,
-        selectedDate: params.date || 'Septiembre 2025',
-        guests: 2,
-        nights: params.nights || '7-10 noches'
-      };
     }
     
     // Para todos los demás servicios, solo mostrar los resultados (cards) sin navegar
     setSearchParams(params);
     setShowResults(true);
+  };
+
+  const handleVerDetalles = (paqueteId?: string) => {
+    router.push('/administradores/detalles-paquetes-turisticos');
   };
 
   // Nueva función para manejar la selección de una opción específica
@@ -335,72 +335,84 @@ export default function CrearCotizacionPage() {
     }
   };
 
-  return (
-    
-      <div className="mx-auto relative z-10">
-        {/* Header con Banner */}
-        <div className="relative mb-8 overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/assets/banner.jpg')" }}
-          />
-          <div className="relative z-10 bg-black/40 backdrop-blur-sm p-12 text-center">
-            <h1 className="text-4xl font-bold text-white mb-2">Crear Cotización</h1>
-            <p className="text-white/90 text-lg">Selecciona el tipo de servicio y completa los detalles</p>
-          </div>
-        </div>
+     return (
+       <div className="min-h-screen bg-background">
+         {/* Header con Banner */}
+         <div className="relative mb-8 overflow-hidden">
+           <div 
+             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+             style={{ backgroundImage: "url('/assets/banner.jpg')" }}
+           />
+           <div className="relative z-10 bg-black/40 backdrop-blur-sm p-12 text-center">
+             <h1 className="text-4xl font-bold text-white mb-2">Crear Cotización</h1>
+             <p className="text-white/90 text-lg">Selecciona el tipo de servicio y completa los detalles</p>
+           </div>
+         </div>
 
-        {/* Main Search Card */}
-        <div className="">
-          {/* Category Navigation */}
-          <div className="flex flex-wrap gap-4 mb-8 justify-center">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.id)}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:scale-105 ${
-                  selectedCategory === category.id
-                    ? "text-blue-600 bg-blue-50 shadow-lg shadow-blue-100"
-                    : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                <div className="relative">
-                  <div className={`p-2 rounded-lg ${
-                    selectedCategory === category.id ? "bg-blue-100" : "bg-gray-100"
-                  }`}>
-                    {category.icon}
-                  </div>
-                  {category.isNew && (
-                    <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg">
-                      NEW
-                    </span>
-                  )}
-                </div>
-                <span className="text-sm font-medium text-center max-w-[100px]">{category.label}</span>
-                {selectedCategory === category.id && (
-                  <div className="w-full h-1 bg-blue-600 rounded-full animate-pulse"></div>
-                )}
-              </button>
-            ))}
-          </div>
+         <div className="mx-auto px-4 py-8">
+           {/* Main Search Card */}
+           <div className="">
+             {/* Category Navigation */}
+             <div className="flex flex-wrap gap-4 mb-8 justify-center">
+               {categories.map((category) => (
+                 <button
+                   key={category.id}
+                   onClick={() => handleCategoryChange(category.id)}
+                   className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:scale-105 ${
+                     selectedCategory === category.id
+                       ? "text-blue-600 bg-blue-50 shadow-lg shadow-blue-100"
+                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                   }`}
+                 >
+                   <div className="relative">
+                     <div className={`p-2 rounded-lg ${
+                       selectedCategory === category.id ? "bg-blue-100" : "bg-gray-100"
+                     }`}>
+                       {category.icon}
+                     </div>
+                     {category.isNew && (
+                       <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg">
+                         NEW
+                       </span>
+                     )}
+                   </div>
+                   <span className="text-sm font-medium text-center max-w-[100px]">{category.label}</span>
+                   {selectedCategory === category.id && (
+                     <div className="w-full h-1 bg-blue-600 rounded-full animate-pulse"></div>
+                   )}
+                 </button>
+               ))}
+             </div>
 
-          {/* Search Form */}
-          {renderSearchForm()}
-        </div>
+             {/* Search Form */}
+             {renderSearchForm()}
+           </div>
 
-                {/* Results Section */}
-        {showResults && searchParams && (
-          <div className="mt-8">
-            <ResultsCardComponents 
-              searchParams={searchParams} 
-              isVisible={showResults}
-              onSelectOption={handleSelectOption}
-            />
-          </div>
-        )}
-      </div>
-    
-    );
+           {/* Results Section */}
+           {showResults && searchParams && (
+             <div className="mt-8">
+               {selectedCategory === 'paquetes' ? (
+                 <div>
+                   <div className="text-center mb-8">
+                     <h2 className="text-3xl font-bold text-gray-800 mb-2">Resultados de Paquetes Turísticos</h2>
+                     <p className="text-gray-600 text-lg">
+                       Encontramos los mejores paquetes según tus criterios de búsqueda
+                     </p>
+                   </div>
+                   <VacationPackagesResults onVerDetalles={handleVerDetalles} />
+                 </div>
+               ) : (
+                 <ResultsCardComponents 
+                   searchParams={searchParams} 
+                   isVisible={showResults}
+                   onSelectOption={handleSelectOption}
+                 />
+               )}
+             </div>
+           )}
+         </div>
+       </div>
+     );
   }
 
 // Formulario de Alojamiento
@@ -1698,7 +1710,7 @@ const TransportForm = ({ onSearch }: { onSearch: (params: any) => void }) => {
 };
 
 // Componente de Resultados de Paquetes Vacacionales
-const VacationPackagesResults = () => {
+const VacationPackagesResults = ({ onVerDetalles }: { onVerDetalles: (paqueteId?: string) => void }) => {
   const [selectedFilter, setSelectedFilter] = useState("6-10");
   const [priceRange, setPriceRange] = useState([3322, 107271]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -1979,7 +1991,10 @@ const VacationPackagesResults = () => {
                         <p className="text-gray-500 text-sm">Por persona</p>
                       </div>
                       
-                      <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                      <button 
+                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                        onClick={() => onVerDetalles(pkg.id.toString())}
+                      >
                         Detalles
                       </button>
                     </div>

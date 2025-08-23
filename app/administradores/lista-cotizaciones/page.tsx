@@ -1161,30 +1161,45 @@ export default function SolicitudesPaquetesPage() {
   }, [verDetalle, editarSolicitud, confirmarEliminar])
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Solicitudes de Paquetes</h1>
-          <p className="text-muted-foreground">
-            Gestiona las solicitudes de paquetes turísticos de los clientes
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            Exportar
-          </Button>
-          <Button 
-            size="sm" 
-            className="bg-[#1605ac] hover:bg-[#1605ac]/90"
-            onClick={() => router.push('/administradores/crear-cotizacion')}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Agregar Cotizaciones
-          </Button>
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="text-center lg:text-left mb-6 lg:mb-0">
+              <h1 className="text-4xl font-bold mb-4">Solicitudes de Paquetes</h1>
+              <p className="text-xl text-primary-foreground/90">Gestiona las solicitudes de paquetes turísticos de los clientes</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 text-primary border-0 px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200">
+                <Download className="w-5 h-5 mr-2" />
+                Exportar
+              </Button>
+              <Button 
+                size="sm" 
+                className="bg-white hover:bg-gray-100 text-primary border-0 px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                onClick={() => router.push('/administradores/crear-cotizacion')}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Agregar Cotizaciones
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div className="mx-auto px-4 py-8">
+        {/* Header del contenido */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Panel de Control</h2>
+              <p className="text-muted-foreground">
+                Administra y monitorea todas las solicitudes del sistema
+              </p>
+            </div>
+          </div>
+        </div>
 
       {/* Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1550,8 +1565,7 @@ export default function SolicitudesPaquetesPage() {
           </div>
         </CardContent>
       </Card>
-
-
+      </div>
 
       {/* Modal de Edición */}
       {editarSolicitud && (
