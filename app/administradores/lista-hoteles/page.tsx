@@ -815,7 +815,7 @@ export default function ListaHotelesPage() {
                     <h3 className="text-xl font-semibold mb-4 text-primary">Información del Hotel</h3>
 
                     {/* Imagen Principal */}
-                    <div className="relative mb-4">
+                    <div className=" mb-4">
                       <img
                         src={hotelSeleccionado.imagenes[0]}
                         alt={hotelSeleccionado.nombre}
