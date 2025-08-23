@@ -1014,7 +1014,7 @@ export default function SolicitudesPaquetesPage() {
 
   // Función para ver detalle
   const handleVerDetalle = (solicitud: SolicitudPaquete) => {
-    setVerDetalleCliente(solicitud)
+    setVerDetalle(solicitud)
   }
 
   // Función para eliminar solicitud
