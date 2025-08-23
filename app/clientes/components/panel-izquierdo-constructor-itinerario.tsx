@@ -15,8 +15,23 @@ import {
   Search,
   Edit,
   RotateCcw,
-  X
+  X,
+  Calendar,
+  MapPin,
+  Clock,
+  DollarSign,
+  Star,
+  TrendingUp,
+  Route,
+  Compass,
+  Zap,
+  Heart,
+  Shield,
+  Gift,
+  BarChart3,
+  ChevronLeft
 } from 'lucide-react'
+import { useState } from 'react'
 
 export interface Destination {
   id: string
@@ -71,6 +86,7 @@ export const PanelIzquierdoConstructorItinerario = ({
   isWizard = false
 }: PanelIzquierdoConstructorItinerarioProps) => {
   const router = useRouter()
+  const [showStatsDrawer, setShowStatsDrawer] = useState(false)
 
   const handleFinishItinerario = () => {
     if (isWizard && onContinue) {
@@ -103,46 +119,89 @@ export const PanelIzquierdoConstructorItinerario = ({
   )
 
   return (
-    <div className="h-full space-y-6 bg-white rounded-lg p-6">
-      {/* Header del itinerario */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Cree el itinerario de su viaje</h2>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Users className="w-4 h-4" />
-            <span>2 Adultos</span>
-          </div>
-        </div>
+    <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 via-white to-purple-50 rounded-2xl border border-blue-100 shadow-lg overflow-hidden">
+      {/* Header del itinerario con diseño mejorado */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 text-white p-6 flex-shrink-0">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
         
-        {/* Fechas del viaje */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">
-              {startDate} {'>'} {endDate}
-            </span>
-            <span className="text-sm text-gray-500">{totalNights} Noches</span>
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <Route className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">Constructor de Itinerario</h2>
+                <p className="text-white/90 text-sm">Diseña tu viaje perfecto paso a paso</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 text-sm">
+              <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-full backdrop-blur-sm">
+                <Users className="w-4 h-4" />
+                <span>2 Adultos</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="p-2">
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" className="p-2">
-              <RotateCcw className="w-4 h-4" />
-            </Button>
+          
+          {/* Fechas del viaje con diseño mejorado */}
+          <div className="flex items-center justify-between bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-white/90" />
+                <span className="text-lg font-semibold">
+                  {startDate} {'→'} {endDate}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm font-medium">{totalNights} Noches</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" className="p-2 text-white/80 hover:text-white hover:bg-white/20">
+                <Edit className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="p-2 text-white/80 hover:text-white hover:bg-white/20">
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Lista de destinos */}
-      <div className="space-y-4">
+      {/* Botón compacto para estadísticas */}
+      <div className="p-4 flex-shrink-0">
+        <Button 
+          onClick={() => setShowStatsDrawer(true)}
+          variant="outline" 
+          className="w-full bg-white/80 hover:bg-white border-blue-200 text-blue-700 hover:text-blue-800 shadow-sm"
+        >
+          <BarChart3 className="w-4 h-4 mr-2" />
+          Ver Estadísticas del Viaje
+        </Button>
+      </div>
+
+      {/* Lista de destinos con diseño mejorado */}
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Compass className="w-5 h-5 text-primary" />
+            Ruta del Viaje
+          </h3>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            {destinations.length} destinos configurados
+          </Badge>
+        </div>
+
         {destinations.map((destination, index) => (
           <div key={destination.id} className="relative">
-            {/* Línea conectora */}
+            {/* Línea conectora mejorada */}
             {index > 0 && (
-              <div className="absolute left-6 top-0 w-0.5 h-8 bg-gray-300 border-l-2 border-dashed border-gray-400">
+              <div className="absolute left-8 top-0 w-1 h-12 bg-gradient-to-b from-blue-400 to-purple-400">
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <div className="flex items-center space-x-2 bg-white px-2 py-1 rounded-full shadow-sm">
-                    <Plane className="w-3 h-3 text-blue-600" />
+                  <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-lg border border-blue-200">
+                    <Plane className="w-4 h-4 text-blue-600" />
                     <Switch 
                       checked={destination.transportIncluded} 
                       onCheckedChange={(checked) => updateDestination(destination.id, { transportIncluded: checked })}
@@ -153,98 +212,115 @@ export const PanelIzquierdoConstructorItinerario = ({
               </div>
             )}
 
-            {/* Tarjeta del destino */}
-            <Card className="relative border border-gray-200 shadow-sm">
-              <CardContent className="p-4">
+            {/* Tarjeta del destino mejorada */}
+            <Card className="relative border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/30">
+              <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  {/* Badge numerado */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                    destination.type === 'start' ? 'bg-blue-500' : 
-                    destination.type === 'end' ? 'bg-pink-500' : 'bg-purple-500'
+                  {/* Badge numerado mejorado */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                    destination.type === 'start' ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 
+                    destination.type === 'end' ? 'bg-gradient-to-br from-pink-500 to-pink-600' : 
+                    'bg-gradient-to-br from-purple-500 to-purple-600'
                   }`}>
                     {destination.type === 'start' ? '1' : 
                      destination.type === 'end' ? '2' : index + 1}
                   </div>
 
                   {/* Contenido del destino */}
-                  <div className="flex-1 space-y-3">
+                  <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900">{destination.name}</h3>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{destination.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {destination.startDate} {'→'} {destination.endDate}
+                        </p>
+                      </div>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="p-1 text-red-500 hover:text-red-700"
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50"
                         onClick={() => removeDestination(destination.id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
 
-                    {/* Fechas del destino */}
-                    <p className="text-sm text-gray-600">
-                      {destination.startDate} {'>'} {destination.endDate}
-                    </p>
-
-                    {/* Controles de transporte y alojamiento */}
-                    <div className="space-y-3">
+                    {/* Controles de transporte y alojamiento mejorados */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Transporte */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Plane className="w-4 h-4 text-blue-600" />
+                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Plane className="w-5 h-5 text-blue-600" />
+                            <span className="font-medium text-blue-800">Transporte Incluido</span>
+                          </div>
+                          <Switch 
+                            checked={destination.transportIncluded} 
+                            onCheckedChange={(checked) => updateDestination(destination.id, { transportIncluded: checked })}
+                          />
                         </div>
-                        <Switch 
-                          checked={destination.transportIncluded} 
-                          onCheckedChange={(checked) => updateDestination(destination.id, { transportIncluded: checked })}
-                        />
+                        {destination.transportIncluded && (
+                          <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                            ✓ Transporte configurado para este destino
+                          </div>
+                        )}
                       </div>
 
                       {/* Alojamiento */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Hotel className="w-4 h-4 text-green-600" />
-                          <span className="text-sm text-gray-700">Alojamiento incluido</span>
-                        </div>
-                        <Switch 
-                          checked={destination.accommodationIncluded} 
-                          onCheckedChange={(checked) => updateDestination(destination.id, { accommodationIncluded: checked })}
-                        />
-                      </div>
-
-                      {/* Selector de noches */}
-                      {destination.accommodationIncluded && (
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm text-gray-700">Noches</span>
-                          <div className="flex items-center space-x-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-8 h-8 p-0"
-                              onClick={() => {
-                                const currentNights = destination.nights || 1
-                                if (currentNights > 1) {
-                                  updateDestination(destination.id, { nights: currentNights - 1 })
-                                }
-                              }}
-                            >
-                              -
-                            </Button>
-                            <span className="w-8 text-center text-sm font-medium">
-                              {destination.nights || 1}
-                            </span>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-8 h-8 p-0"
-                              onClick={() => {
-                                const currentNights = destination.nights || 1
-                                updateDestination(destination.id, { nights: currentNights + 1 })
-                              }}
-                            >
-                              +
-                            </Button>
+                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Hotel className="w-5 h-5 text-green-600" />
+                            <span className="font-medium text-green-800">Alojamiento</span>
                           </div>
+                          <Switch 
+                            checked={destination.accommodationIncluded} 
+                            onCheckedChange={(checked) => updateDestination(destination.id, { accommodationIncluded: checked })}
+                          />
                         </div>
-                      )}
+                        
+                        {destination.accommodationIncluded && (
+                          <div className="space-y-3">
+                            <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                              ✓ Alojamiento incluido
+                            </div>
+                            
+                            {/* Selector de noches mejorado */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-green-700">Noches:</span>
+                              <div className="flex items-center space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="w-8 h-8 p-0 border-green-300 text-green-600 hover:bg-green-100"
+                                  onClick={() => {
+                                    const currentNights = destination.nights || 1
+                                    if (currentNights > 1) {
+                                      updateDestination(destination.id, { nights: currentNights - 1 })
+                                    }
+                                  }}
+                                >
+                                  -
+                                </Button>
+                                <span className="w-8 text-center text-sm font-bold text-green-700">
+                                  {destination.nights || 1}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="w-8 h-8 p-0 border-green-300 text-green-600 hover:bg-green-100"
+                                  onClick={() => {
+                                    const currentNights = destination.nights || 1
+                                    updateDestination(destination.id, { nights: currentNights + 1 })
+                                  }}
+                                >
+                                  +
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -256,24 +332,32 @@ export const PanelIzquierdoConstructorItinerario = ({
         {/* Línea conectora para el próximo destino */}
         {destinations.length > 0 && availableDestinations.length > 0 && (
           <div className="relative">
-            <div className="absolute left-6 top-0 w-0.5 h-8 bg-gray-300 border-l-2 border-dashed border-gray-400">
+            <div className="absolute left-8 top-0 w-1 h-12 bg-gradient-to-b from-blue-400 to-purple-400">
               <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="flex items-center space-x-2 bg-white px-2 py-1 rounded-full shadow-sm">
-                  <Plane className="w-3 h-3 text-blue-600" />
+                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-lg border border-blue-200">
+                  <Plane className="w-4 h-4 text-blue-600" />
                   <Switch defaultChecked className="scale-75" />
                 </div>
               </div>
             </div>
 
-            {/* Campo para agregar próximo destino */}
-            <Card className="relative border border-gray-200 shadow-sm">
-              <CardContent className="p-4">
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">¿Tu próximo destino?</h4>
+            {/* Campo para agregar próximo destino mejorado */}
+            <Card className="relative border-2 border-dashed border-blue-300 bg-blue-50/50 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Plus className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-blue-800">¿Tu próximo destino?</h4>
+                      <p className="text-sm text-blue-600">Agrega más destinos a tu itinerario</p>
+                    </div>
+                  </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <Select value={newDestination} onValueChange={setNewDestination}>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white border-blue-200">
                         <SelectValue placeholder="Selecciona un destino" />
                       </SelectTrigger>
                       <SelectContent>
@@ -289,34 +373,36 @@ export const PanelIzquierdoConstructorItinerario = ({
                     </Select>
 
                     {newDestination && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900">{newDestination}</span>
-                          <span className="text-xs text-gray-500">🇵🇪</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">sáb. 13 sept 2025 - Fin</span>
+                      <div className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <MapPin className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-900">{newDestination}</span>
+                              <p className="text-xs text-gray-500">sáb. 13 sept 2025 - Fin</p>
+                            </div>
+                          </div>
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="p-1"
+                            className="p-1 text-gray-400 hover:text-gray-600"
                             onClick={() => setNewDestination('')}
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-4 h-4" />
                           </Button>
                         </div>
-                      </div>
-                    )}
 
-                    {newDestination && (
-                      <Button 
-                        onClick={addDestination}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                        size="sm"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Agregar Destino
-                      </Button>
+                        <Button 
+                          onClick={addDestination}
+                          className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2"
+                          size="sm"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Agregar Destino
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -327,22 +413,181 @@ export const PanelIzquierdoConstructorItinerario = ({
 
         {/* Mensaje cuando no hay más destinos disponibles */}
         {availableDestinations.length === 0 && destinations.length > 0 && (
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Todos los destinos disponibles han sido agregados</p>
-          </div>
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Compass className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h4 className="text-lg font-semibold text-yellow-800 mb-2">¡Itinerario Completo!</h4>
+              <p className="text-sm text-yellow-700">Todos los destinos disponibles han sido agregados a tu viaje</p>
+            </CardContent>
+          </Card>
         )}
       </div>
 
-      {/* Botón continuar */}
-      <div className="pt-4">
+      {/* Botón continuar mejorado */}
+      <div className="px-6 pb-6 pt-4 flex-shrink-0">
         <Button 
           onClick={handleFinishItinerario}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3"
+          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
           disabled={destinations.length < 2}
         >
-          Continuar
+          <Route className="w-5 h-5 mr-2" />
+          {destinations.length < 2 ? 'Agrega al menos 2 destinos' : 'Continuar con el Itinerario'}
         </Button>
+        
+        {destinations.length < 2 && (
+          <p className="text-center text-sm text-gray-500 mt-2">
+            Necesitas configurar al menos 2 destinos para continuar
+          </p>
+        )}
       </div>
+
+      {/* Drawer de Estadísticas */}
+      {showStatsDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowStatsDrawer(false)}
+          />
+          
+          {/* Drawer */}
+          <div className="absolute right-0 top-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out">
+            {/* Header del drawer */}
+            <div className="bg-gradient-to-r from-primary to-primary/80 text-white p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold">Estadísticas del Viaje</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2 text-white/80 hover:text-white hover:bg-white/20"
+                  onClick={() => setShowStatsDrawer(false)}
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Contenido del drawer */}
+            <div className="p-6 space-y-6 overflow-y-auto h-full">
+              {/* Estadísticas del viaje */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <MapPin className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-2xl font-bold text-blue-700">{destinations.length}</div>
+                    <div className="text-xs text-blue-600">Destinos</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Clock className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-2xl font-bold text-green-700">{totalNights}</div>
+                    <div className="text-xs text-green-600">Noches</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Plane className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {destinations.filter(d => d.transportIncluded).length}
+                    </div>
+                    <div className="text-xs text-purple-600">Transportes</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Hotel className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-2xl font-bold text-orange-700">
+                      {destinations.filter(d => d.accommodationIncluded).length}
+                    </div>
+                    <div className="text-xs text-orange-600">Alojamientos</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Resumen del viaje */}
+              {destinations.length > 0 && (
+                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-white" />
+                      </div>
+                      <h4 className="text-lg font-semibold text-purple-800">Resumen del Viaje</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-700">{destinations.length}</div>
+                        <div className="text-xs text-purple-600">Destinos</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-700">{totalNights}</div>
+                        <div className="text-xs text-blue-600">Noches</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-700">
+                          {destinations.filter(d => d.transportIncluded).length}
+                        </div>
+                        <div className="text-xs text-green-600">Transportes</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-700">
+                          {destinations.filter(d => d.accommodationIncluded).length}
+                        </div>
+                        <div className="text-xs text-orange-600">Alojamientos</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Información adicional */}
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-blue-800">Progreso del Itinerario</h4>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Destinos configurados</span>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                        {destinations.length}/10
+                      </Badge>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${(destinations.length / 10) * 100}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center">
+                      {destinations.length < 2 ? 'Agrega más destinos para continuar' : '¡Itinerario listo para continuar!'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
