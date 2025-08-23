@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { 
   Search, 
   Filter,
@@ -95,6 +96,50 @@ export default function ListaHotelesPage() {
   const [modalDetalle, setModalDetalle] = useState(false)
   const [modalEditar, setModalEditar] = useState(false)
   const [modalEliminar, setModalEliminar] = useState(false)
+  const [isCallDrawerOpen, setIsCallDrawerOpen] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState('+51 ')
+
+  // Función para agregar un número al marcador
+  const handleAddNumber = (digit: string) => {
+    setPhoneNumber(prev => prev + digit);
+  };
+
+  // Función para eliminar el último número
+  const handleDeleteNumber = () => {
+    setPhoneNumber(prev => {
+      if (prev.length <= 4) return '+51 '; // Mantener el prefijo mínimo
+      return prev.slice(0, -1);
+    });
+  };
+
+  // Función para limpiar todo el número
+  const handleClearNumber = () => {
+    setPhoneNumber('+51 ');
+  };
+
+  // Resetear número cuando se abre el drawer
+  useEffect(() => {
+    if (isCallDrawerOpen) {
+      setPhoneNumber('+51 ');
+    }
+  }, [isCallDrawerOpen]);
+
+  // Función para iniciar llamada telefónica
+  const handleCall = (phoneNumberToCall: string) => {
+    try {
+      // En dispositivos móviles, esto abrirá la app de teléfono
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = `tel:${phoneNumberToCall}`;
+      } else {
+        // Para desktop, copiar al portapapeles sin mostrar alertas
+        navigator.clipboard.writeText(phoneNumberToCall);
+        // Opcional: mostrar un toast o notificación sutil
+        console.log(`Número ${phoneNumberToCall} copiado al portapapeles`);
+      }
+    } catch (error) {
+      console.log('Error al procesar la llamada:', error);
+    }
+  };
 
   useEffect(() => {
     // Simular carga de datos de hoteles
@@ -345,27 +390,32 @@ export default function ListaHotelesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Gestión de Hoteles</h1>
-            <p className="text-muted-foreground">Administra todos los hoteles del sistema</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filtros
-            </Button>
-            <Button>
-              <Search className="w-4 h-4 mr-2" />
-              Buscar
-            </Button>
-            
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="text-center lg:text-left mb-6 lg:mb-0">
+              <h1 className="text-4xl font-bold mb-4">Gestión de Hoteles</h1>
+              <p className="text-xl text-primary-foreground/90">
+                Administra todos los hoteles del sistema
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                <Filter className="w-4 h-4 mr-2" />
+                Filtros
+              </Button>
+              <Button className="bg-white hover:bg-gray-100 text-primary border-0 px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200">
+                <Plus className="w-5 h-5 mr-2" />
+                Agregar Hotel
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8">
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-6">
           <Card>
@@ -469,352 +519,443 @@ export default function ListaHotelesPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      {/* Contenido Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar de Filtros */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Filter className="w-5 h-5 text-primary" />
-                <span>Filtros</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Categoría */}
-              <div>
-                <h3 className="font-medium mb-2">Categoría</h3>
-                <div className="space-y-2">
-                  {['todos', '3', '4', '5'].map((categoria) => (
-                    <label key={categoria} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="categoria"
-                        value={categoria}
-                        checked={filtros.categoria === categoria}
-                        onChange={(e) => setFiltros({...filtros, categoria: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm">
-                        {categoria === 'todos' ? 'Todas las categorías' : `${categoria} Estrellas`}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Ciudad */}
-              <div>
-                <h3 className="font-medium mb-2">Ciudad</h3>
-                <div className="space-y-2">
-                  {['todos', 'Lima', 'Cusco', 'Paracas', 'Arequipa', 'Iquitos'].map((ciudad) => (
-                    <label key={ciudad} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="ciudad"
-                        value={ciudad}
-                        checked={filtros.ciudad === ciudad}
-                        onChange={(e) => setFiltros({...filtros, ciudad: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm">{ciudad}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Estado */}
-              <div>
-                <h3 className="font-medium mb-2">Estado</h3>
-                <div className="space-y-2">
-                  {['todos', 'activo', 'inactivo', 'mantenimiento'].map((estado) => (
-                    <label key={estado} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="estado"
-                        value={estado}
-                        checked={filtros.estado === estado}
-                        onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm capitalize">{estado}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Precio */}
-              <div>
-                <h3 className="font-medium mb-2">Rango de Precio</h3>
-                <div className="space-y-2">
-                  {['todos', 'economico', 'medio', 'lujo'].map((precio) => (
-                    <label key={precio} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="precio"
-                        value={precio}
-                        checked={filtros.precio === precio}
-                        onChange={(e) => setFiltros({...filtros, precio: e.target.value})}
-                        className="text-primary"
-                      />
-                      <span className="text-sm capitalize">{precio}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Lista de Hoteles */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Hoteles ({hotelesFiltrados.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {hotelesFiltrados.map((hotel) => (
-                  <div key={hotel.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-4">
-                      {/* Imagen del Hotel */}
-                      <div className="relative w-24 h-24 flex-shrink-0">
-                        <img
-                          src={hotel.imagenes[0]}
-                          alt={hotel.nombre}
-                          className="w-full h-full object-cover rounded-lg"
+        {/* Contenido Principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar de Filtros */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Filter className="w-5 h-5 text-primary" />
+                  <span>Filtros</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Categoría */}
+                <div>
+                  <h3 className="font-medium mb-2">Categoría</h3>
+                  <div className="space-y-2">
+                    {['todos', '3', '4', '5'].map((categoria) => (
+                      <label key={categoria} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="categoria"
+                          value={categoria}
+                          checked={filtros.categoria === categoria}
+                          onChange={(e) => setFiltros({...filtros, categoria: e.target.value})}
+                          className="text-primary"
                         />
-                        <div className="absolute top-2 right-2">
-                          {renderEstado(hotel.estado)}
-                        </div>
-                      </div>
-
-                      {/* Información Principal */}
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-foreground text-lg">{hotel.nombre}</h3>
-                            <p className="text-sm text-muted-foreground">{hotel.cadena}</p>
-                            <div className="flex items-center space-x-4 mt-1">
-                              {renderCategoria(hotel.categoria)}
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span className="text-sm text-muted-foreground">{hotel.calificacion}</span>
-                                <span className="text-xs text-muted-foreground">({hotel.reseñas})</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Detalles del Hotel */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                              <MapPin className="w-4 h-4" />
-                              <span>{hotel.ciudad}, {hotel.pais}</span>
-                            </div>
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center space-x-1">
-                                <Users className="w-4 h-4" />
-                                <span>{hotel.habitaciones.disponibles} disponibles</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <Clock className="w-4 h-4" />
-                                <span>Check-in: {hotel.politicas.checkIn}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm text-muted-foreground">Precios desde:</span>
-                              <span className="font-medium text-foreground">
-                                {hotel.precios.moneda} {hotel.precios.simple}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div className="flex flex-wrap gap-1">
-                              {hotel.servicios.slice(0, 4).map((servicio, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {servicio}
-                                </Badge>
-                              ))}
-                              {hotel.servicios.length > 4 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{hotel.servicios.length - 4} más
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              Última actualización: {hotel.ultimaActualizacion}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Acciones */}
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleVerDetalle(hotel)}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              Ver Detalle
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditar(hotel)}
-                            >
-                              <Edit className="w-4 h-4 mr-2" />
-                              Editar
-                            </Button>
-                          </div>
-
-                          
-                        </div>
-                      </div>
-                    </div>
+                        <span className="text-sm">
+                          {categoria === 'todos' ? 'Todas las categorías' : `${categoria} Estrellas`}
+                        </span>
+                      </label>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+
+                <Separator />
+
+                {/* Ciudad */}
+                <div>
+                  <h3 className="font-medium mb-2">Ciudad</h3>
+                  <div className="space-y-2">
+                    {['todos', 'Lima', 'Cusco', 'Paracas', 'Arequipa', 'Iquitos'].map((ciudad) => (
+                      <label key={ciudad} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="ciudad"
+                          value={ciudad}
+                          checked={filtros.ciudad === ciudad}
+                          onChange={(e) => setFiltros({...filtros, ciudad: e.target.value})}
+                          className="text-primary"
+                        />
+                        <span className="text-sm">{ciudad}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Estado */}
+                <div>
+                  <h3 className="font-medium mb-2">Estado</h3>
+                  <div className="space-y-2">
+                    {['todos', 'activo', 'inactivo', 'mantenimiento'].map((estado) => (
+                      <label key={estado} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="estado"
+                          value={estado}
+                          checked={filtros.estado === estado}
+                          onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
+                          className="text-primary"
+                        />
+                        <span className="text-sm capitalize">{estado}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Precio */}
+                <div>
+                  <h3 className="font-medium mb-2">Rango de Precio</h3>
+                  <div className="space-y-2">
+                    {['todos', 'economico', 'medio', 'lujo'].map((precio) => (
+                      <label key={precio} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="precio"
+                          value={precio}
+                          checked={filtros.precio === precio}
+                          onChange={(e) => setFiltros({...filtros, precio: e.target.value})}
+                          className="text-primary"
+                        />
+                        <span className="text-sm capitalize">{precio}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lista de Hoteles */}
+          <div className="lg:col-span-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Hoteles ({hotelesFiltrados.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {hotelesFiltrados.map((hotel) => (
+                    <Card key={hotel.id} className="overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          {/* Información del Hotel */}
+                          <div className="lg:col-span-2">
+                            <div className="flex items-start space-x-4">
+                              {/* Imagen */}
+                              <div className="relative">
+                                <img
+                                  src={hotel.imagenes[0]}
+                                  alt={hotel.nombre}
+                                  className="w-32 h-24 object-cover rounded-lg"
+                                />
+                                {hotel.habitaciones.disponibles <= 3 && (
+                                  <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs">
+                                    Solo queda {hotel.habitaciones.disponibles}
+                                  </Badge>
+                                )}
+                              </div>
+
+                              {/* Detalles */}
+                              <div className="flex-1">
+                                <div className="flex items-start justify-between mb-2">
+                                  <h3 className="text-lg font-semibold">{hotel.nombre}</h3>
+                                  <Badge variant="secondary" className="capitalize">
+                                    {hotel.cadena}
+                                  </Badge>
+                                </div>
+
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground">
+                                    {hotel.ciudad}, {hotel.pais}. {hotel.direccion}
+                                  </span>
+                                  <Button variant="ghost" size="sm" className="text-primary p-0 h-auto">
+                                    Ver en mapa
+                                  </Button>
+                                </div>
+
+                                <div className="flex items-center space-x-4 mb-3">
+                                  <div className="flex items-center space-x-1">
+                                    {renderCategoria(hotel.categoria)}
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                    <span className="text-sm text-muted-foreground">{hotel.calificacion}/10</span>
+                                    <span className="text-xs text-muted-foreground">({hotel.reseñas} reseñas)</span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Wifi className="w-4 h-4 text-green-600" />
+                                    <Car className="w-4 h-4 text-blue-600" />
+                                    <Utensils className="w-4 h-4 text-orange-600" />
+                                    <Building className="w-4 h-4 text-purple-600" />
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center space-x-2 mb-3">
+                                  <span className="text-sm text-muted-foreground">
+                                    {hotel.habitaciones.total} habitaciones totales
+                                  </span>
+                                </div>
+
+                                {/* Información de Habitaciones */}
+                                <div className="bg-muted/30 rounded-lg p-3 mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <Building className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium">
+                                      {hotel.habitaciones.disponibles} disponibles • {hotel.habitaciones.ocupadas} ocupadas
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Características */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="text-sm text-green-700">Check-in: {hotel.politicas.checkIn}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="text-sm text-green-700">Check-out: {hotel.politicas.checkOut}</span>
+                                  </div>
+                                  {hotel.politicas.mascotas && (
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                      <span className="text-sm text-green-700">Acepta mascotas</span>
+                                    </div>
+                                  )}
+                                  <div className="text-xs text-muted-foreground">
+                                    Última actualización: {hotel.ultimaActualizacion}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Resumen de Precios */}
+                          <div className="lg:col-span-1">
+                            <div className="bg-muted/30 rounded-lg p-4">
+                              <div className="text-center mb-4">
+                                <div className="text-sm text-muted-foreground">
+                                  Tarifas por noche
+                                </div>
+                                <div className="text-sm text-muted-foreground">Precio desde</div>
+                                <div className="flex items-center justify-center space-x-1">
+                                  <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                  <div className="text-2xl font-bold text-primary">{hotel.precios.moneda} {hotel.precios.simple}</div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2 mb-4">
+                                <div className="flex justify-between text-sm">
+                                  <span>Doble:</span>
+                                  <span>{hotel.precios.moneda} {hotel.precios.doble}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Suite:</span>
+                                  <span>{hotel.precios.moneda} {hotel.precios.suite}</span>
+                                </div>
+                                <div className="text-xs text-muted-foreground text-center">
+                                  Precios por noche, impuestos no incluidos
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Button
+                                  className="w-full bg-primary hover:bg-primary/90"
+                                  onClick={() => handleVerDetalle(hotel)}
+                                >
+                                  Ver detalle
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
+                                  onClick={() => handleEditar(hotel)}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Editar Hotel
+                                </Button>
+                                <div className="flex items-center justify-center space-x-2 text-sm">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  <span className="text-muted-foreground">Estado:</span>
+                                  <span className="font-medium capitalize">{hotel.estado}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
       {/* Modal de Detalle */}
       {modalDetalle && hotelSeleccionado && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg max-w-4xl w-full max-h-[95vh] overflow-y-auto">
-            <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground">Detalle del Hotel</h2>
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-primary">{hotelSeleccionado.nombre}</h2>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setModalDetalle(false)}
+                className="hover:bg-gray-100"
               >
                 <XCircle className="w-6 h-6" />
               </Button>
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Columna 1: Información General */}
+                {/* Columna Izquierda - Información del Hotel */}
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Información General</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Nombre</label>
-                        <p className="font-medium">{hotelSeleccionado.nombre}</p>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Información del Hotel</h3>
+
+                    {/* Imagen Principal */}
+                    <div className="relative mb-4">
+                      <img
+                        src={hotelSeleccionado.imagenes[0]}
+                        alt={hotelSeleccionado.nombre}
+                        className="w-full h-64 object-cover rounded-lg"
+                      />
+                      {hotelSeleccionado.habitaciones.disponibles <= 3 && (
+                        <Badge className="absolute top-4 right-4 bg-red-500 text-white">
+                          Solo queda {hotelSeleccionado.habitaciones.disponibles}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Detalles del Hotel */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="w-5 h-5 text-primary" />
+                          <span className="font-medium">{hotelSeleccionado.ciudad}, {hotelSeleccionado.pais}</span>
+                        </div>
+                        <Badge variant="secondary" className="capitalize">
+                          {hotelSeleccionado.cadena}
+                        </Badge>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Cadena</label>
-                        <p className="font-medium">{hotelSeleccionado.cadena}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Categoría</label>
+
+                      <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">
                           {renderCategoria(hotelSeleccionado.categoria)}
                         </div>
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <span className="text-sm text-muted-foreground">{hotelSeleccionado.calificacion}/10</span>
+                          <span className="text-xs text-muted-foreground">({hotelSeleccionado.reseñas} reseñas)</span>
+                        </div>
                       </div>
+
+                      <div className="text-sm text-muted-foreground">
+                        {hotelSeleccionado.direccion}
+                      </div>
+
+                      {/* Servicios */}
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Dirección</label>
-                        <p className="font-medium">{hotelSeleccionado.direccion}</p>
-                        <p className="text-sm text-muted-foreground">{hotelSeleccionado.ciudad}, {hotelSeleccionado.pais}</p>
+                        <h4 className="font-medium mb-2">Servicios Incluidos</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          {hotelSeleccionado.servicios.slice(0, 6).map((servicio, index) => (
+                            <div key={index} className="flex items-center space-x-2 text-sm">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span>{servicio}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Contacto */}
+                  {/* Información de Contacto */}
                   <div>
-                    <h4 className="font-medium mb-3">Información de Contacto</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Información de Contacto</h3>
+                    <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Teléfono:</span>
                         <span>{hotelSeleccionado.telefono}</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Email:</span>
                         <span>{hotelSeleccionado.email}</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Globe className="w-4 h-4 text-muted-foreground" />
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Sitio Web:</span>
                         <span>{hotelSeleccionado.sitioWeb}</span>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Políticas */}
-                  <div>
-                    <h4 className="font-medium mb-3">Políticas del Hotel</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <label className="text-muted-foreground">Check-in</label>
-                        <p className="font-medium">{hotelSeleccionado.politicas.checkIn}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Check-out</label>
-                        <p className="font-medium">{hotelSeleccionado.politicas.checkOut}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Cancelación</label>
-                        <p className="font-medium">{hotelSeleccionado.politicas.cancelacion}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Mascotas</label>
-                        <p className="font-medium">{hotelSeleccionado.politicas.mascotas ? 'Permitidas' : 'No permitidas'}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Gerente:</span>
+                        <span>{hotelSeleccionado.contacto.gerente}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Columna 2: Servicios y Precios */}
+                {/* Columna Derecha - Precios y Políticas */}
                 <div className="space-y-6">
-                  {/* Servicios */}
                   <div>
-                    <h4 className="font-medium mb-3">Servicios Disponibles</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {hotelSeleccionado.servicios.map((servicio, index) => (
-                        <div key={index} className="flex items-center space-x-2 text-sm">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-muted-foreground">{servicio}</span>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Resumen de Precios</h3>
+                    <div className="bg-muted/30 rounded-lg p-6 space-y-4">
+                      <div className="text-center">
+                        <div className="text-sm text-muted-foreground">Tarifas por noche</div>
+                        <div className="text-3xl font-bold text-primary">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.simple}</div>
+                        <div className="text-sm text-muted-foreground">desde</div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Habitación Simple:</span>
+                          <span>{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.simple}</span>
                         </div>
-                      ))}
+                        <div className="flex justify-between">
+                          <span>Habitación Doble:</span>
+                          <span className="font-semibold">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.doble}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Suite:</span>
+                          <span className="font-semibold">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.suite}</span>
+                        </div>
+                        <Separator />
+                        <div className="text-xs text-muted-foreground text-center">
+                          Precios por noche, impuestos no incluidos
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Precios */}
+                  {/* Características Especiales */}
                   <div>
-                    <h4 className="font-medium mb-3">Tarifas</h4>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Características Especiales</h3>
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <span className="text-sm">Habitación Simple</span>
-                        <span className="font-semibold">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.simple}</span>
+                      <div className="flex items-center space-x-2 p-3 bg-green-50 rounded-lg">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span className="text-green-700 font-medium">Check-in: {hotelSeleccionado.politicas.checkIn}</span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <span className="text-sm">Habitación Doble</span>
-                        <span className="font-semibold">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.doble}</span>
+                      <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <span className="text-blue-700 font-medium">Check-out: {hotelSeleccionado.politicas.checkOut}</span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <span className="text-sm">Suite</span>
-                        <span className="font-semibold">{hotelSeleccionado.precios.moneda} {hotelSeleccionado.precios.suite}</span>
+                      <div className="flex items-center space-x-2 p-3 bg-purple-50 rounded-lg">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        <span className="text-purple-700 font-medium">Cancelación: {hotelSeleccionado.politicas.cancelacion}</span>
                       </div>
+                      {hotelSeleccionado.politicas.mascotas && (
+                        <div className="flex items-center space-x-2 p-3 bg-orange-50 rounded-lg">
+                          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                          <span className="text-orange-700 font-medium">Acepta mascotas</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Habitaciones */}
+                  {/* Estado de Habitaciones */}
                   <div>
-                    <h4 className="font-medium mb-3">Estado de Habitaciones</h4>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Estado de Habitaciones</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{hotelSeleccionado.habitaciones.disponibles}</div>
@@ -833,6 +974,27 @@ export default function ListaHotelesPage() {
                         <div className="text-sm text-gray-600">Total</div>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Botones de Acción */}
+                  <div className="space-y-3">
+                    <Button 
+                      className="w-full bg-primary hover:bg-primary/90 text-white py-3 text-lg"
+                      onClick={() => setIsCallDrawerOpen(true)}
+                    >
+                      <Phone className="w-5 h-5 mr-2" />
+                      Llamar para Reservar
+                    </Button>
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg"
+                    >
+                      <Mail className="w-5 h-5 mr-2" />
+                      Enviar Consulta por Email
+                    </Button>
+                    <Button variant="outline" className="w-full py-3">
+                      <Edit className="w-5 h-5 mr-2" />
+                      Editar Hotel
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -876,6 +1038,146 @@ export default function ListaHotelesPage() {
           </div>
         </div>
       )}
+
+      {/* Drawer de Teléfono */}
+      <Drawer open={isCallDrawerOpen} onOpenChange={setIsCallDrawerOpen}>
+        <DrawerContent className="bg-slate-900 border-slate-700">
+          <div className="mx-auto w-full max-w-sm">
+            <DrawerHeader className="border-b border-slate-700">
+              <DrawerTitle className="text-center text-xl font-semibold text-white">
+                📞 Marcador Telefónico
+              </DrawerTitle>
+              <p className="text-center text-sm text-slate-300">
+                Marca el número que deseas llamar
+              </p>
+            </DrawerHeader>
+            
+            {/* Número mostrado */}
+            <div className="px-6 py-6 text-center bg-slate-800/50">
+              <div className="text-4xl font-bold text-white mb-2">
+                {phoneNumber === '+51 ' ? 'Ingresa número' : phoneNumber}
+              </div>
+              <div className="text-sm text-slate-400 font-medium">
+                {phoneNumber === '+51 ' ? 'LISTO PARA MARCAR' : 'LLAMANDO'}
+              </div>
+            </div>
+            
+            {/* Teclado numérico */}
+            <div className="px-6 py-6">
+              <div className="grid grid-cols-3 gap-5 mb-8">
+                {/* Primera fila: 1, 2, 3 */}
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('1')}
+                >
+                  1
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('2')}
+                >
+                  2
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('3')}
+                >
+                  3
+                </button>
+                
+                {/* Segunda fila: 4, 5, 6 */}
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('4')}
+                >
+                  4
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('5')}
+                >
+                  5
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('6')}
+                >
+                  6
+                </button>
+                
+                {/* Tercera fila: 7, 8, 9 */}
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('7')}
+                >
+                  7
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('8')}
+                >
+                  8
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('9')}
+                >
+                  9
+                </button>
+                
+                {/* Cuarta fila: *, 0, # */}
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('*')}
+                >
+                  *
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('0')}
+                >
+                  0
+                </button>
+                <button 
+                  className="w-18 h-18 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-3xl font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  onClick={() => handleAddNumber('#')}
+                >
+                  #
+                </button>
+              </div>
+              
+              {/* Botones de acción */}
+              <div className="flex gap-4 mb-6">
+                {/* Botón de borrar - Centrado arriba */}
+                <div className="flex justify-center mb-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="w-20 h-20 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg border-4 border-red-400/30"
+                    onClick={handleDeleteNumber}
+                    title="Borrar último número"
+                  >
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-6-2h2v-2h-2v2zm0-4h2v-2h-2v2zm-2-2v2h2v-2h-2zm-2 2h2v-2h-2v2zm0 4h2v-2h-2v2zm-2-2v2h2v-2h-2z"/>
+                    </svg>
+                  </Button>
+                </div>
+                
+                {/* Botón de llamar - Centrado */}
+                <div className="mb-4 flex px-4">
+                  <Button 
+                    className="w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border-4 border-green-400/30"
+                    onClick={() => handleCall(phoneNumber)}
+                    title="Llamar"
+                  >
+                    <Phone className="w-10 h-10" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }
