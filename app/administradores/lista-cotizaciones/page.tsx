@@ -58,7 +58,7 @@ interface SolicitudPaquete {
   cliente: string
   email: string
   telefono: string
-  tipoCliente: "A" | "B" // Tipo de cliente A o B
+  tipoCliente: "A" | "B" // Tipo de cliente A (prioritario) o B (estándar)
   destino: string
   fechaInicio: string
   fechaFin: string
@@ -69,17 +69,8 @@ interface SolicitudPaquete {
   servicios: string[]
   fechaSolicitud: string
   notas: string
-  // Precios según tipo de cliente
-  preciosClienteA: {
-    hotel: number
-    vuelos: number
-    transporte: number
-    guia: number
-    tours: number
-    actividades: number
-    total: number
-  }
-  preciosClienteB: {
+  // Precio del paquete (único para todos los clientes)
+  precio: {
     hotel: number
     vuelos: number
     transporte: number
@@ -91,8 +82,7 @@ interface SolicitudPaquete {
   // Historial de precios para detectar cambios
   historialPrecios: {
     fecha: string
-    preciosClienteA: number
-    preciosClienteB: number
+    precio: number
     cambio: "subida" | "bajada" | "sin_cambio"
   }[]
 }
@@ -115,12 +105,11 @@ const solicitudesMock: SolicitudPaquete[] = [
     servicios: ["hotel", "vuelos", "guía", "transporte"],
     fechaSolicitud: "2024-01-15",
     notas: "Familia con niños pequeños, preferencia por hoteles familiares",
-    preciosClienteA: { hotel: 1200, vuelos: 500, transporte: 300, guia: 150, tours: 0, actividades: 0, total: 2150 },
-    preciosClienteB: { hotel: 1300, vuelos: 550, transporte: 350, guia: 180, tours: 0, actividades: 0, total: 2430 },
+    precio: { hotel: 1200, vuelos: 500, transporte: 300, guia: 150, tours: 0, actividades: 0, total: 2150 },
     historialPrecios: [
-      { fecha: "2024-01-15", preciosClienteA: 2150, preciosClienteB: 2430, cambio: "sin_cambio" },
-      { fecha: "2024-01-20", preciosClienteA: 2200, preciosClienteB: 2480, cambio: "subida" },
-      { fecha: "2024-01-25", preciosClienteA: 2180, preciosClienteB: 2450, cambio: "bajada" }
+      { fecha: "2024-01-15", precio: 2150, cambio: "sin_cambio" },
+      { fecha: "2024-01-20", precio: 2200, cambio: "subida" },
+      { fecha: "2024-01-25", precio: 2180, cambio: "bajada" }
     ]
   },
   {
@@ -139,11 +128,10 @@ const solicitudesMock: SolicitudPaquete[] = [
     servicios: ["hotel", "vuelos", "tours"],
     fechaSolicitud: "2024-01-20",
     notas: "Pareja en luna de miel, buscan experiencias románticas",
-    preciosClienteA: { hotel: 1000, vuelos: 450, transporte: 250, guia: 120, tours: 200, actividades: 0, total: 2020 },
-    preciosClienteB: { hotel: 1100, vuelos: 500, transporte: 300, guia: 130, tours: 220, actividades: 0, total: 2250 },
+    precio: { hotel: 1000, vuelos: 450, transporte: 250, guia: 120, tours: 200, actividades: 0, total: 2020 },
     historialPrecios: [
-      { fecha: "2024-01-20", preciosClienteA: 2020, preciosClienteB: 2250, cambio: "sin_cambio" },
-      { fecha: "2024-01-22", preciosClienteA: 1950, preciosClienteB: 2180, cambio: "bajada" }
+      { fecha: "2024-01-20", precio: 2020, cambio: "sin_cambio" },
+      { fecha: "2024-01-22", precio: 1950, cambio: "bajada" }
     ]
   },
   {
@@ -162,11 +150,10 @@ const solicitudesMock: SolicitudPaquete[] = [
     servicios: ["hotel", "vuelos", "transporte", "guía", "actividades"],
     fechaSolicitud: "2024-01-18",
     notas: "Grupo de amigos, intereses en gastronomía y cultura",
-    preciosClienteA: { hotel: 1500, vuelos: 600, transporte: 400, guia: 200, tours: 0, actividades: 300, total: 3000 },
-    preciosClienteB: { hotel: 1600, vuelos: 650, transporte: 450, guia: 220, tours: 0, actividades: 330, total: 3250 },
+    precio: { hotel: 1500, vuelos: 600, transporte: 400, guia: 200, tours: 0, actividades: 300, total: 3000 },
     historialPrecios: [
-      { fecha: "2024-01-18", preciosClienteA: 3000, preciosClienteB: 3250, cambio: "sin_cambio" },
-      { fecha: "2024-01-23", preciosClienteA: 3100, preciosClienteB: 3350, cambio: "subida" }
+      { fecha: "2024-01-18", precio: 3000, cambio: "sin_cambio" },
+      { fecha: "2024-01-23", precio: 3100, cambio: "subida" }
     ]
   },
   {
@@ -185,11 +172,10 @@ const solicitudesMock: SolicitudPaquete[] = [
     servicios: ["hotel", "vuelos", "guía"],
     fechaSolicitud: "2024-01-22",
     notas: "Viaje de aventura, preferencia por alojamientos rústicos",
-    preciosClienteA: { hotel: 1100, vuelos: 480, transporte: 280, guia: 140, tours: 0, actividades: 0, total: 1900 },
-    preciosClienteB: { hotel: 1200, vuelos: 520, transporte: 320, guia: 150, tours: 0, actividades: 0, total: 2090 },
+    precio: { hotel: 1200, vuelos: 520, transporte: 320, guia: 150, tours: 0, actividades: 0, total: 2090 },
     historialPrecios: [
-      { fecha: "2024-01-22", preciosClienteA: 1900, preciosClienteB: 2090, cambio: "sin_cambio" },
-      { fecha: "2024-01-24", preciosClienteA: 1850, preciosClienteB: 2040, cambio: "bajada" }
+      { fecha: "2024-01-22", precio: 2090, cambio: "sin_cambio" },
+      { fecha: "2024-01-24", precio: 2040, cambio: "bajada" }
     ]
   },
   {
@@ -208,10 +194,9 @@ const solicitudesMock: SolicitudPaquete[] = [
     servicios: ["hotel", "vuelos", "transporte", "tours"],
     fechaSolicitud: "2024-01-25",
     notas: "Familia numerosa, interés en arqueología y playas",
-    preciosClienteA: { hotel: 1300, vuelos: 550, transporte: 350, guia: 180, tours: 250, actividades: 0, total: 2630 },
-    preciosClienteB: { hotel: 1400, vuelos: 600, transporte: 400, guia: 200, tours: 270, actividades: 0, total: 2870 },
+    precio: { hotel: 1300, vuelos: 550, transporte: 350, guia: 180, tours: 250, actividades: 0, total: 2630 },
     historialPrecios: [
-      { fecha: "2024-01-25", preciosClienteA: 2630, preciosClienteB: 2870, cambio: "sin_cambio" }
+      { fecha: "2024-01-25", precio: 2630, cambio: "sin_cambio" }
     ]
   }
 ]
@@ -240,8 +225,7 @@ const EditarSolicitudForm = ({
     prioridad: solicitud.prioridad,
     servicios: [...solicitud.servicios],
     notas: solicitud.notas,
-    preciosClienteA: solicitud.preciosClienteA,
-    preciosClienteB: solicitud.preciosClienteB,
+    precio: solicitud.precio,
     historialPrecios: [...solicitud.historialPrecios]
   })
 
@@ -561,100 +545,57 @@ const DetalleSolicitud = ({ solicitud }: { solicitud: SolicitudPaquete }) => {
         </Card>
       )}
 
-      {/* Precios por Tipo de Cliente */}
+      {/* Precio del Paquete */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            Precios por Tipo de Cliente
+            Precio del Paquete
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-6">
-            {/* Precios Cliente A */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="default">Tipo A</Badge>
-                <span className="text-sm font-medium">Precios Preferenciales</span>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Hotel:</span>
-                  <span className="font-medium">${solicitud.preciosClienteA.hotel}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Vuelos:</span>
-                  <span className="font-medium">${solicitud.preciosClienteA.vuelos}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Transporte:</span>
-                  <span className="font-medium">${solicitud.preciosClienteA.transporte}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Guía:</span>
-                  <span className="font-medium">${solicitud.preciosClienteA.guia}</span>
-                </div>
-                {solicitud.preciosClienteA.tours > 0 && (
-                  <div className="flex justify-between">
-                    <span>Tours:</span>
-                    <span className="font-medium">${solicitud.preciosClienteA.tours}</span>
-                  </div>
-                )}
-                {solicitud.preciosClienteA.actividades > 0 && (
-                  <div className="flex justify-between">
-                    <span>Actividades:</span>
-                    <span className="font-medium">${solicitud.preciosClienteA.actividades}</span>
-                  </div>
-                )}
-                <div className="border-t pt-2">
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total:</span>
-                    <span className="text-blue-600">${solicitud.preciosClienteA.total}</span>
-                  </div>
-                </div>
-              </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Badge variant={solicitud.tipoCliente === "A" ? "default" : "secondary"}>
+                Cliente Tipo {solicitud.tipoCliente}
+              </Badge>
+              <span className="text-sm font-medium">
+                {solicitud.tipoCliente === "A" ? "Cliente Prioritario" : "Cliente Estándar"}
+              </span>
             </div>
-
-            {/* Precios Cliente B */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">Tipo B</Badge>
-                <span className="text-sm font-medium">Precios Estándar</span>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Hotel:</span>
+                <span className="font-medium">${solicitud.precio.hotel}</span>
               </div>
-              <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Vuelos:</span>
+                <span className="font-medium">${solicitud.precio.vuelos}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Transporte:</span>
+                <span className="font-medium">${solicitud.precio.transporte}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Guía:</span>
+                <span className="font-medium">${solicitud.precio.guia}</span>
+              </div>
+              {solicitud.precio.tours > 0 && (
                 <div className="flex justify-between">
-                  <span>Hotel:</span>
-                  <span className="font-medium">${solicitud.preciosClienteB.hotel}</span>
+                  <span>Tours:</span>
+                  <span className="font-medium">${solicitud.precio.tours}</span>
                 </div>
+              )}
+              {solicitud.precio.actividades > 0 && (
                 <div className="flex justify-between">
-                  <span>Vuelos:</span>
-                  <span className="font-medium">${solicitud.preciosClienteB.vuelos}</span>
+                  <span>Actividades:</span>
+                  <span className="font-medium">${solicitud.precio.actividades}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Transporte:</span>
-                  <span className="font-medium">${solicitud.preciosClienteB.transporte}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Guía:</span>
-                  <span className="font-medium">${solicitud.preciosClienteB.guia}</span>
-                </div>
-                {solicitud.preciosClienteB.tours > 0 && (
-                  <div className="flex justify-between">
-                    <span>Tours:</span>
-                    <span className="font-medium">${solicitud.preciosClienteB.tours}</span>
-                  </div>
-                )}
-                {solicitud.preciosClienteB.actividades > 0 && (
-                  <div className="flex justify-between">
-                    <span>Actividades:</span>
-                    <span className="font-medium">${solicitud.preciosClienteB.actividades}</span>
-                  </div>
-                )}
-                <div className="border-t pt-2">
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total:</span>
-                    <span className="text-purple-600">${solicitud.preciosClienteB.total}</span>
-                  </div>
+              )}
+              <div className="border-t pt-2">
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total:</span>
+                  <span className="text-primary">${solicitud.precio.total}</span>
                 </div>
               </div>
             </div>
@@ -712,8 +653,8 @@ const detectarCambiosPrecios = (solicitud: SolicitudPaquete) => {
   
   if (ultimoPrecio.cambio === "sin_cambio") return null
   
-  const precioActual = solicitud.tipoCliente === "A" ? ultimoPrecio.preciosClienteA : ultimoPrecio.preciosClienteB
-  const precioAnterior = solicitud.tipoCliente === "A" ? penultimoPrecio.preciosClienteA : penultimoPrecio.preciosClienteB
+  const precioActual = ultimoPrecio.precio
+  const precioAnterior = penultimoPrecio.precio
   
   return {
     tipo: ultimoPrecio.cambio,
@@ -788,15 +729,11 @@ const PreciosCarousel = ({ historialPrecios }: { historialPrecios: SolicitudPaqu
   const calcularCambio = () => {
     if (!historialAnterior) return null
     
-    const cambioA = historialActual.preciosClienteA - historialAnterior.preciosClienteA
-    const cambioB = historialActual.preciosClienteB - historialAnterior.preciosClienteB
-    
-    const porcentajeA = ((cambioA / historialAnterior.preciosClienteA) * 100).toFixed(1)
-    const porcentajeB = ((cambioB / historialAnterior.preciosClienteB) * 100).toFixed(1)
+    const cambio = historialActual.precio - historialAnterior.precio
+    const porcentaje = ((cambio / historialAnterior.precio) * 100).toFixed(1)
     
     return {
-      cambioA: { cambio: cambioA, porcentaje: porcentajeA, tipo: cambioA > 0 ? "subida" : cambioA < 0 ? "bajada" : "sin_cambio" },
-      cambioB: { cambio: cambioB, porcentaje: porcentajeB, tipo: cambioB > 0 ? "subida" : cambioB < 0 ? "bajada" : "sin_cambio" }
+      cambio: { cambio, porcentaje, tipo: cambio > 0 ? "subida" : cambio < 0 ? "bajada" : "sin_cambio" }
     }
   }
   
@@ -881,19 +818,15 @@ const PreciosCarousel = ({ historialPrecios }: { historialPrecios: SolicitudPaqu
         </div>
         
         {/* Indicadores de Cambio de Precios */}
-        {cambio && (
+        {cambio && cambio.cambio.tipo !== "sin_cambio" && (
           <div className="absolute top-6 right-6">
-            <div className="flex flex-col gap-2">
-              {cambio.cambioA.tipo !== "sin_cambio" && (
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-lg ${
-                  cambio.cambioA.tipo === "subida" 
-                    ? "bg-destructive text-destructive-foreground" 
-                    : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                }`}>
-                  {cambio.cambioA.tipo === "subida" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  <span>Precios: {cambio.cambioA.tipo === "subida" ? "Subió" : "Bajó"} {cambio.cambioA.porcentaje}%</span>
-                </div>
-              )}
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-lg ${
+              cambio.cambio.tipo === "subida" 
+                ? "bg-destructive text-destructive-foreground" 
+                : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+            }`}>
+              {cambio.cambio.tipo === "subida" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+              <span>Precio: {cambio.cambio.tipo === "subida" ? "Subió" : "Bajó"} {cambio.cambio.porcentaje}%</span>
             </div>
           </div>
         )}
@@ -912,46 +845,24 @@ const PreciosCarousel = ({ historialPrecios }: { historialPrecios: SolicitudPaqu
             </div>
             
             <div className="space-y-4">
-              {/* Precio Cliente Tipo A */}
+              {/* Precio del Paquete */}
               <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="font-bold text-lg text-primary">${historialActual.preciosClienteA}</span>
-              </div>
-              
-              {/* Precio Cliente Tipo B */}
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="font-bold text-lg text-secondary">${historialActual.preciosClienteB}</span>
+                <span className="font-bold text-lg text-primary">${historialActual.precio}</span>
               </div>
               
               {/* Cambio de Precios */}
-              {cambio && (cambio.cambioA.tipo !== "sin_cambio" || cambio.cambioB.tipo !== "sin_cambio") && (
+              {cambio && cambio.cambio.tipo !== "sin_cambio" && (
                 <div className="mt-4 p-4 bg-accent/10 rounded-lg border border-accent/20">
-                  <h4 className="font-semibold text-accent-foreground mb-2">Cambios respecto a la fecha anterior:</h4>
-                  <div className="space-y-2">
-                    {cambio.cambioA.tipo !== "sin_cambio" && (
-                      <div className={`flex items-center justify-between text-sm ${
-                        cambio.cambioA.tipo === "subida" 
-                          ? "text-destructive" 
-                          : "text-green-600 dark:text-green-400"
-                      }`}>
-                        
-                        <span className="flex items-center gap-1">
-                          {cambio.cambioA.tipo === "subida" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                          {cambio.cambioA.tipo === "subida" ? "+" : ""}${Math.abs(cambio.cambioA.cambio)} ({cambio.cambioA.porcentaje}%)
-                        </span>
-                      </div>
-                    )}
-                    {cambio.cambioB.tipo !== "sin_cambio" && (
-                      <div className={`flex items-center justify-between text-sm ${
-                        cambio.cambioB.tipo === "subida" 
-                          ? "text-destructive" 
-                          : "text-green-600 dark:text-green-400"
-                      }`}>
-                        <span className="flex items-center gap-1">
-                          {cambio.cambioB.tipo === "subida" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                          {cambio.cambioB.tipo === "subida" ? "+" : ""}${Math.abs(cambio.cambioB.cambio)} ({cambio.cambioB.porcentaje}%)
-                        </span>
-                      </div>
-                    )}
+                  <h4 className="font-semibold text-accent-foreground mb-2">Cambio respecto a la fecha anterior:</h4>
+                  <div className={`flex items-center justify-between text-sm ${
+                    cambio.cambio.tipo === "subida" 
+                      ? "text-destructive" 
+                      : "text-green-600 dark:text-green-400"
+                  }`}>
+                    <span className="flex items-center gap-1">
+                      {cambio.cambio.tipo === "subida" ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                      {cambio.cambio.tipo === "subida" ? "+" : ""}${Math.abs(cambio.cambio.cambio)} ({cambio.cambio.porcentaje}%)
+                    </span>
                   </div>
                 </div>
               )}
@@ -998,10 +909,8 @@ const PreciosCarousel = ({ historialPrecios }: { historialPrecios: SolicitudPaqu
         <div className="space-y-3">
           {historialPrecios.slice(1).map((historial, index) => {
             const historialPrevio = historialPrecios[index]
-            const cambioA = historial.preciosClienteA - historialPrevio.preciosClienteA
-            const cambioB = historial.preciosClienteB - historialPrevio.preciosClienteB
-            const porcentajeA = ((cambioA / historialPrevio.preciosClienteA) * 100).toFixed(1)
-            const porcentajeB = ((cambioB / historialPrevio.preciosClienteB) * 100).toFixed(1)
+            const cambio = historial.precio - historialPrevio.precio
+            const porcentaje = ((cambio / historialPrevio.precio) * 100).toFixed(1)
             
             return (
               <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-xl border border-border">
@@ -1013,32 +922,18 @@ const PreciosCarousel = ({ historialPrecios }: { historialPrecios: SolicitudPaqu
                     {new Date(historialPrevio.fecha).toLocaleDateString('es-ES')} → {new Date(historial.fecha).toLocaleDateString('es-ES')}
                   </span>
                 </div>
-                <div className="flex gap-4">
-                  {cambioA !== 0 && (
-                    <div className={`px-3 py-2 rounded-lg text-sm font-semibold ${
-                      cambioA > 0 
-                        ? "bg-destructive/10 text-destructive border border-destructive/20" 
-                        : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-700"
-                    }`}>
-                      <div className="flex items-center gap-2">
-                        {cambioA > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                        <span>Tipo A: {cambioA > 0 ? "Subió" : "Bajó"} {porcentajeA}%</span>
-                      </div>
+                {cambio !== 0 && (
+                  <div className={`px-3 py-2 rounded-lg text-sm font-semibold ${
+                    cambio > 0 
+                      ? "bg-destructive/10 text-destructive border border-destructive/20" 
+                      : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-700"
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      {cambio > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                      <span>Precio: {cambio > 0 ? "Subió" : "Bajó"} {porcentaje}%</span>
                     </div>
-                  )}
-                  {cambioB !== 0 && (
-                    <div className={`px-3 py-2 rounded-lg text-sm font-semibold ${
-                      cambioB > 0 
-                        ? "bg-destructive/10 text-destructive border border-destructive/20" 
-                        : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-700"
-                    }`}>
-                      <div className="flex items-center gap-2">
-                        {cambioB > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                        <span>Tipo B: {cambioB > 0 ? "Subió" : "Bajó"} {porcentajeB}%</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -1087,14 +982,9 @@ export default function SolicitudesPaquetesPage() {
     // Nuevas estadísticas de precios
     clientesTipoA: solicitudes.filter(s => s.tipoCliente === "A").length,
     clientesTipoB: solicitudes.filter(s => s.tipoCliente === "B").length,
-    precioPromedioA: solicitudes
-      .filter(s => s.tipoCliente === "A")
-      .reduce((sum, s) => sum + s.preciosClienteA.total, 0) / 
-      Math.max(solicitudes.filter(s => s.tipoCliente === "A").length, 1),
-    precioPromedioB: solicitudes
-      .filter(s => s.tipoCliente === "B")
-      .reduce((sum, s) => sum + s.preciosClienteB.total, 0) / 
-      Math.max(solicitudes.filter(s => s.tipoCliente === "B").length, 1),
+    precioPromedio: solicitudes
+      .reduce((sum, s) => sum + s.precio.total, 0) / 
+      Math.max(solicitudes.length, 1),
     cambiosPrecios: solicitudes.filter(s => 
       s.historialPrecios.some(h => h.cambio !== "sin_cambio")
     ).length
@@ -1124,7 +1014,7 @@ export default function SolicitudesPaquetesPage() {
 
   // Función para ver detalle
   const handleVerDetalle = (solicitud: SolicitudPaquete) => {
-    setVerDetalle(solicitud)
+    setVerDetalleCliente(solicitud)
   }
 
   // Función para eliminar solicitud
@@ -1288,12 +1178,12 @@ export default function SolicitudesPaquetesPage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Precio Promedio A</CardTitle>
+            <CardTitle className="text-sm font-medium">Precio Promedio</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              ${estadisticas.precioPromedioA.toFixed(0)}
+            <div className="text-2xl font-bold text-primary">
+              ${estadisticas.precioPromedio.toFixed(0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Promedio por solicitud
@@ -1396,9 +1286,8 @@ export default function SolicitudesPaquetesPage() {
                   <TableHead>Destino</TableHead>
                   <TableHead>Fechas</TableHead>
                   <TableHead>Personas</TableHead>
-                  <TableHead>Precio Cliente A</TableHead>
-                  <TableHead>Precio Cliente B</TableHead>
-                  <TableHead>Precio Actual</TableHead>
+                  <TableHead>Precio del Paquete</TableHead>
+                  <TableHead>Cambios</TableHead>
                   <TableHead>Cambios</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>Prioridad</TableHead>
@@ -1409,9 +1298,6 @@ export default function SolicitudesPaquetesPage() {
               <TableBody>
                 {solicitudesFiltradas.map((solicitud) => {
                   const cambioPrecio = detectarCambiosPrecios(solicitud)
-                  const precioActual = solicitud.tipoCliente === "A" 
-                    ? solicitud.preciosClienteA.total 
-                    : solicitud.preciosClienteB.total
                   
                   return (
                     <TableRow key={solicitud.id}>
@@ -1458,27 +1344,9 @@ export default function SolicitudesPaquetesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <div className="font-medium">${solicitud.preciosClienteA.total.toLocaleString('en-US')}</div>
+                          <div className="font-medium">${solicitud.precio.total.toLocaleString('en-US')}</div>
                           <div className="text-muted-foreground text-xs">
-                            Hotel: ${solicitud.preciosClienteA.hotel} | Vuelos: ${solicitud.preciosClienteA.vuelos}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div className="font-medium">${solicitud.preciosClienteB.total.toLocaleString('en-US')}</div>
-                          <div className="text-muted-foreground text-xs">
-                            Hotel: ${solicitud.preciosClienteB.hotel} | Vuelos: ${solicitud.preciosClienteB.vuelos}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div className={`font-medium ${solicitud.tipoCliente === "A" ? "text-blue-600" : "text-purple-600"}`}>
-                            ${precioActual.toLocaleString('en-US')}
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Precio para Tipo {solicitud.tipoCliente}
+                            Hotel: ${solicitud.precio.hotel} | Vuelos: ${solicitud.precio.vuelos}
                           </div>
                         </div>
                       </TableCell>

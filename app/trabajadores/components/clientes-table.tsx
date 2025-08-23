@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import DetalleCliente from '@/app/administradores/components/detalle-clientes'
 
 interface Cliente {
   id: string
@@ -230,6 +231,7 @@ export const ClientesTable = () => {
   }
 
   const [editingClienteId, setEditingClienteId] = useState<string | null>(null)
+  const [verDetalleCliente, setVerDetalleCliente] = useState<Cliente | null>(null)
 
   const handleSubmit = () => {
     if (!nuevoCliente.nombre || !nuevoCliente.apellido || !nuevoCliente.email || !nuevoCliente.telefono || !nuevoCliente.dni) {
@@ -316,6 +318,10 @@ export const ClientesTable = () => {
     })
     setEditingClienteId(cliente.id)
     setIsModalOpen(true)
+  }
+
+  const handleVerDetalleCliente = (cliente: Cliente) => {
+    setVerDetalleCliente(cliente)
   }
 
   return (
@@ -719,7 +725,13 @@ export const ClientesTable = () => {
                   
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Ver detalles">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0" 
+                        title="Ver detalles"
+                        onClick={() => handleVerDetalleCliente(cliente)}
+                      >
                         <Eye className="w-4 h-4" />
                       </Button>
                       <Button 
@@ -749,6 +761,67 @@ export const ClientesTable = () => {
         </CardContent>
       </Card>
 
+      {/* Modal de Detalle de Cliente */}
+      {verDetalleCliente && (
+        <DetalleCliente
+          cliente={{
+            id: verDetalleCliente.id,
+            nombre: `${verDetalleCliente.nombre} ${verDetalleCliente.apellido}`,
+            email: verDetalleCliente.email,
+            telefono: verDetalleCliente.telefono,
+            dni: verDetalleCliente.dni,
+            tipoCliente: verDetalleCliente.prioridad,
+            fechaRegistro: verDetalleCliente.fechaRegistro,
+            direccion: verDetalleCliente.direccion,
+            ciudad: verDetalleCliente.ciudad,
+            pais: verDetalleCliente.pais,
+            preferencias: ['hotel', 'vuelos', 'transporte'],
+            notas: verDetalleCliente.notas || ''
+          }}
+          cotizaciones={[
+            {
+              id: 'COT-001',
+              fecha: '2024-01-15',
+              destino: 'Cusco, Perú',
+              personas: 4,
+              presupuesto: 2500,
+              estado: 'aprobada',
+              precio: 2150,
+              servicios: ['hotel', 'vuelos', 'transporte'],
+              prioridad: 'alta',
+              notas: 'Familia con niños pequeños'
+            },
+            {
+              id: 'COT-002',
+              fecha: '2024-02-20',
+              destino: 'Arequipa, Perú',
+              personas: 2,
+              presupuesto: 1800,
+              estado: 'cotizacion',
+              precio: 1950,
+              servicios: ['hotel', 'vuelos'],
+              prioridad: 'media',
+              notas: 'Pareja en luna de miel'
+            }
+          ]}
+          compras={[
+            {
+              id: 'COMP-001',
+              fechaCompra: '2024-01-20',
+              fechaViaje: '2024-03-15',
+              destino: 'Cusco, Perú',
+              personas: 4,
+              precioTotal: 2150,
+              estado: 'completada',
+              servicios: ['hotel', 'vuelos', 'transporte'],
+              calificacion: 5,
+              comentarios: 'Excelente experiencia, todo perfecto',
+              factura: 'FAC-2024-001'
+            }
+          ]}
+          onClose={() => setVerDetalleCliente(null)}
+        />
+      )}
       
     </div>
   )
